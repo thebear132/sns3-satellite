@@ -97,7 +97,7 @@ SatRxPowerInputTraceContainer::AddNode(key_t key)
 
     if (beamId < 0 || (utId < 0 && gwId < 0))
     {
-        return NULL;
+        return nullptr;
     }
     else
     {
@@ -133,7 +133,7 @@ SatRxPowerInputTraceContainer::AddNode(key_t key)
     }
 
     NS_FATAL_ERROR("SatRxPowerInputTraceContainer::AddNode failed");
-    return NULL;
+    return nullptr;
 }
 
 Ptr<SatInputFileStreamTimeDoubleContainer>

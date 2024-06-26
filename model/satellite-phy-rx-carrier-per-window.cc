@@ -72,7 +72,7 @@ SatPhyRxCarrierPerWindow::BeginEndScheduling()
     NS_LOG_FUNCTION(this);
     if (!m_windowEndSchedulingInitialized)
     {
-        if (GetNodeInfo() == NULL)
+        if (GetNodeInfo() == nullptr)
         {
             NS_FATAL_ERROR("SatPhyRxWindow::BeginWindowEndScheduling - m_nodeInfo not set");
         }
@@ -648,7 +648,7 @@ SatPhyRxCarrierPerWindow::GetEffectiveSnir(
 
     Ptr<SatLinkResultsRtn> satLinkResults = GetLinkResults()->GetObject<SatLinkResultsFSim>();
     Ptr<SatMutualInformationTable> mutualInformationTable;
-    if (satLinkResults != NULL)
+    if (satLinkResults != nullptr)
     {
         mutualInformationTable =
             (GetLinkResults()->GetObject<SatLinkResultsFSim>())->GetMutualInformationTable();
@@ -720,7 +720,7 @@ SatPhyRxCarrierPerWindow::CleanOldPackets(const Time windowStartTime)
             NS_LOG_INFO("SatPhyRxCarrierPerWindow::CleanOldPackets - Remove packet "
                         << it->rxParams->m_txInfo.crdsaUniquePacketId << " from "
                         << it->sourceAddress);
-            it->rxParams = NULL;
+            it->rxParams = nullptr;
             m_essaPacketContainer.erase(it++);
         }
         else

@@ -143,8 +143,8 @@ SatPhyRxCarrierUplink::EndRxData(uint32_t key)
     GetInterferenceModel()->NotifyRxEnd(packetRxParams.interferenceEvent);
 
     /// erase the used Rx params
-    packetRxParams.rxParams = NULL;
-    packetRxParams.interferenceEvent = NULL;
+    packetRxParams.rxParams = nullptr;
+    packetRxParams.interferenceEvent = nullptr;
     RemoveStoredRxParams(key);
 }
 

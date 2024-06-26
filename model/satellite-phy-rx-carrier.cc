@@ -257,9 +257,9 @@ SatPhyRxCarrier::DoDispose()
     m_cnoCallback.Nullify();
     m_additionalInterferenceCallback.Nullify();
     m_avgNormalizedOfferedLoadCallback.Nullify();
-    m_satInterference = NULL;
-    m_satInterferenceElimination = NULL;
-    m_uniformVariable = NULL;
+    m_satInterference = nullptr;
+    m_satInterferenceElimination = nullptr;
+    m_uniformVariable = nullptr;
 
     Object::DoDispose();
 }

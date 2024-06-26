@@ -645,7 +645,7 @@ SatFrameAllocator::GenerateTimeSlots(SatFrameAllocator::TbtpMsgContainer_t& tbtp
 
         while (utSymbolsLeft > 0)
         {
-            Ptr<SatTimeSlotConf> timeSlot = NULL;
+            Ptr<SatTimeSlotConf> timeSlot = nullptr;
 
             // try to first create Control slot if present in request and is not already created
             // otherwise create TRC slot
@@ -981,7 +981,7 @@ SatFrameAllocator::CreateTimeSlot(uint16_t carrierId,
 {
     NS_LOG_FUNCTION(this << carrierId << cno << rcBasedAllocationEnabled);
 
-    Ptr<SatTimeSlotConf> timeSlotConf = NULL;
+    Ptr<SatTimeSlotConf> timeSlotConf = nullptr;
     int64_t symbolsToUse = std::min<int64_t>(carrierSymbolsToUse, utSymbolsToUse);
     uint32_t waveformId = 0;
     int64_t timeSlotSymbols = 0;
@@ -1073,7 +1073,7 @@ SatFrameAllocator::CreateCtrlTimeSlot(uint16_t carrierId,
 {
     NS_LOG_FUNCTION(this);
 
-    Ptr<SatTimeSlotConf> timeSlotConf = NULL;
+    Ptr<SatTimeSlotConf> timeSlotConf = nullptr;
     int64_t symbolsToUse = std::min<int64_t>(carrierSymbolsToUse, utSymbolsToUse);
 
     int64_t timeSlotSymbols = m_mostRobustWaveform->GetBurstLengthInSymbols();

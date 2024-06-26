@@ -125,7 +125,7 @@ SatPhyRxCarrierConf::DoDispose()
 {
     NS_LOG_FUNCTION(this);
 
-    m_linkResults = NULL;
+    m_linkResults = nullptr;
     m_carrierBandwidthConverter.Nullify();
     m_additionalInterferenceCallback.Nullify();
 

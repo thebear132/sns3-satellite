@@ -312,7 +312,7 @@ SatFrameConf::GetTimeSlotConf(uint16_t carrierId, uint16_t index) const
 {
     NS_LOG_FUNCTION(this);
 
-    Ptr<SatTimeSlotConf> foundTimeSlot = NULL;
+    Ptr<SatTimeSlotConf> foundTimeSlot = nullptr;
 
     SatTimeSlotConfMap_t::const_iterator foundCarrier = m_timeSlotConfMap.find(carrierId);
 
@@ -333,7 +333,7 @@ SatFrameConf::GetTimeSlotConf(uint16_t index) const
 {
     NS_LOG_FUNCTION(this);
 
-    Ptr<SatTimeSlotConf> foundTimeSlot = NULL;
+    Ptr<SatTimeSlotConf> foundTimeSlot = nullptr;
     uint32_t carrierId = index / m_timeSlotConfMap.begin()->second.size();
     uint16_t timeSlotIndex = index % m_timeSlotConfMap.begin()->second.size();
 
@@ -1216,8 +1216,8 @@ SatSuperframeConf::GetIndexAsFrameName(uint32_t index)
                       "The frame configuration type used for super frame.",                        \
                       TypeId::ATTR_CONSTRUCT,                                                      \
                       EnumValue(configType),                                                       \
-                      MakeEnumAccessor(&SatSuperframeConf::SetConfigType,                          \
-                                       &SatSuperframeConf::GetConfigType),                         \
+                      MakeEnumAccessor<SatSuperframeConf::ConfigType_t>(&SatSuperframeConf::SetConfigType,                          \
+                                                                        &SatSuperframeConf::GetConfigType),                         \
                       MakeEnumChecker(SatSuperframeConf::CONFIG_TYPE_0,                            \
                                       "ConfigType_0",                                              \
                                       SatSuperframeConf::CONFIG_TYPE_1,                            \

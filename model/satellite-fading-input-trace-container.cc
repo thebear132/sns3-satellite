@@ -131,7 +131,7 @@ SatFadingInputTraceContainer::AddNode(key_t key)
     }
 
     NS_FATAL_ERROR("SatFadingInputTraceContainer::AddNode failed");
-    return NULL;
+    return nullptr;
 }
 
 Ptr<SatInputFileStreamTimeDoubleContainer>

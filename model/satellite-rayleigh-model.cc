@@ -86,9 +86,9 @@ SatRayleighModel::Reset()
 {
     NS_LOG_FUNCTION(this);
 
-    m_rayleighConf = NULL;
+    m_rayleighConf = nullptr;
     m_oscillators.clear();
-    m_uniformVariable = NULL;
+    m_uniformVariable = nullptr;
 }
 
 void

@@ -1271,7 +1271,7 @@ SatHelper::SetUtMobility(NodeContainer uts, uint32_t satId, uint32_t beamId)
     {
         allocator = m_utPositionsByBeam[beamId];
     }
-    else if (m_utPositions != NULL)
+    else if (m_utPositions != nullptr)
     {
         allocator = m_utPositions;
     }
@@ -1418,8 +1418,8 @@ SatHelper::InstallMobilityObserver(uint32_t satId, NodeContainer nodes) const
             Ptr<SatMobilityModel> satMobility =
                 m_beamHelper->GetGeoSatNodes().Get(satId)->GetObject<SatMobilityModel>();
 
-            NS_ASSERT(ownMobility != NULL);
-            NS_ASSERT(satMobility != NULL);
+            NS_ASSERT(ownMobility != nullptr);
+            NS_ASSERT(satMobility != nullptr);
 
             observer = CreateObject<SatMobilityObserver>(
                 ownMobility,
@@ -1468,8 +1468,8 @@ SatHelper::SetMulticastGroupRoutes(Ptr<Node> source,
     {
         Ptr<Node> routerNode = m_userHelper->GetRouter();
 
-        Ptr<NetDevice> routerInputDev = NULL;
-        Ptr<NetDevice> gwOutputDev = NULL;
+        Ptr<NetDevice> routerInputDev = nullptr;
+        Ptr<NetDevice> gwOutputDev = nullptr;
 
         // set multicast routes to satellite network utilizing beam helper
         NetDeviceContainer gwInputDevices =
@@ -1573,10 +1573,10 @@ SatHelper::DoDispose()
 {
     NS_LOG_FUNCTION(this);
 
-    m_userHelper = NULL;
+    m_userHelper = nullptr;
     m_beamHelper->DoDispose();
-    m_beamHelper = NULL;
-    m_antennaGainPatterns = NULL;
+    m_beamHelper = nullptr;
+    m_antennaGainPatterns = nullptr;
     m_utPositionsByBeam.clear();
     m_mobileUtsByBeam.clear();
     m_mobileUtsUsersByBeam.clear();
@@ -1732,7 +1732,7 @@ SatHelper::FindMatchingDevices(Ptr<Node> nodeA,
 Ptr<NetDevice>
 SatHelper::FindMatchingDevice(Ptr<NetDevice> devA, Ptr<Node> nodeB)
 {
-    Ptr<NetDevice> matchingDevice = NULL;
+    Ptr<NetDevice> matchingDevice = nullptr;
 
     Ipv4Address addressA =
         devA->GetNode()->GetObject<Ipv4L3Protocol>()->GetAddress(devA->GetIfIndex(), 0).GetLocal();
@@ -1802,7 +1802,7 @@ SatHelper::ConstructMulticastInfo(Ptr<Node> sourceUtNode,
 
     bool routeToSourceNertwork = false;
 
-    routerUserOutputDev = NULL;
+    routerUserOutputDev = nullptr;
 
     // go through all receivers
     for (uint32_t i = 0; i < receivers.GetN(); i++)

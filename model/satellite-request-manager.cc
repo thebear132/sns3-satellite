@@ -142,12 +142,12 @@ SatRequestManager::GetTypeId(void)
             .AddAttribute("RbdcCapacityRequestAlgorithm",
                           "Algorithm to calculate RBDC capacity requests.",
                           EnumValue(SatEnums::CR_RBDC_LEGACY),
-                          MakeEnumAccessor(&SatRequestManager::m_rbdcCapacityRequestAlgorithm),
+                          MakeEnumAccessor<SatEnums::RbdcCapacityRequestAlgorithm_t>(&SatRequestManager::m_rbdcCapacityRequestAlgorithm),
                           MakeEnumChecker(SatEnums::CR_RBDC_LEGACY, "Legacy"))
             .AddAttribute("VbdcCapacityRequestAlgorithm",
                           "Algorithm to calculate VBDC capacity requests.",
                           EnumValue(SatEnums::CR_VBDC_LEGACY),
-                          MakeEnumAccessor(&SatRequestManager::m_vbdcCapacityRequestAlgorithm),
+                          MakeEnumAccessor<SatEnums::VbdcCapacityRequestAlgorithm_t>(&SatRequestManager::m_vbdcCapacityRequestAlgorithm),
                           MakeEnumChecker(SatEnums::CR_VBDC_LEGACY, "Legacy"))
             .AddTraceSource("CrTrace",
                             "Capacity request trace",
@@ -197,7 +197,7 @@ SatRequestManager::DoDispose()
     m_ctrlMsgTxPossibleCallback.Nullify();
     m_logonMsgTxPossibleCallback.Nullify();
 
-    m_llsConf = NULL;
+    m_llsConf = nullptr;
 
     Object::DoDispose();
 }

@@ -645,7 +645,7 @@ Ptr<Channel>
 SatGeoNetDevice::GetChannel(void) const
 {
     NS_LOG_FUNCTION(this);
-    return NULL;
+    return nullptr;
 }
 
 void

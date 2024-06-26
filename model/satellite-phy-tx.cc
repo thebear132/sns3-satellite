@@ -98,7 +98,7 @@ SatPhyTx::GetTypeId(void)
                             .AddAttribute("TxMode",
                                           "Tx mode of this Phy Tx.",
                                           EnumValue(SatPhyTx::NORMAL),
-                                          MakeEnumAccessor(&SatPhyTx::m_txMode),
+                                          MakeEnumAccessor<SatPhyTx::SatPhyTxMode_t>(&SatPhyTx::m_txMode),
                                           MakeEnumChecker(SatPhyTx::NORMAL,
                                                           "Normal Tx mode",
                                                           SatPhyTx::TRANSPARENT,
@@ -213,7 +213,7 @@ SatPhyTx::ClearChannel()
     NS_LOG_FUNCTION(this);
     NS_ASSERT(m_channel != nullptr);
 
-    m_channel = NULL;
+    m_channel = nullptr;
     ChangeState(RECONFIGURING);
 }
 

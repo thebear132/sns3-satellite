@@ -78,7 +78,7 @@ SatStatsFwdLinkSchedulerSymbolRateHelper::SymbolRateCallback(uint8_t sliceId, do
 {
     NS_LOG_FUNCTION(this << sliceId << " " << symbolRate);
 
-    Ptr<DataCollectionObject> collector = NULL;
+    Ptr<DataCollectionObject> collector = nullptr;
 
     switch (GetIdentifierType())
     {

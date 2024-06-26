@@ -183,7 +183,7 @@ SatPhyRxCarrierPerSlot::CreateInterference(Ptr<SatSignalParameters> rxParams, Ad
     }
 
     NS_FATAL_ERROR("SatSatellitePhyRxCarrier::CreateInterference - Invalid channel type!");
-    return NULL;
+    return nullptr;
 }
 
 void
@@ -215,7 +215,7 @@ SatPhyRxCarrierPerSlot::EndRxData(uint32_t key)
     GetInterferenceModel()->NotifyRxEnd(packetRxParams.interferenceEvent);
 
     /// erase the used Rx params
-    packetRxParams.interferenceEvent = NULL;
+    packetRxParams.interferenceEvent = nullptr;
     RemoveStoredRxParams(key);
 }
 
@@ -521,7 +521,7 @@ SatPhyRxCarrierPerSlot::ReceiveSlot(SatPhyRxCarrier::rxParams_s packetRxParams,
     /// send packet upwards
     m_rxCallback(packetRxParams.rxParams, phyError);
 
-    packetRxParams.rxParams = NULL;
+    packetRxParams.rxParams = nullptr;
 }
 
 void

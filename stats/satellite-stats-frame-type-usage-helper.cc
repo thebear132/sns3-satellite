@@ -212,10 +212,10 @@ SatStatsFrameTypeUsageHelper::DoInstall()
         for (uint32_t i = 0; i < (*node)->GetNDevices(); i++)
         {
             Ptr<SatNetDevice> dev = DynamicCast<SatNetDevice>((*node)->GetDevice(i));
-            if (dev == NULL)
+            if (dev == nullptr)
                 continue;
             Ptr<SatGwMac> mac = DynamicCast<SatGwMac>(dev->GetMac());
-            if (mac == NULL)
+            if (mac == nullptr)
                 continue;
 
             // Connect the trace source

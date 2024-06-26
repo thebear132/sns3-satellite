@@ -44,7 +44,7 @@ SatTracedMobilityModel::GetTypeId(void)
             .AddAttribute("ReferenceEllipsoid",
                           "Reference Ellipsoid model to use when reading coordinates",
                           EnumValue(GeoCoordinate::SPHERE),
-                          MakeEnumAccessor(&SatTracedMobilityModel::m_refEllipsoid),
+                          MakeEnumAccessor<GeoCoordinate::ReferenceEllipsoid_t>(&SatTracedMobilityModel::m_refEllipsoid),
                           MakeEnumChecker(GeoCoordinate::SPHERE,
                                           "Sphere",
                                           GeoCoordinate::WGS84,
@@ -69,7 +69,7 @@ SatTracedMobilityModel::GetInstanceTypeId(void) const
 void
 SatTracedMobilityModel::DoDispose()
 {
-    m_antennaGainPatterns = NULL;
+    m_antennaGainPatterns = nullptr;
 
     Object::DoDispose();
 }

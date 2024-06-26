@@ -171,7 +171,7 @@ SatPerPacketInterferenceTestCase::SatPerPacketInterferenceTestCase()
     for (int i = 0; i < 4; i++)
     {
         finalPower[i] = 0;
-        m_rxEvent[i] = NULL;
+        m_rxEvent[i] = nullptr;
     }
 }
 

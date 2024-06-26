@@ -260,7 +260,7 @@ SatBbFrameContainer::ClearAllFrames()
 Ptr<SatBbFrame>
 SatBbFrameContainer::GetNextFrame()
 {
-    Ptr<SatBbFrame> nextFrame = NULL;
+    Ptr<SatBbFrame> nextFrame = nullptr;
 
     if (m_ctrlContainer.empty() == false)
     {
@@ -300,7 +300,7 @@ SatBbFrameContainer::CreateFrameToTail(uint32_t priorityClass, SatEnums::SatModc
 
     Ptr<SatBbFrame> frame = Create<SatBbFrame>(modcod, m_defaultBbFrameType, m_bbFrameConf);
 
-    if (frame != NULL)
+    if (frame != nullptr)
     {
         if (priorityClass > 0)
         {
@@ -347,8 +347,7 @@ SatBbFrameContainer::MergeBbFrames(double carrierBandwidthInHz)
 
                 double maxNewOccupancyIfMerged =
                     0.0; // holder variable during a maximum value search
-                Ptr<SatBbFrame> frameToMerge =
-                    NULL; // holder variable for frame to potentially merge
+                Ptr<SatBbFrame> frameToMerge = nullptr; // holder variable for frame to potentially merge
 
                 // check rest of the containers to find frame to merge.
                 for (FrameContainer_t::reverse_iterator itToMerge =

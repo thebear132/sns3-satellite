@@ -288,7 +288,7 @@ SatUtLlc::SetNodeInfo(Ptr<SatNodeInfo> nodeInfo)
 void
 SatUtLlc::CreateEncap(Ptr<EncapKey> key)
 {
-    CreateEncap(key, NULL);
+    CreateEncap(key, nullptr);
 }
 
 void

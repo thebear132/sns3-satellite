@@ -43,9 +43,9 @@ SatLooModel::SatLooModel()
     : m_numOfStates(0),
       m_currentSet(0),
       m_currentState(0),
-      m_looConf(NULL),
-      m_normalRandomVariable(NULL),
-      m_uniformVariable(NULL)
+      m_looConf(nullptr),
+      m_normalRandomVariable(nullptr),
+      m_uniformVariable(nullptr)
 {
     NS_LOG_FUNCTION(this);
 
@@ -60,8 +60,8 @@ SatLooModel::SatLooModel(Ptr<SatLooConf> looConf,
       m_currentSet(initialSet),
       m_currentState(initialState),
       m_looConf(looConf),
-      m_normalRandomVariable(NULL),
-      m_uniformVariable(NULL)
+      m_normalRandomVariable(nullptr),
+      m_uniformVariable(nullptr)
 {
     NS_LOG_FUNCTION(this << numOfStates << " " << initialSet << " " << initialState);
 
@@ -96,9 +96,9 @@ SatLooModel::Reset()
 {
     NS_LOG_FUNCTION(this);
 
-    m_looConf = NULL;
-    m_normalRandomVariable = NULL;
-    m_uniformVariable = NULL;
+    m_looConf = nullptr;
+    m_normalRandomVariable = nullptr;
+    m_uniformVariable = nullptr;
 
     if (!m_directSignalOscillators.empty())
     {

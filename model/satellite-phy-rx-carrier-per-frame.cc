@@ -70,7 +70,7 @@ SatPhyRxCarrierPerFrame::BeginEndScheduling()
 
         Time schedulingDelay = nextSuperFrameRxTime - Now();
 
-        if (GetNodeInfo() == NULL)
+        if (GetNodeInfo() == nullptr)
         {
             NS_FATAL_ERROR("m_nodeInfo not set");
         }
@@ -120,7 +120,7 @@ SatPhyRxCarrierPerFrame::DoDispose()
         std::list<SatPhyRxCarrierPerFrame::crdsaPacketRxParams_s>::iterator iterList;
         for (iterList = iter->second.begin(); iterList != iter->second.end(); iterList++)
         {
-            iterList->rxParams = NULL;
+            iterList->rxParams = nullptr;
         }
         iter->second.clear();
     }
@@ -221,7 +221,7 @@ SatPhyRxCarrierPerFrame::DoFrameEnd()
             /// send packet upwards
             m_rxCallback(crdsaPacket.rxParams, crdsaPacket.phyError);
 
-            crdsaPacket.rxParams = NULL;
+            crdsaPacket.rxParams = nullptr;
         }
 
         results.clear();

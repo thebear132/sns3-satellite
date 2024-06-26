@@ -66,7 +66,7 @@ SatBaseEncapsulator::SatBaseEncapsulator(Mac48Address encapAddress,
 SatBaseEncapsulator::~SatBaseEncapsulator()
 {
     NS_LOG_FUNCTION(this);
-    m_txQueue = NULL;
+    m_txQueue = nullptr;
     m_rxCallback.Nullify();
 }
 

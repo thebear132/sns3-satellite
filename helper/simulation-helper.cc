@@ -74,8 +74,8 @@ NS_OBJECT_ENSURE_REGISTERED(SimulationHelperConf);
         .AddAttribute("Traffic" TOSTRING(index) "Protocol",                                        \
                       "Network protocol that this traffic model will use",                         \
                       EnumValue(a2),                                                               \
-                      MakeEnumAccessor(&SimulationHelperConf::SetTraffic##index##Protocol,         \
-                                       &SimulationHelperConf::GetTraffic##index##Protocol),        \
+                      MakeEnumAccessor<SimulationHelperConf::TransportLayerProtocol_t>(&SimulationHelperConf::SetTraffic##index##Protocol,         \
+                                                                                       &SimulationHelperConf::GetTraffic##index##Protocol),        \
                       MakeEnumChecker(SimulationHelperConf::PROTOCOL_UDP,                          \
                                       "UDP",                                                       \
                                       SimulationHelperConf::PROTOCOL_TCP,                          \
@@ -85,8 +85,8 @@ NS_OBJECT_ENSURE_REGISTERED(SimulationHelperConf);
         .AddAttribute("Traffic" TOSTRING(index) "Direction",                                       \
                       "Satellite link direction that this traffic model will use",                 \
                       EnumValue(a3),                                                               \
-                      MakeEnumAccessor(&SimulationHelperConf::SetTraffic##index##Direction,        \
-                                       &SimulationHelperConf::GetTraffic##index##Direction),       \
+                      MakeEnumAccessor<SimulationHelperConf::TrafficDirection_t>(&SimulationHelperConf::SetTraffic##index##Direction,        \
+                                                                                 &SimulationHelperConf::GetTraffic##index##Direction),       \
                       MakeEnumChecker(SimulationHelperConf::RTN_LINK,                              \
                                       "ReturnLink",                                                \
                                       SimulationHelperConf::FWD_LINK,                              \
@@ -237,8 +237,8 @@ SimulationHelper::GetInstanceTypeId(void) const
 }
 
 SimulationHelper::SimulationHelper()
-    : m_satHelper(NULL),
-      m_statContainer(NULL),
+    : m_satHelper(nullptr),
+      m_statContainer(nullptr),
       m_commonUtPositions(),
       m_utPositionsByBeam(),
       m_scenarioPath(""),
@@ -263,8 +263,8 @@ SimulationHelper::SimulationHelper()
 }
 
 SimulationHelper::SimulationHelper(std::string simulationName)
-    : m_satHelper(NULL),
-      m_statContainer(NULL),
+    : m_satHelper(nullptr),
+      m_statContainer(nullptr),
       m_commonUtPositions(),
       m_utPositionsByBeam(),
       m_simulationName(""),
@@ -316,7 +316,7 @@ SimulationHelper::DoDispose(void)
 {
     NS_LOG_FUNCTION(this);
 
-    m_commonUtPositions = NULL;
+    m_commonUtPositions = nullptr;
     m_utPositionsByBeam.clear();
 }
 
@@ -994,7 +994,7 @@ SimulationHelper::SetErrorModel(SatPhyRxCarrierConf::ErrorModel em, double error
     Config::SetDefault("ns3::SatUtHelper::FwdLinkErrorModel", EnumValue(em));
     Config::SetDefault("ns3::SatGwHelper::RtnLinkErrorModel", EnumValue(em));
 
-    if (errorRate == SatPhyRxCarrierConf::EM_CONSTANT)
+    if (em == SatPhyRxCarrierConf::EM_CONSTANT)
     {
         Config::SetDefault("ns3::SatGwHelper::RtnLinkConstantErrorRate", DoubleValue(errorRate));
         Config::SetDefault("ns3::SatUtHelper::FwdLinkConstantErrorRate", DoubleValue(errorRate));
@@ -1547,7 +1547,7 @@ SimulationHelper::HasSinkInstalled(Ptr<Node> node, uint16_t port)
     for (uint32_t i = 0; i < node->GetNApplications(); i++)
     {
         auto sink = DynamicCast<PacketSink>(node->GetApplication(i));
-        if (sink != NULL)
+        if (sink != nullptr)
         {
             AddressValue av;
             sink->GetAttribute("Local", av);

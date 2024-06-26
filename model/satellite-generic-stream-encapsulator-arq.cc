@@ -516,7 +516,7 @@ SatGenericStreamEncapsulatorArq::ReceivePdu(Ptr<Packet> p)
                     NS_LOG_INFO("Context NOT found for SeqNo: " << i);
 
                     Ptr<SatArqBufferContext> arqContext = CreateObject<SatArqBufferContext>();
-                    arqContext->m_pdu = NULL;
+                    arqContext->m_pdu = nullptr;
                     arqContext->m_rxStatus = false;
                     arqContext->m_seqNo = i;
                     arqContext->m_retransmissionCount = 0;

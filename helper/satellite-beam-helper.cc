@@ -86,7 +86,7 @@ SatBeamHelper::GetTypeId(void)
             .AddAttribute("FadingModel",
                           "Fading model",
                           EnumValue(SatEnums::FADING_OFF),
-                          MakeEnumAccessor(&SatBeamHelper::m_fadingModel),
+                          MakeEnumAccessor<SatEnums::FadingModel_t>(&SatBeamHelper::m_fadingModel),
                           MakeEnumChecker(SatEnums::FADING_OFF,
                                           "FadingOff",
                                           SatEnums::FADING_TRACE,
@@ -96,7 +96,7 @@ SatBeamHelper::GetTypeId(void)
             .AddAttribute("RandomAccessModel",
                           "Random Access Model",
                           EnumValue(SatEnums::RA_MODEL_OFF),
-                          MakeEnumAccessor(&SatBeamHelper::m_randomAccessModel),
+                          MakeEnumAccessor<SatEnums::RandomAccessModel_t>(&SatBeamHelper::m_randomAccessModel),
                           MakeEnumChecker(SatEnums::RA_MODEL_OFF,
                                           "RaOff",
                                           SatEnums::RA_MODEL_SLOTTED_ALOHA,
@@ -112,7 +112,7 @@ SatBeamHelper::GetTypeId(void)
             .AddAttribute("RaInterferenceModel",
                           "Interference model for random access",
                           EnumValue(SatPhyRxCarrierConf::IF_CONSTANT),
-                          MakeEnumAccessor(&SatBeamHelper::m_raInterferenceModel),
+                          MakeEnumAccessor<SatPhyRxCarrierConf::InterferenceModel>(&SatBeamHelper::m_raInterferenceModel),
                           MakeEnumChecker(SatPhyRxCarrierConf::IF_CONSTANT,
                                           "Constant",
                                           SatPhyRxCarrierConf::IF_TRACE,
@@ -124,7 +124,7 @@ SatBeamHelper::GetTypeId(void)
             .AddAttribute("RaInterferenceEliminationModel",
                           "Interference elimination model for random access",
                           EnumValue(SatPhyRxCarrierConf::SIC_PERFECT),
-                          MakeEnumAccessor(&SatBeamHelper::m_raInterferenceEliminationModel),
+                          MakeEnumAccessor<SatPhyRxCarrierConf::InterferenceEliminationModel>(&SatBeamHelper::m_raInterferenceEliminationModel),
                           MakeEnumChecker(SatPhyRxCarrierConf::SIC_PERFECT,
                                           "Perfect",
                                           SatPhyRxCarrierConf::SIC_RESIDUAL,
@@ -133,7 +133,7 @@ SatBeamHelper::GetTypeId(void)
                 "RaCollisionModel",
                 "Collision model for random access",
                 EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
-                MakeEnumAccessor(&SatBeamHelper::m_raCollisionModel),
+                MakeEnumAccessor<SatPhyRxCarrierConf::RandomAccessCollisionModel>(&SatBeamHelper::m_raCollisionModel),
                 MakeEnumChecker(SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED,
                                 "RaCollisionNotDefined",
                                 SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS,
@@ -150,7 +150,7 @@ SatBeamHelper::GetTypeId(void)
             .AddAttribute("PropagationDelayModel",
                           "Propagation delay model",
                           EnumValue(SatEnums::PD_CONSTANT_SPEED),
-                          MakeEnumAccessor(&SatBeamHelper::m_propagationDelayModel),
+                          MakeEnumAccessor<SatEnums::PropagationDelayModel_t>(&SatBeamHelper::m_propagationDelayModel),
                           MakeEnumChecker(SatEnums::PD_CONSTANT_SPEED,
                                           "ConstantSpeed",
                                           SatEnums::PD_CONSTANT,
@@ -189,12 +189,12 @@ SatBeamHelper::GetTypeId(void)
             .AddAttribute("DvbVersion",
                           "Indicates if using DVB-S2 or DVB-S2X",
                           EnumValue(SatEnums::DVB_S2),
-                          MakeEnumAccessor(&SatBeamHelper::m_dvbVersion),
+                          MakeEnumAccessor<SatEnums::DvbVersion_t>(&SatBeamHelper::m_dvbVersion),
                           MakeEnumChecker(SatEnums::DVB_S2, "DVB_S2", SatEnums::DVB_S2X, "DVB_S2X"))
             .AddAttribute("ReturnLinkLinkResults",
                           "Protocol used for the return link link results.",
                           EnumValue(SatEnums::LR_RCS2),
-                          MakeEnumAccessor(&SatBeamHelper::m_rlLinkResultsType),
+                          MakeEnumAccessor<SatEnums::LinkResults_t>(&SatBeamHelper::m_rlLinkResultsType),
                           MakeEnumChecker(SatEnums::LR_RCS2,
                                           "RCS2",
                                           SatEnums::LR_FSIM,
@@ -481,7 +481,7 @@ SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
     case SatEnums::FADING_OFF:
     case SatEnums::FADING_TRACE:
     default: {
-        m_markovConf = NULL;
+        m_markovConf = nullptr;
         break;
     }
     }
@@ -499,15 +499,15 @@ SatBeamHelper::DoDispose()
 
     m_beam.clear();
     m_gwNode.clear();
-    m_ulChannels = NULL;
-    m_flChannels = NULL;
+    m_ulChannels = nullptr;
+    m_flChannels = nullptr;
     m_beamFreqs.clear();
-    m_markovConf = NULL;
-    m_ncc = NULL;
-    m_geoHelper = NULL;
-    m_gwHelper = NULL;
-    m_utHelper = NULL;
-    m_antennaGainPatterns = NULL;
+    m_markovConf = nullptr;
+    m_ncc = nullptr;
+    m_geoHelper = nullptr;
+    m_gwHelper = nullptr;
+    m_utHelper = nullptr;
+    m_antennaGainPatterns = nullptr;
 }
 
 void
@@ -587,7 +587,7 @@ SatBeamHelper::Install(NodeContainer ut,
 
     Ptr<Node> geoNode = m_geoNodes.Get(satId);
 
-    NS_ASSERT(geoNode != NULL);
+    NS_ASSERT(geoNode != nullptr);
 
     // Get the position of the GW serving this beam, get the best beam based on antenna patterns
     // for this position, and set the antenna patterns to the feeder PHY objects via
@@ -616,7 +616,7 @@ SatBeamHelper::Install(NodeContainer ut,
                                 m_returnLinkRegenerationMode);
 
     Ptr<SatMobilityModel> gwMobility = gwNode->GetObject<SatMobilityModel>();
-    NS_ASSERT(gwMobility != NULL);
+    NS_ASSERT(gwMobility != nullptr);
 
     // enable timing advance in observers of the UTs
     for (NodeContainer::Iterator i = ut.Begin(); i != ut.End(); i++)
@@ -624,7 +624,7 @@ SatBeamHelper::Install(NodeContainer ut,
         // enable timing advance observing in nodes.
 
         Ptr<SatMobilityObserver> observer = (*i)->GetObject<SatMobilityObserver>();
-        NS_ASSERT(observer != NULL);
+        NS_ASSERT(observer != nullptr);
         observer->ObserveTimingAdvance(userLink.second->GetPropagationDelayModel(),
                                        feederLink.second->GetPropagationDelayModel(),
                                        gwMobility);
@@ -951,7 +951,7 @@ SatBeamHelper::GetGwNode(uint32_t gwId) const
     NS_LOG_FUNCTION(this << gwId);
 
     std::map<uint32_t, Ptr<Node>>::const_iterator gwIterator = m_gwNode.find(gwId);
-    Ptr<Node> node = NULL;
+    Ptr<Node> node = nullptr;
 
     if (gwIterator != m_gwNode.end())
     {
@@ -1114,10 +1114,10 @@ SatBeamHelper::AddMulticastGroupRoutes(MulticastBeamInfo_t beamInfo,
     Ipv4StaticRoutingHelper multicast;
     NetDeviceContainer gwInputDevices;
     NetDeviceContainer routerGwOutputDevices;
-    Ptr<NetDevice> routerDev = NULL;
+    Ptr<NetDevice> routerDev = nullptr;
 
     uint32_t sourceBeamId = GetUtBeamId(sourceUtNode);
-    gwOutputDev = NULL;
+    gwOutputDev = nullptr;
 
     // Check the address sanity
     if (groupAddress.IsMulticast())
@@ -1138,7 +1138,7 @@ SatBeamHelper::AddMulticastGroupRoutes(MulticastBeamInfo_t beamInfo,
     {
         bool routerGw = false;
         NetDeviceContainer gwOutputDevices;
-        Ptr<NetDevice> gwInputDev = NULL;
+        Ptr<NetDevice> gwInputDev = nullptr;
 
         // go through devices in GW node
         for (uint32_t i = 1; i < (*it)->GetNDevices(); i++)
@@ -1225,7 +1225,7 @@ SatBeamHelper::AddMulticastGroupRoutes(MulticastBeamInfo_t beamInfo,
     }
     else
     {
-        gwOutputDev = NULL;
+        gwOutputDev = nullptr;
     }
 
     // route traffic from source beam satellite net device to satellite net devices forwarding
@@ -1603,7 +1603,7 @@ SatBeamHelper::StoreGwNode(uint32_t id, Ptr<Node> node)
 
     Ptr<Node> storedNode = GetGwNode(id);
 
-    if (storedNode != NULL) // nGW node with id already stored
+    if (storedNode != nullptr) // nGW node with id already stored
     {
         if (storedNode == node) // check that node is same
         {
@@ -1633,7 +1633,7 @@ SatBeamHelper::InstallFadingContainer(Ptr<Node> node) const
         {
         case SatEnums::FADING_MARKOV: {
             Ptr<SatMobilityObserver> observer = node->GetObject<SatMobilityObserver>();
-            NS_ASSERT(observer != NULL);
+            NS_ASSERT(observer != nullptr);
 
             SatBaseFading::ElevationCallback elevationCb =
                 MakeCallback(&SatMobilityObserver::GetElevationAngle, observer);
@@ -1674,8 +1674,8 @@ SatBeamHelper::AddMulticastRouteToUt(Ptr<Node> utNode,
 {
     NS_LOG_FUNCTION(this);
 
-    Ptr<NetDevice> satDev = NULL;
-    Ptr<NetDevice> publicDev = NULL;
+    Ptr<NetDevice> satDev = nullptr;
+    Ptr<NetDevice> publicDev = nullptr;
 
     for (uint32_t i = 1; i < utNode->GetNDevices(); i++)
     {
@@ -1719,7 +1719,7 @@ SatBeamHelper::GetPropagationDelayModel(uint32_t satId,
                                         uint32_t beamId,
                                         SatEnums::ChannelType_t channelType)
 {
-    Ptr<SatChannel> channel = NULL;
+    Ptr<SatChannel> channel = nullptr;
     switch (channelType)
     {
     case SatEnums::FORWARD_FEEDER_CH: {
@@ -1739,7 +1739,7 @@ SatBeamHelper::GetPropagationDelayModel(uint32_t satId,
         break;
     }
     default: {
-        return NULL;
+        return nullptr;
     }
     }
 

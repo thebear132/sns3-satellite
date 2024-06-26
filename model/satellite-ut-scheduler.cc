@@ -108,8 +108,8 @@ SatUtScheduler::DoDispose()
 
     m_schedContextCallback.Nullify();
     m_txOpportunityCallback.Nullify();
-    m_llsConf = NULL;
-    m_nodeInfo = NULL;
+    m_llsConf = nullptr;
+    m_nodeInfo = nullptr;
 
     Object::DoDispose();
 }

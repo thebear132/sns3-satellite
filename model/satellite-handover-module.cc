@@ -51,7 +51,7 @@ SatHandoverModule::GetTypeId(void)
             .AddAttribute("HandoverDecisionAlgorithm",
                           "Algorithm to use for handovers",
                           EnumValue(SatHandoverModule::SAT_N_CLOSEST_SAT),
-                          MakeEnumAccessor(&SatHandoverModule::m_handoverDecisionAlgorithm),
+                          MakeEnumAccessor<SatHandoverModule::HandoverDecisionAlgorithm_t>(&SatHandoverModule::m_handoverDecisionAlgorithm),
                           MakeEnumChecker(SatHandoverModule::SAT_N_CLOSEST_SAT, "NClosestSats"))
             .AddAttribute("NumberClosestSats",
                           "Number of satellites to consider when using algorithm SAT_N_CLOSEST_SAT",
@@ -79,13 +79,13 @@ SatHandoverModule::DoDispose()
     NS_LOG_FUNCTION(this);
 
     m_handoverCallback.Nullify();
-    m_antennaGainPatterns = NULL;
+    m_antennaGainPatterns = nullptr;
 
     Object::DoDispose();
 }
 
 SatHandoverModule::SatHandoverModule()
-    : m_antennaGainPatterns(NULL),
+    : m_antennaGainPatterns(nullptr),
       m_lastMessageSentAt(0),
       m_repeatRequestTimeout(600),
       m_hasPendingRequest(false),

@@ -181,7 +181,7 @@ SatRtnArqTestCase::~SatRtnArqTestCase()
     if (m_rle)
     {
         m_rle->DoDispose();
-        m_rle = NULL;
+        m_rle = nullptr;
     }
 }
 
@@ -482,7 +482,7 @@ SatFwdArqTestCase::~SatFwdArqTestCase()
     if (m_gse)
     {
         m_gse->DoDispose();
-        m_gse = NULL;
+        m_gse = nullptr;
     }
 }
 

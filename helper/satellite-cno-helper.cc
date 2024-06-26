@@ -51,7 +51,7 @@ SatCnoHelper::GetInstanceTypeId(void) const
 }
 
 SatCnoHelper::SatCnoHelper()
-    : m_satHelper(NULL),
+    : m_satHelper(nullptr),
       m_useTraces(false)
 {
     Config::Set("/ChannelList/*/$ns3::SatChannel/RxPowerCalculationMode",

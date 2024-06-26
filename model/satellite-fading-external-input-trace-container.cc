@@ -47,7 +47,7 @@ SatFadingExternalInputTraceContainer::GetTypeId(void)
             .AddAttribute("UtInputMode",
                           "Input mode to read trace source files from given index table.",
                           EnumValue(SatFadingExternalInputTraceContainer::LIST_MODE),
-                          MakeEnumAccessor(&SatFadingExternalInputTraceContainer::m_utInputMode),
+                          MakeEnumAccessor<SatFadingExternalInputTraceContainer::InputMode_t>(&SatFadingExternalInputTraceContainer::m_utInputMode),
                           MakeEnumChecker(SatFadingExternalInputTraceContainer::LIST_MODE,
                                           "ListMode",
                                           SatFadingExternalInputTraceContainer::POSITION_MODE,
@@ -275,7 +275,7 @@ SatFadingExternalInputTraceContainer::TestFadingTraces(uint32_t numOfUts, uint32
         if (iter == m_utFadingMap.end())
         {
             ueCount++;
-            CreateUtFadingTrace(ueCount, NULL);
+            CreateUtFadingTrace(ueCount, nullptr);
         }
     }
 
@@ -286,7 +286,7 @@ SatFadingExternalInputTraceContainer::TestFadingTraces(uint32_t numOfUts, uint32
         if (iter == m_gwFadingMap.end())
         {
             gwCount++;
-            CreateGwFadingTrace(gwCount, NULL);
+            CreateGwFadingTrace(gwCount, nullptr);
         }
     }
 
