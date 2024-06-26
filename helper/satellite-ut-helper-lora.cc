@@ -21,6 +21,8 @@
 
 #include "satellite-ut-helper-lora.h"
 
+#include "satellite-lora-conf.h"
+
 #include <ns3/callback.h>
 #include <ns3/log.h>
 #include <ns3/lorawan-mac-end-device-class-a.h>
@@ -30,7 +32,6 @@
 #include <ns3/satellite-const-variables.h>
 #include <ns3/satellite-enums.h>
 #include <ns3/satellite-id-mapper.h>
-#include <ns3/satellite-lora-conf.h>
 #include <ns3/satellite-lorawan-net-device.h>
 #include <ns3/satellite-net-device.h>
 #include <ns3/satellite-node-info.h>

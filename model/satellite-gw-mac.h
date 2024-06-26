@@ -21,11 +21,12 @@
 #ifndef SAT_GW_MAC_H
 #define SAT_GW_MAC_H
 
+#include "satellite-mac.h"
+#include "satellite-phy.h"
+
 #include <ns3/callback.h>
 #include <ns3/nstime.h>
 #include <ns3/ptr.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-phy.h>
 #include <ns3/traced-callback.h>
 
 namespace ns3

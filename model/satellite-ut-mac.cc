@@ -28,6 +28,7 @@
 #include "satellite-crdsa-replica-tag.h"
 #include "satellite-encap-pdu-status-tag.h"
 #include "satellite-frame-conf.h"
+#include "satellite-id-mapper.h"
 #include "satellite-log.h"
 #include "satellite-node-info.h"
 #include "satellite-rtn-link-time.h"
@@ -42,7 +43,6 @@
 #include <ns3/packet.h>
 #include <ns3/pointer.h>
 #include <ns3/random-variable-stream.h>
-#include <ns3/satellite-id-mapper.h>
 #include <ns3/simulator.h>
 #include <ns3/singleton.h>
 

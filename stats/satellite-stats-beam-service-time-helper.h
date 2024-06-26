@@ -22,10 +22,11 @@
 #ifndef SATELLITE_STATS_BEAM_SERVICE_TIME_HELPER_H
 #define SATELLITE_STATS_BEAM_SERVICE_TIME_HELPER_H
 
+#include "satellite-stats-helper.h"
+
 #include <ns3/collector-map.h>
 #include <ns3/ptr.h>
 #include <ns3/satellite-enums.h>
-#include <ns3/satellite-stats-helper.h>
 
 #include <map>
 

@@ -21,6 +21,8 @@
 
 #include "satellite-stats-composite-sinr-helper.h"
 
+#include "satellite-sinr-probe.h"
+
 #include <ns3/boolean.h>
 #include <ns3/callback.h>
 #include <ns3/data-collection-object.h>
@@ -39,7 +41,6 @@
 #include <ns3/satellite-phy-rx-carrier.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy.h>
-#include <ns3/satellite-sinr-probe.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>

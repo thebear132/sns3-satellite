@@ -23,14 +23,15 @@
 #ifndef SIMULATION_HELPER_H
 #define SIMULATION_HELPER_H
 
+#include "satellite-cno-helper.h"
+#include "satellite-group-helper.h"
+#include "satellite-helper.h"
+#include "satellite-traffic-helper.h"
+
 #include <ns3/command-line.h>
 #include <ns3/random-variable-stream.h>
-#include <ns3/satellite-cno-helper.h>
 #include <ns3/satellite-enums.h>
-#include <ns3/satellite-group-helper.h>
-#include <ns3/satellite-helper.h>
 #include <ns3/satellite-stats-helper-container.h>
-#include <ns3/satellite-traffic-helper.h>
 
 #include <set>
 

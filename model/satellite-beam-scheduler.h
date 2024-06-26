@@ -26,14 +26,14 @@
 #include "satellite-cno-estimator.h"
 #include "satellite-enums.h"
 #include "satellite-frame-allocator.h"
+#include "satellite-geo-net-device.h"
+#include "satellite-gw-mac.h"
+#include "satellite-net-device.h"
 
 #include <ns3/callback.h>
 #include <ns3/nstime.h>
 #include <ns3/object.h>
 #include <ns3/ptr.h>
-#include <ns3/satellite-geo-net-device.h>
-#include <ns3/satellite-gw-mac.h>
-#include <ns3/satellite-net-device.h>
 #include <ns3/simple-ref-count.h>
 #include <ns3/traced-callback.h>
 

@@ -114,7 +114,8 @@ SatChannel::GetTypeId(void)
             .AddAttribute("RxPowerCalculationMode",
                           "Rx Power calculation mode",
                           EnumValue(SatEnums::RX_PWR_CALCULATION),
-                          MakeEnumAccessor<SatEnums::RxPowerCalculationMode_t>(&SatChannel::m_rxPowerCalculationMode),
+                          MakeEnumAccessor<SatEnums::RxPowerCalculationMode_t>(
+                              &SatChannel::m_rxPowerCalculationMode),
                           MakeEnumChecker(SatEnums::RX_PWR_CALCULATION,
                                           "RxPowerCalculation",
                                           SatEnums::RX_PWR_INPUT_TRACE,

@@ -23,9 +23,10 @@
 #ifndef SATELLITE_STATS_HELPER_CONTAINER_H
 #define SATELLITE_STATS_HELPER_CONTAINER_H
 
+#include "satellite-stats-helper.h"
+
 #include <ns3/object.h>
 #include <ns3/ptr.h>
-#include <ns3/satellite-stats-helper.h>
 
 #include <list>
 #include <set>

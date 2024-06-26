@@ -24,6 +24,8 @@
 
 #include "simulation-helper.h"
 
+#include "satellite-on-off-helper.h"
+
 #include <ns3/address.h>
 #include <ns3/cbr-helper.h>
 #include <ns3/config-store.h>
@@ -37,7 +39,6 @@
 #include <ns3/pointer.h>
 #include <ns3/random-variable-stream.h>
 #include <ns3/satellite-env-variables.h>
-#include <ns3/satellite-on-off-helper.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
 #include <ns3/three-gpp-http-satellite-helper.h>
@@ -74,8 +75,9 @@ NS_OBJECT_ENSURE_REGISTERED(SimulationHelperConf);
         .AddAttribute("Traffic" TOSTRING(index) "Protocol",                                        \
                       "Network protocol that this traffic model will use",                         \
                       EnumValue(a2),                                                               \
-                      MakeEnumAccessor<SimulationHelperConf::TransportLayerProtocol_t>(&SimulationHelperConf::SetTraffic##index##Protocol,         \
-                                                                                       &SimulationHelperConf::GetTraffic##index##Protocol),        \
+                      MakeEnumAccessor<SimulationHelperConf::TransportLayerProtocol_t>(            \
+                          &SimulationHelperConf::SetTraffic##index##Protocol,                      \
+                          &SimulationHelperConf::GetTraffic##index##Protocol),                     \
                       MakeEnumChecker(SimulationHelperConf::PROTOCOL_UDP,                          \
                                       "UDP",                                                       \
                                       SimulationHelperConf::PROTOCOL_TCP,                          \
@@ -85,8 +87,9 @@ NS_OBJECT_ENSURE_REGISTERED(SimulationHelperConf);
         .AddAttribute("Traffic" TOSTRING(index) "Direction",                                       \
                       "Satellite link direction that this traffic model will use",                 \
                       EnumValue(a3),                                                               \
-                      MakeEnumAccessor<SimulationHelperConf::TrafficDirection_t>(&SimulationHelperConf::SetTraffic##index##Direction,        \
-                                                                                 &SimulationHelperConf::GetTraffic##index##Direction),       \
+                      MakeEnumAccessor<SimulationHelperConf::TrafficDirection_t>(                  \
+                          &SimulationHelperConf::SetTraffic##index##Direction,                     \
+                          &SimulationHelperConf::GetTraffic##index##Direction),                    \
                       MakeEnumChecker(SimulationHelperConf::RTN_LINK,                              \
                                       "ReturnLink",                                                \
                                       SimulationHelperConf::FWD_LINK,                              \

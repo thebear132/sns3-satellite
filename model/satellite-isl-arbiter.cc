@@ -21,9 +21,10 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/satellite-isl-arbiter.h"
+#include "satellite-isl-arbiter.h"
 
-#include <ns3/satellite-id-mapper.h>
+#include "satellite-id-mapper.h"
+
 #include <ns3/singleton.h>
 
 NS_LOG_COMPONENT_DEFINE("SatIslArbiter");

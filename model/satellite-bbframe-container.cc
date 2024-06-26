@@ -347,7 +347,8 @@ SatBbFrameContainer::MergeBbFrames(double carrierBandwidthInHz)
 
                 double maxNewOccupancyIfMerged =
                     0.0; // holder variable during a maximum value search
-                Ptr<SatBbFrame> frameToMerge = nullptr; // holder variable for frame to potentially merge
+                Ptr<SatBbFrame> frameToMerge =
+                    nullptr; // holder variable for frame to potentially merge
 
                 // check rest of the containers to find frame to merge.
                 for (FrameContainer_t::reverse_iterator itToMerge =

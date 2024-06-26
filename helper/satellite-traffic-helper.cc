@@ -21,13 +21,14 @@
 
 #include "satellite-traffic-helper.h"
 
+#include "satellite-on-off-helper.h"
+#include "simulation-helper.h"
+
 #include <ns3/cbr-helper.h>
 #include <ns3/log.h>
 #include <ns3/nrtv-helper.h>
 #include <ns3/packet-sink-helper.h>
 #include <ns3/packet-sink.h>
-#include <ns3/satellite-on-off-helper.h>
-#include <ns3/simulation-helper.h>
 #include <ns3/three-gpp-http-satellite-helper.h>
 #include <ns3/type-id.h>
 

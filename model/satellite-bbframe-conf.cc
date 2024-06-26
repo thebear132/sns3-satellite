@@ -417,16 +417,17 @@ SatBbFrameConf::GetTypeId(void)
                           DoubleValue(0.5),
                           MakeDoubleAccessor(&SatBbFrameConf::m_bbFrameLowOccupancyThreshold),
                           MakeDoubleChecker<double>(0.0, 1.0))
-            .AddAttribute("BBFrameUsageMode",
-                          "Mode for selecting used BB Frames.",
-                          EnumValue(SatEnums::NORMAL_FRAMES),
-                          MakeEnumAccessor<SatEnums::BbFrameUsageMode_t>(&SatBbFrameConf::m_bbFrameUsageMode),
-                          MakeEnumChecker(SatEnums::SHORT_FRAMES,
-                                          "ShortFrames",
-                                          SatEnums::NORMAL_FRAMES,
-                                          "NormalFrames",
-                                          SatEnums::SHORT_AND_NORMAL_FRAMES,
-                                          "ShortAndNormalFrames"))
+            .AddAttribute(
+                "BBFrameUsageMode",
+                "Mode for selecting used BB Frames.",
+                EnumValue(SatEnums::NORMAL_FRAMES),
+                MakeEnumAccessor<SatEnums::BbFrameUsageMode_t>(&SatBbFrameConf::m_bbFrameUsageMode),
+                MakeEnumChecker(SatEnums::SHORT_FRAMES,
+                                "ShortFrames",
+                                SatEnums::NORMAL_FRAMES,
+                                "NormalFrames",
+                                SatEnums::SHORT_AND_NORMAL_FRAMES,
+                                "ShortAndNormalFrames"))
             .AddAttribute("BBFramePilotsS2X",
                           "Use Pilots in DVB-S2X BB Frames.",
                           BooleanValue(true),

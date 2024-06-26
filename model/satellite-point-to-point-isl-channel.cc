@@ -21,10 +21,11 @@
  *
  */
 
-#include "ns3/satellite-point-to-point-isl-channel.h"
+#include "satellite-point-to-point-isl-channel.h"
+
+#include "satellite-const-variables.h"
 
 #include "ns3/core-module.h"
-#include "ns3/satellite-const-variables.h"
 
 NS_LOG_COMPONENT_DEFINE("PointToPointIslChannel");
 

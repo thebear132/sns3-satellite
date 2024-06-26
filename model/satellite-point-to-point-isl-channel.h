@@ -24,11 +24,12 @@
 #ifndef SATELLITE_POINT_TO_POINT_ISL_CHANNEL_H
 #define SATELLITE_POINT_TO_POINT_ISL_CHANNEL_H
 
+#include "satellite-point-to-point-isl-net-device.h"
+
 #include "ns3/channel.h"
 #include "ns3/data-rate.h"
 #include "ns3/mobility-model.h"
 #include "ns3/node.h"
-#include "ns3/satellite-point-to-point-isl-net-device.h"
 
 namespace ns3
 {

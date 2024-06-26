@@ -20,7 +20,7 @@
  * Author: Mathias Ettinger <mettinger@viveris.toulouse.fr>
  */
 
-#include "ns3/satellite-gw-helper.h"
+#include "satellite-gw-helper.h"
 
 #include <ns3/boolean.h>
 #include <ns3/config.h>
@@ -53,7 +53,8 @@ SatGwHelper::GetTypeId(void)
             .AddAttribute("DaRtnLinkInterferenceModel",
                           "Return link interference model for dedicated access",
                           EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET),
-                          MakeEnumAccessor<SatPhyRxCarrierConf::InterferenceModel>(&SatGwHelper::m_daInterferenceModel),
+                          MakeEnumAccessor<SatPhyRxCarrierConf::InterferenceModel>(
+                              &SatGwHelper::m_daInterferenceModel),
                           MakeEnumChecker(SatPhyRxCarrierConf::IF_CONSTANT,
                                           "Constant",
                                           SatPhyRxCarrierConf::IF_TRACE,
@@ -62,20 +63,22 @@ SatGwHelper::GetTypeId(void)
                                           "PerPacket",
                                           SatPhyRxCarrierConf::IF_PER_FRAGMENT,
                                           "PerFragment"))
-            .AddAttribute("RtnLinkErrorModel",
-                          "Return link error model for",
-                          EnumValue(SatPhyRxCarrierConf::EM_AVI),
-                          MakeEnumAccessor<SatPhyRxCarrierConf::ErrorModel>(&SatGwHelper::m_errorModel),
-                          MakeEnumChecker(SatPhyRxCarrierConf::EM_NONE,
-                                          "None",
-                                          SatPhyRxCarrierConf::EM_CONSTANT,
-                                          "Constant",
-                                          SatPhyRxCarrierConf::EM_AVI,
-                                          "AVI"))
+            .AddAttribute(
+                "RtnLinkErrorModel",
+                "Return link error model for",
+                EnumValue(SatPhyRxCarrierConf::EM_AVI),
+                MakeEnumAccessor<SatPhyRxCarrierConf::ErrorModel>(&SatGwHelper::m_errorModel),
+                MakeEnumChecker(SatPhyRxCarrierConf::EM_NONE,
+                                "None",
+                                SatPhyRxCarrierConf::EM_CONSTANT,
+                                "Constant",
+                                SatPhyRxCarrierConf::EM_AVI,
+                                "AVI"))
             .AddAttribute("FwdSchedulingAlgorithm",
                           "The scheduling algorithm used to fill the BBFrames",
                           EnumValue(SatEnums::NO_TIME_SLICING),
-                          MakeEnumAccessor<SatEnums::FwdSchedulingAlgorithm_t>(&SatGwHelper::m_fwdSchedulingAlgorithm),
+                          MakeEnumAccessor<SatEnums::FwdSchedulingAlgorithm_t>(
+                              &SatGwHelper::m_fwdSchedulingAlgorithm),
                           MakeEnumChecker(SatEnums::NO_TIME_SLICING,
                                           "NoTimeSlicing",
                                           SatEnums::TIME_SLICING,

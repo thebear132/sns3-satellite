@@ -52,7 +52,8 @@ SatUtHelper::GetTypeId(void)
             .AddAttribute("DaFwdLinkInterferenceModel",
                           "Forward link interference model for dedicated access",
                           EnumValue(SatPhyRxCarrierConf::IF_CONSTANT),
-                          MakeEnumAccessor<SatPhyRxCarrierConf::InterferenceModel>(&SatUtHelper::m_daInterferenceModel),
+                          MakeEnumAccessor<SatPhyRxCarrierConf::InterferenceModel>(
+                              &SatUtHelper::m_daInterferenceModel),
                           MakeEnumChecker(SatPhyRxCarrierConf::IF_CONSTANT,
                                           "Constant",
                                           SatPhyRxCarrierConf::IF_TRACE,
@@ -61,16 +62,17 @@ SatUtHelper::GetTypeId(void)
                                           "PerPacket",
                                           SatPhyRxCarrierConf::IF_PER_FRAGMENT,
                                           "PerFragment"))
-            .AddAttribute("FwdLinkErrorModel",
-                          "Forward link error model",
-                          EnumValue(SatPhyRxCarrierConf::EM_AVI),
-                          MakeEnumAccessor<SatPhyRxCarrierConf::ErrorModel>(&SatUtHelper::m_errorModel),
-                          MakeEnumChecker(SatPhyRxCarrierConf::EM_NONE,
-                                          "None",
-                                          SatPhyRxCarrierConf::EM_CONSTANT,
-                                          "Constant",
-                                          SatPhyRxCarrierConf::EM_AVI,
-                                          "AVI"))
+            .AddAttribute(
+                "FwdLinkErrorModel",
+                "Forward link error model",
+                EnumValue(SatPhyRxCarrierConf::EM_AVI),
+                MakeEnumAccessor<SatPhyRxCarrierConf::ErrorModel>(&SatUtHelper::m_errorModel),
+                MakeEnumChecker(SatPhyRxCarrierConf::EM_NONE,
+                                "None",
+                                SatPhyRxCarrierConf::EM_CONSTANT,
+                                "Constant",
+                                SatPhyRxCarrierConf::EM_AVI,
+                                "AVI"))
             .AddAttribute("FwdLinkConstantErrorRate",
                           "Constant error rate",
                           DoubleValue(0.01),

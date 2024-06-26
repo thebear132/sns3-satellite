@@ -25,10 +25,10 @@
 #ifndef LORAWAN_MAC_END_DEVICE_CLASS_A_H
 #define LORAWAN_MAC_END_DEVICE_CLASS_A_H
 
-#include <ns3/lora-device-address.h>
-#include <ns3/lora-frame-header.h>      // RxParamSetupReq
-#include <ns3/lorawan-mac-end-device.h> // LorawanMacEndDevice
-#include <ns3/lorawan-mac.h>            // Packet
+#include "lora-device-address.h"
+#include "lora-frame-header.h"      // RxParamSetupReq
+#include "lorawan-mac-end-device.h" // LorawanMacEndDevice
+#include "lorawan-mac.h"            // Packet
 
 namespace ns3
 {

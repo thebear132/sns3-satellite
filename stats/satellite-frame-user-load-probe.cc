@@ -26,7 +26,7 @@
  * - Budiarto Herman (budiarto.herman@magister.fi)
  */
 
-#include "ns3/satellite-frame-user-load-probe.h"
+#include "satellite-frame-user-load-probe.h"
 
 #include "ns3/callback.h"
 #include "ns3/config.h"

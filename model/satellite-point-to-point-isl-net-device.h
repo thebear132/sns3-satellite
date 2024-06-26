@@ -25,6 +25,8 @@
 #ifndef SATELLITE_POINT_TO_POINT_ISL_NET_DEVICE_H
 #define SATELLITE_POINT_TO_POINT_ISL_NET_DEVICE_H
 
+#include "satellite-geo-net-device.h"
+
 #include "ns3/address.h"
 #include "ns3/callback.h"
 #include "ns3/data-rate.h"
@@ -34,7 +36,6 @@
 #include "ns3/nstime.h"
 #include "ns3/packet.h"
 #include "ns3/ptr.h"
-#include "ns3/satellite-geo-net-device.h"
 #include "ns3/traced-callback.h"
 
 #include <cstring>

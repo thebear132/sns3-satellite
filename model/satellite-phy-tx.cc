@@ -93,16 +93,17 @@ operator<<(std::ostream& os, SatPhyTx::State s)
 TypeId
 SatPhyTx::GetTypeId(void)
 {
-    static TypeId tid = TypeId("ns3::SatPhyTx")
-                            .SetParent<Object>()
-                            .AddAttribute("TxMode",
-                                          "Tx mode of this Phy Tx.",
-                                          EnumValue(SatPhyTx::NORMAL),
-                                          MakeEnumAccessor<SatPhyTx::SatPhyTxMode_t>(&SatPhyTx::m_txMode),
-                                          MakeEnumChecker(SatPhyTx::NORMAL,
-                                                          "Normal Tx mode",
-                                                          SatPhyTx::TRANSPARENT,
-                                                          "Transparent Tx mode"));
+    static TypeId tid =
+        TypeId("ns3::SatPhyTx")
+            .SetParent<Object>()
+            .AddAttribute("TxMode",
+                          "Tx mode of this Phy Tx.",
+                          EnumValue(SatPhyTx::NORMAL),
+                          MakeEnumAccessor<SatPhyTx::SatPhyTxMode_t>(&SatPhyTx::m_txMode),
+                          MakeEnumChecker(SatPhyTx::NORMAL,
+                                          "Normal Tx mode",
+                                          SatPhyTx::TRANSPARENT,
+                                          "Transparent Tx mode"));
     return tid;
 }
 

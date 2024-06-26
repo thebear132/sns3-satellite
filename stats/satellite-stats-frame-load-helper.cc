@@ -21,6 +21,9 @@
 
 #include "satellite-stats-frame-load-helper.h"
 
+#include "satellite-frame-symbol-load-probe.h"
+#include "satellite-frame-user-load-probe.h"
+
 #include <ns3/boolean.h>
 #include <ns3/callback.h>
 #include <ns3/data-collection-object.h>
@@ -31,8 +34,6 @@
 #include <ns3/node-container.h>
 #include <ns3/satellite-beam-helper.h>
 #include <ns3/satellite-beam-scheduler.h>
-#include <ns3/satellite-frame-symbol-load-probe.h>
-#include <ns3/satellite-frame-user-load-probe.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-ncc.h>
 #include <ns3/scalar-collector.h>

@@ -24,7 +24,7 @@
 #ifndef SATELLITE_ISL_ARBITER_UNICAST_H
 #define SATELLITE_ISL_ARBITER_UNICAST_H
 
-#include <ns3/satellite-isl-arbiter.h>
+#include "satellite-isl-arbiter.h"
 
 #include <map>
 

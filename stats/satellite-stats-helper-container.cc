@@ -22,38 +22,39 @@
 
 #include "satellite-stats-helper-container.h"
 
+#include "satellite-stats-antenna-gain-helper.h"
+#include "satellite-stats-backlogged-request-helper.h"
+#include "satellite-stats-beam-service-time-helper.h"
+#include "satellite-stats-capacity-request-helper.h"
+#include "satellite-stats-carrier-id-helper.h"
+#include "satellite-stats-composite-sinr-helper.h"
+#include "satellite-stats-delay-helper.h"
+#include "satellite-stats-frame-load-helper.h"
+#include "satellite-stats-frame-type-usage-helper.h"
+#include "satellite-stats-fwd-link-scheduler-symbol-rate-helper.h"
+#include "satellite-stats-jitter-helper.h"
+#include "satellite-stats-link-delay-helper.h"
+#include "satellite-stats-link-jitter-helper.h"
+#include "satellite-stats-link-modcod-helper.h"
+#include "satellite-stats-link-rx-power-helper.h"
+#include "satellite-stats-link-sinr-helper.h"
+#include "satellite-stats-marsala-correlation-helper.h"
+#include "satellite-stats-packet-collision-helper.h"
+#include "satellite-stats-packet-drop-rate-helper.h"
+#include "satellite-stats-packet-error-helper.h"
+#include "satellite-stats-plt-helper.h"
+#include "satellite-stats-queue-helper.h"
+#include "satellite-stats-rbdc-request-helper.h"
+#include "satellite-stats-resources-granted-helper.h"
+#include "satellite-stats-satellite-queue-helper.h"
+#include "satellite-stats-signalling-load-helper.h"
+#include "satellite-stats-throughput-helper.h"
+#include "satellite-stats-waveform-usage-helper.h"
+#include "satellite-stats-window-load-helper.h"
+
 #include <ns3/enum.h>
 #include <ns3/log.h>
 #include <ns3/satellite-helper.h>
-#include <ns3/satellite-stats-antenna-gain-helper.h>
-#include <ns3/satellite-stats-backlogged-request-helper.h>
-#include <ns3/satellite-stats-beam-service-time-helper.h>
-#include <ns3/satellite-stats-capacity-request-helper.h>
-#include <ns3/satellite-stats-carrier-id-helper.h>
-#include <ns3/satellite-stats-composite-sinr-helper.h>
-#include <ns3/satellite-stats-delay-helper.h>
-#include <ns3/satellite-stats-frame-load-helper.h>
-#include <ns3/satellite-stats-frame-type-usage-helper.h>
-#include <ns3/satellite-stats-fwd-link-scheduler-symbol-rate-helper.h>
-#include <ns3/satellite-stats-jitter-helper.h>
-#include <ns3/satellite-stats-link-delay-helper.h>
-#include <ns3/satellite-stats-link-jitter-helper.h>
-#include <ns3/satellite-stats-link-modcod-helper.h>
-#include <ns3/satellite-stats-link-rx-power-helper.h>
-#include <ns3/satellite-stats-link-sinr-helper.h>
-#include <ns3/satellite-stats-marsala-correlation-helper.h>
-#include <ns3/satellite-stats-packet-collision-helper.h>
-#include <ns3/satellite-stats-packet-drop-rate-helper.h>
-#include <ns3/satellite-stats-packet-error-helper.h>
-#include <ns3/satellite-stats-plt-helper.h>
-#include <ns3/satellite-stats-queue-helper.h>
-#include <ns3/satellite-stats-rbdc-request-helper.h>
-#include <ns3/satellite-stats-resources-granted-helper.h>
-#include <ns3/satellite-stats-satellite-queue-helper.h>
-#include <ns3/satellite-stats-signalling-load-helper.h>
-#include <ns3/satellite-stats-throughput-helper.h>
-#include <ns3/satellite-stats-waveform-usage-helper.h>
-#include <ns3/satellite-stats-window-load-helper.h>
 #include <ns3/satellite-ut-mac.h>
 #include <ns3/string.h>
 
@@ -912,22 +913,22 @@ SatStatsHelperContainer::GetTypeId()
 void
 SatStatsHelperContainer::SetName(std::string name)
 {
-  NS_LOG_FUNCTION(this << name);
+    NS_LOG_FUNCTION(this << name);
 
-  // convert all spaces and slashes in the name to underscores
-  for (size_t pos = name.find_first_of(" /"); pos != std::string::npos;
-       pos = name.find_first_of(" /", pos + 1, 1))
-  {
-      name[pos] = '_';
-  }
+    // convert all spaces and slashes in the name to underscores
+    for (size_t pos = name.find_first_of(" /"); pos != std::string::npos;
+         pos = name.find_first_of(" /", pos + 1, 1))
+    {
+        name[pos] = '_';
+    }
 
-  m_name = name;
+    m_name = name;
 }
 
 std::string
 SatStatsHelperContainer::GetName() const
 {
-  return m_name;
+    return m_name;
 }
 
 /*
@@ -2422,51 +2423,51 @@ SAT_STATS_PER_BEAM_METHOD_DEFINITION(RtnFeederWindowLoad, "rtn-feeder-window-loa
 std::string // static
 SatStatsHelperContainer::GetOutputTypeSuffix(SatStatsHelper::OutputType_t outputType)
 {
-  switch (outputType)
-  {
-  case SatStatsHelper::OUTPUT_NONE:
-      return "";
+    switch (outputType)
+    {
+    case SatStatsHelper::OUTPUT_NONE:
+        return "";
 
-  case SatStatsHelper::OUTPUT_SCALAR_FILE:
-  case SatStatsHelper::OUTPUT_SCALAR_PLOT:
-      return "-scalar";
+    case SatStatsHelper::OUTPUT_SCALAR_FILE:
+    case SatStatsHelper::OUTPUT_SCALAR_PLOT:
+        return "-scalar";
 
-  case SatStatsHelper::OUTPUT_SCATTER_FILE:
-  case SatStatsHelper::OUTPUT_SCATTER_PLOT:
-      return "-scatter";
+    case SatStatsHelper::OUTPUT_SCATTER_FILE:
+    case SatStatsHelper::OUTPUT_SCATTER_PLOT:
+        return "-scatter";
 
-  case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
-  case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
-      return "-histogram";
+    case SatStatsHelper::OUTPUT_HISTOGRAM_FILE:
+    case SatStatsHelper::OUTPUT_HISTOGRAM_PLOT:
+        return "-histogram";
 
-  case SatStatsHelper::OUTPUT_PDF_FILE:
-  case SatStatsHelper::OUTPUT_PDF_PLOT:
-      return "-pdf";
+    case SatStatsHelper::OUTPUT_PDF_FILE:
+    case SatStatsHelper::OUTPUT_PDF_PLOT:
+        return "-pdf";
 
-  case SatStatsHelper::OUTPUT_CDF_FILE:
-  case SatStatsHelper::OUTPUT_CDF_PLOT:
-      return "-cdf";
+    case SatStatsHelper::OUTPUT_CDF_FILE:
+    case SatStatsHelper::OUTPUT_CDF_PLOT:
+        return "-cdf";
 
-  default:
-      NS_FATAL_ERROR("SatStatsHelperContainer - Invalid output type");
-      break;
-  }
+    default:
+        NS_FATAL_ERROR("SatStatsHelperContainer - Invalid output type");
+        break;
+    }
 
-  NS_FATAL_ERROR("SatStatsHelperContainer - Invalid output type");
-  return "";
+    NS_FATAL_ERROR("SatStatsHelperContainer - Invalid output type");
+    return "";
 }
 
 void
 SatStatsHelperContainer::UpdateAddressAndIdentifier(Ptr<Node> utNode)
 {
-  NS_LOG_FUNCTION(this << utNode->GetId());
+    NS_LOG_FUNCTION(this << utNode->GetId());
 
-  std::list<Ptr<SatStatsHelper>>::iterator it;
-  for (it = m_stats.begin(); it != m_stats.end(); it++)
-  {
-      (*it)->UpdateAddressAndIdentifier(utNode);
-      (*it)->UpdateIdentifierOnProbes();
-  }
+    std::list<Ptr<SatStatsHelper>>::iterator it;
+    for (it = m_stats.begin(); it != m_stats.end(); it++)
+    {
+        (*it)->UpdateAddressAndIdentifier(utNode);
+        (*it)->UpdateIdentifierOnProbes();
+    }
 }
 
 } // end of namespace ns3

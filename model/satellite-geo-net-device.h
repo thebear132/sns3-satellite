@@ -21,16 +21,17 @@
 #ifndef SATELLITE_GEO_NET_DEVICE_H
 #define SATELLITE_GEO_NET_DEVICE_H
 
+#include "satellite-channel.h"
+#include "satellite-isl-arbiter.h"
+#include "satellite-mac.h"
+#include "satellite-phy.h"
+#include "satellite-point-to-point-isl-net-device.h"
+#include "satellite-signal-parameters.h"
+
 #include <ns3/error-model.h>
 #include <ns3/mac48-address.h>
 #include <ns3/net-device.h>
 #include <ns3/output-stream-wrapper.h>
-#include <ns3/satellite-channel.h>
-#include <ns3/satellite-isl-arbiter.h>
-#include <ns3/satellite-mac.h>
-#include <ns3/satellite-phy.h>
-#include <ns3/satellite-point-to-point-isl-net-device.h>
-#include <ns3/satellite-signal-parameters.h>
 #include <ns3/traced-callback.h>
 
 #include <map>

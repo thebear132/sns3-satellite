@@ -22,7 +22,7 @@
  * Adapted to SNS-3 by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/satellite-point-to-point-isl-helper.h"
+#include "satellite-point-to-point-isl-helper.h"
 
 #include "ns3/drop-tail-queue.h"
 #include "ns3/log.h"

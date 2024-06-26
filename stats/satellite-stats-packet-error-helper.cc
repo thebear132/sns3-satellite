@@ -21,6 +21,8 @@
 
 #include "satellite-stats-packet-error-helper.h"
 
+#include "satellite-phy-rx-carrier-packet-probe.h"
+
 #include <ns3/boolean.h>
 #include <ns3/callback.h>
 #include <ns3/data-collection-object.h>
@@ -36,7 +38,6 @@
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-net-device.h>
-#include <ns3/satellite-phy-rx-carrier-packet-probe.h>
 #include <ns3/satellite-phy-rx-carrier.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy.h>

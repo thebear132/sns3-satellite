@@ -52,19 +52,21 @@ SatUserHelper::GetTypeId(void)
         TypeId("ns3::SatUserHelper")
             .SetParent<Object>()
             .AddConstructor<SatUserHelper>()
-            .AddAttribute("BackboneNetworkType",
-                          "Network used between GW and Router, and between Router and Users in "
-                          "operator network",
-                          EnumValue(SatUserHelper::NETWORK_TYPE_SAT_SIMPLE),
-                          MakeEnumAccessor<SatUserHelper::NetworkType>(&SatUserHelper::m_backboneNetworkType),
-                          MakeEnumChecker(SatUserHelper::NETWORK_TYPE_SAT_SIMPLE,
-                                          "SatSimple",
-                                          SatUserHelper::NETWORK_TYPE_CSMA,
-                                          "Csma"))
+            .AddAttribute(
+                "BackboneNetworkType",
+                "Network used between GW and Router, and between Router and Users in "
+                "operator network",
+                EnumValue(SatUserHelper::NETWORK_TYPE_SAT_SIMPLE),
+                MakeEnumAccessor<SatUserHelper::NetworkType>(&SatUserHelper::m_backboneNetworkType),
+                MakeEnumChecker(SatUserHelper::NETWORK_TYPE_SAT_SIMPLE,
+                                "SatSimple",
+                                SatUserHelper::NETWORK_TYPE_CSMA,
+                                "Csma"))
             .AddAttribute("SubscriberNetworkType",
                           "Network used between UTs and Users in subscriber network",
                           EnumValue(SatUserHelper::NETWORK_TYPE_CSMA),
-                          MakeEnumAccessor<SatUserHelper::NetworkType>(&SatUserHelper::m_subscriberNetworkType),
+                          MakeEnumAccessor<SatUserHelper::NetworkType>(
+                              &SatUserHelper::m_subscriberNetworkType),
                           MakeEnumChecker(SatUserHelper::NETWORK_TYPE_SAT_SIMPLE,
                                           "SatSimple",
                                           SatUserHelper::NETWORK_TYPE_CSMA,

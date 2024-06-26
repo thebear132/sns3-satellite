@@ -123,7 +123,8 @@ SatFwdLinkScheduler::GetTypeId(void)
             .AddAttribute("AdditionalSortCriteria",
                           "Sorting criteria after priority for scheduling objects from LLC.",
                           EnumValue(SatFwdLinkScheduler::NO_SORT),
-                          MakeEnumAccessor<SatFwdLinkScheduler::ScheduleSortingCriteria_t>(&SatFwdLinkScheduler::m_additionalSortCriteria),
+                          MakeEnumAccessor<SatFwdLinkScheduler::ScheduleSortingCriteria_t>(
+                              &SatFwdLinkScheduler::m_additionalSortCriteria),
                           MakeEnumChecker(SatFwdLinkScheduler::NO_SORT,
                                           "NoSorting",
                                           SatFwdLinkScheduler::BUFFERING_DELAY_SORT,
@@ -133,7 +134,8 @@ SatFwdLinkScheduler::GetTypeId(void)
             .AddAttribute("CnoEstimationMode",
                           "Mode of the C/N0 estimator",
                           EnumValue(SatCnoEstimator::LAST),
-                          MakeEnumAccessor<SatCnoEstimator::EstimationMode_t>(&SatFwdLinkScheduler::m_cnoEstimatorMode),
+                          MakeEnumAccessor<SatCnoEstimator::EstimationMode_t>(
+                              &SatFwdLinkScheduler::m_cnoEstimatorMode),
                           MakeEnumChecker(SatCnoEstimator::LAST,
                                           "LastValueInWindow",
                                           SatCnoEstimator::MINIMUM,

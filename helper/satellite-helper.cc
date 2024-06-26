@@ -20,6 +20,10 @@
 
 #include "satellite-helper.h"
 
+#include "lora-forwarder-helper.h"
+#include "lora-network-server-helper.h"
+#include "satellite-lora-conf.h"
+
 #include <ns3/arp-cache.h>
 #include <ns3/csma-helper.h>
 #include <ns3/double.h>
@@ -29,8 +33,6 @@
 #include <ns3/ipv4-static-routing-helper.h>
 #include <ns3/log.h>
 #include <ns3/lora-device-address-generator.h>
-#include <ns3/lora-forwarder-helper.h>
-#include <ns3/lora-network-server-helper.h>
 #include <ns3/mobility-helper.h>
 #include <ns3/names.h>
 #include <ns3/queue.h>
@@ -38,7 +40,6 @@
 #include <ns3/satellite-handover-module.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-log.h>
-#include <ns3/satellite-lora-conf.h>
 #include <ns3/satellite-point-to-point-isl-net-device.h>
 #include <ns3/satellite-position-allocator.h>
 #include <ns3/satellite-position-input-trace-container.h>

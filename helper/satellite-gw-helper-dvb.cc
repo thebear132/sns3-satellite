@@ -19,7 +19,7 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/satellite-gw-helper-dvb.h"
+#include "satellite-gw-helper-dvb.h"
 
 #include <ns3/log.h>
 #include <ns3/pointer.h>

@@ -19,7 +19,9 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/satellite-gw-helper-lora.h"
+#include "satellite-gw-helper-lora.h"
+
+#include "satellite-lora-conf.h"
 
 #include <ns3/log.h>
 #include <ns3/lorawan-mac-gateway.h>
@@ -32,7 +34,6 @@
 #include <ns3/satellite-gw-phy.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-link-results.h>
-#include <ns3/satellite-lora-conf.h>
 #include <ns3/satellite-lorawan-net-device.h>
 #include <ns3/satellite-lower-layer-service.h>
 #include <ns3/satellite-net-device.h>

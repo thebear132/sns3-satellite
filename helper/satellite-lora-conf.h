@@ -21,9 +21,10 @@
 #ifndef SAT_LORA_CONF_H
 #define SAT_LORA_CONF_H
 
+#include "satellite-conf.h"
+
 #include <ns3/lorawan-mac-end-device-class-a.h>
 #include <ns3/lorawan-mac-gateway.h>
-#include <ns3/satellite-conf.h>
 
 namespace ns3
 {

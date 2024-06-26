@@ -20,7 +20,10 @@
  * Author: Mathias Ettinger <mettinger@viveris.toulouse.fr>
  */
 
-#include "ns3/satellite-geo-helper.h"
+#include "satellite-geo-helper.h"
+
+#include "satellite-helper.h"
+#include "satellite-isl-arbiter-unicast-helper.h"
 
 #include "ns3/config.h"
 #include "ns3/double.h"
@@ -38,9 +41,7 @@
 #include "ns3/satellite-geo-user-llc.h"
 #include "ns3/satellite-geo-user-mac.h"
 #include "ns3/satellite-geo-user-phy.h"
-#include "ns3/satellite-helper.h"
 #include "ns3/satellite-id-mapper.h"
-#include "ns3/satellite-isl-arbiter-unicast-helper.h"
 #include "ns3/satellite-phy-rx-carrier-conf.h"
 #include "ns3/satellite-phy-rx.h"
 #include "ns3/satellite-phy-tx.h"
@@ -66,7 +67,8 @@ SatGeoHelper::GetTypeId(void)
             .AddAttribute("DaFwdLinkInterferenceModel",
                           "Forward link interference model for dedicated access",
                           EnumValue(SatPhyRxCarrierConf::IF_CONSTANT),
-                          MakeEnumAccessor<SatPhyRxCarrierConf::InterferenceModel>(&SatGeoHelper::m_daFwdLinkInterferenceModel),
+                          MakeEnumAccessor<SatPhyRxCarrierConf::InterferenceModel>(
+                              &SatGeoHelper::m_daFwdLinkInterferenceModel),
                           MakeEnumChecker(SatPhyRxCarrierConf::IF_CONSTANT,
                                           "Constant",
                                           SatPhyRxCarrierConf::IF_TRACE,
@@ -78,7 +80,8 @@ SatGeoHelper::GetTypeId(void)
             .AddAttribute("DaRtnLinkInterferenceModel",
                           "Return link interference model for dedicated access",
                           EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET),
-                          MakeEnumAccessor<SatPhyRxCarrierConf::InterferenceModel>(&SatGeoHelper::m_daRtnLinkInterferenceModel),
+                          MakeEnumAccessor<SatPhyRxCarrierConf::InterferenceModel>(
+                              &SatGeoHelper::m_daRtnLinkInterferenceModel),
                           MakeEnumChecker(SatPhyRxCarrierConf::IF_CONSTANT,
                                           "Constant",
                                           SatPhyRxCarrierConf::IF_TRACE,
@@ -87,41 +90,44 @@ SatGeoHelper::GetTypeId(void)
                                           "PerPacket",
                                           SatPhyRxCarrierConf::IF_PER_FRAGMENT,
                                           "PerFragment"))
-            .AddAttribute("FwdLinkErrorModel",
-                          "Forward feeder link error model",
-                          EnumValue(SatPhyRxCarrierConf::EM_NONE),
-                          MakeEnumAccessor<SatPhyRxCarrierConf::ErrorModel>(&SatGeoHelper::m_fwdErrorModel),
-                          MakeEnumChecker(SatPhyRxCarrierConf::EM_NONE,
-                                          "None",
-                                          SatPhyRxCarrierConf::EM_CONSTANT,
-                                          "Constant",
-                                          SatPhyRxCarrierConf::EM_AVI,
-                                          "AVI"))
+            .AddAttribute(
+                "FwdLinkErrorModel",
+                "Forward feeder link error model",
+                EnumValue(SatPhyRxCarrierConf::EM_NONE),
+                MakeEnumAccessor<SatPhyRxCarrierConf::ErrorModel>(&SatGeoHelper::m_fwdErrorModel),
+                MakeEnumChecker(SatPhyRxCarrierConf::EM_NONE,
+                                "None",
+                                SatPhyRxCarrierConf::EM_CONSTANT,
+                                "Constant",
+                                SatPhyRxCarrierConf::EM_AVI,
+                                "AVI"))
             .AddAttribute("FwdLinkConstantErrorRate",
                           "Constant error rate on forward feeder link",
                           DoubleValue(0.0),
                           MakeDoubleAccessor(&SatGeoHelper::m_fwdDaConstantErrorRate),
                           MakeDoubleChecker<double>())
-            .AddAttribute("RtnLinkErrorModel",
-                          "Return user link error model",
-                          EnumValue(SatPhyRxCarrierConf::EM_NONE),
-                          MakeEnumAccessor<SatPhyRxCarrierConf::ErrorModel>(&SatGeoHelper::m_rtnErrorModel),
-                          MakeEnumChecker(SatPhyRxCarrierConf::EM_NONE,
-                                          "None",
-                                          SatPhyRxCarrierConf::EM_CONSTANT,
-                                          "Constant",
-                                          SatPhyRxCarrierConf::EM_AVI,
-                                          "AVI"))
+            .AddAttribute(
+                "RtnLinkErrorModel",
+                "Return user link error model",
+                EnumValue(SatPhyRxCarrierConf::EM_NONE),
+                MakeEnumAccessor<SatPhyRxCarrierConf::ErrorModel>(&SatGeoHelper::m_rtnErrorModel),
+                MakeEnumChecker(SatPhyRxCarrierConf::EM_NONE,
+                                "None",
+                                SatPhyRxCarrierConf::EM_CONSTANT,
+                                "Constant",
+                                SatPhyRxCarrierConf::EM_AVI,
+                                "AVI"))
             .AddAttribute("RtnLinkConstantErrorRate",
                           "Constant error rate on return user link",
                           DoubleValue(0.0),
                           MakeDoubleAccessor(&SatGeoHelper::m_rtnDaConstantErrorRate),
                           MakeDoubleChecker<double>())
-            .AddAttribute("IslArbiterType",
-                          "Arbiter in use to route packets on ISLs",
-                          EnumValue(SatEnums::UNICAST),
-                          MakeEnumAccessor<SatEnums::IslArbiterType_t>(&SatGeoHelper::m_islArbiterType),
-                          MakeEnumChecker(SatEnums::UNICAST, "Unicast", SatEnums::ECMP, "ECMP"))
+            .AddAttribute(
+                "IslArbiterType",
+                "Arbiter in use to route packets on ISLs",
+                EnumValue(SatEnums::UNICAST),
+                MakeEnumAccessor<SatEnums::IslArbiterType_t>(&SatGeoHelper::m_islArbiterType),
+                MakeEnumChecker(SatEnums::UNICAST, "Unicast", SatEnums::ECMP, "ECMP"))
             .AddTraceSource("Creation",
                             "Creation traces",
                             MakeTraceSourceAccessor(&SatGeoHelper::m_creationTrace),

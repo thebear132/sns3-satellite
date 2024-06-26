@@ -24,6 +24,7 @@
 
 #include "satellite-gw-helper-dvb.h"
 #include "satellite-gw-helper-lora.h"
+#include "satellite-point-to-point-isl-helper.h"
 #include "satellite-ut-helper-dvb.h"
 #include "satellite-ut-helper-lora.h"
 
@@ -53,7 +54,6 @@
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy-tx.h>
 #include <ns3/satellite-phy.h>
-#include <ns3/satellite-point-to-point-isl-helper.h>
 #include <ns3/satellite-propagation-delay-model.h>
 #include <ns3/satellite-sgp4-mobility-model.h>
 #include <ns3/satellite-typedefs.h>
@@ -96,7 +96,8 @@ SatBeamHelper::GetTypeId(void)
             .AddAttribute("RandomAccessModel",
                           "Random Access Model",
                           EnumValue(SatEnums::RA_MODEL_OFF),
-                          MakeEnumAccessor<SatEnums::RandomAccessModel_t>(&SatBeamHelper::m_randomAccessModel),
+                          MakeEnumAccessor<SatEnums::RandomAccessModel_t>(
+                              &SatBeamHelper::m_randomAccessModel),
                           MakeEnumChecker(SatEnums::RA_MODEL_OFF,
                                           "RaOff",
                                           SatEnums::RA_MODEL_SLOTTED_ALOHA,
@@ -112,7 +113,8 @@ SatBeamHelper::GetTypeId(void)
             .AddAttribute("RaInterferenceModel",
                           "Interference model for random access",
                           EnumValue(SatPhyRxCarrierConf::IF_CONSTANT),
-                          MakeEnumAccessor<SatPhyRxCarrierConf::InterferenceModel>(&SatBeamHelper::m_raInterferenceModel),
+                          MakeEnumAccessor<SatPhyRxCarrierConf::InterferenceModel>(
+                              &SatBeamHelper::m_raInterferenceModel),
                           MakeEnumChecker(SatPhyRxCarrierConf::IF_CONSTANT,
                                           "Constant",
                                           SatPhyRxCarrierConf::IF_TRACE,
@@ -124,7 +126,8 @@ SatBeamHelper::GetTypeId(void)
             .AddAttribute("RaInterferenceEliminationModel",
                           "Interference elimination model for random access",
                           EnumValue(SatPhyRxCarrierConf::SIC_PERFECT),
-                          MakeEnumAccessor<SatPhyRxCarrierConf::InterferenceEliminationModel>(&SatBeamHelper::m_raInterferenceEliminationModel),
+                          MakeEnumAccessor<SatPhyRxCarrierConf::InterferenceEliminationModel>(
+                              &SatBeamHelper::m_raInterferenceEliminationModel),
                           MakeEnumChecker(SatPhyRxCarrierConf::SIC_PERFECT,
                                           "Perfect",
                                           SatPhyRxCarrierConf::SIC_RESIDUAL,
@@ -133,7 +136,8 @@ SatBeamHelper::GetTypeId(void)
                 "RaCollisionModel",
                 "Collision model for random access",
                 EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR),
-                MakeEnumAccessor<SatPhyRxCarrierConf::RandomAccessCollisionModel>(&SatBeamHelper::m_raCollisionModel),
+                MakeEnumAccessor<SatPhyRxCarrierConf::RandomAccessCollisionModel>(
+                    &SatBeamHelper::m_raCollisionModel),
                 MakeEnumChecker(SatPhyRxCarrierConf::RA_COLLISION_NOT_DEFINED,
                                 "RaCollisionNotDefined",
                                 SatPhyRxCarrierConf::RA_COLLISION_ALWAYS_DROP_ALL_COLLIDING_PACKETS,
@@ -150,7 +154,8 @@ SatBeamHelper::GetTypeId(void)
             .AddAttribute("PropagationDelayModel",
                           "Propagation delay model",
                           EnumValue(SatEnums::PD_CONSTANT_SPEED),
-                          MakeEnumAccessor<SatEnums::PropagationDelayModel_t>(&SatBeamHelper::m_propagationDelayModel),
+                          MakeEnumAccessor<SatEnums::PropagationDelayModel_t>(
+                              &SatBeamHelper::m_propagationDelayModel),
                           MakeEnumChecker(SatEnums::PD_CONSTANT_SPEED,
                                           "ConstantSpeed",
                                           SatEnums::PD_CONSTANT,
@@ -191,16 +196,17 @@ SatBeamHelper::GetTypeId(void)
                           EnumValue(SatEnums::DVB_S2),
                           MakeEnumAccessor<SatEnums::DvbVersion_t>(&SatBeamHelper::m_dvbVersion),
                           MakeEnumChecker(SatEnums::DVB_S2, "DVB_S2", SatEnums::DVB_S2X, "DVB_S2X"))
-            .AddAttribute("ReturnLinkLinkResults",
-                          "Protocol used for the return link link results.",
-                          EnumValue(SatEnums::LR_RCS2),
-                          MakeEnumAccessor<SatEnums::LinkResults_t>(&SatBeamHelper::m_rlLinkResultsType),
-                          MakeEnumChecker(SatEnums::LR_RCS2,
-                                          "RCS2",
-                                          SatEnums::LR_FSIM,
-                                          "FSIM",
-                                          SatEnums::LR_LORA,
-                                          "LORA"))
+            .AddAttribute(
+                "ReturnLinkLinkResults",
+                "Protocol used for the return link link results.",
+                EnumValue(SatEnums::LR_RCS2),
+                MakeEnumAccessor<SatEnums::LinkResults_t>(&SatBeamHelper::m_rlLinkResultsType),
+                MakeEnumChecker(SatEnums::LR_RCS2,
+                                "RCS2",
+                                SatEnums::LR_FSIM,
+                                "FSIM",
+                                SatEnums::LR_LORA,
+                                "LORA"))
             .AddTraceSource("Creation",
                             "Creation traces",
                             MakeTraceSourceAccessor(&SatBeamHelper::m_creationTrace),

@@ -1212,22 +1212,23 @@ SatSuperframeConf::GetIndexAsFrameName(uint32_t index)
                   MakeUintegerAccessor(&SatSuperframeConf::SetFrameCount,                          \
                                        &SatSuperframeConf::GetFrameCount),                         \
                   MakeUintegerChecker<uint32_t>(1, SatSuperframeConf::m_maxFrameCount))            \
-        .AddAttribute("FrameConfigType",                                                           \
-                      "The frame configuration type used for super frame.",                        \
-                      TypeId::ATTR_CONSTRUCT,                                                      \
-                      EnumValue(configType),                                                       \
-                      MakeEnumAccessor<SatSuperframeConf::ConfigType_t>(&SatSuperframeConf::SetConfigType,                          \
-                                                                        &SatSuperframeConf::GetConfigType),                         \
-                      MakeEnumChecker(SatSuperframeConf::CONFIG_TYPE_0,                            \
-                                      "ConfigType_0",                                              \
-                                      SatSuperframeConf::CONFIG_TYPE_1,                            \
-                                      "ConfigType_1",                                              \
-                                      SatSuperframeConf::CONFIG_TYPE_2,                            \
-                                      "ConfigType_2",                                              \
-                                      SatSuperframeConf::CONFIG_TYPE_3,                            \
-                                      "ConfigType_3",                                              \
-                                      SatSuperframeConf::CONFIG_TYPE_4,                            \
-                                      "ConfigType_4"))                                             \
+        .AddAttribute(                                                                             \
+            "FrameConfigType",                                                                     \
+            "The frame configuration type used for super frame.",                                  \
+            TypeId::ATTR_CONSTRUCT,                                                                \
+            EnumValue(configType),                                                                 \
+            MakeEnumAccessor<SatSuperframeConf::ConfigType_t>(&SatSuperframeConf::SetConfigType,   \
+                                                              &SatSuperframeConf::GetConfigType),  \
+            MakeEnumChecker(SatSuperframeConf::CONFIG_TYPE_0,                                      \
+                            "ConfigType_0",                                                        \
+                            SatSuperframeConf::CONFIG_TYPE_1,                                      \
+                            "ConfigType_1",                                                        \
+                            SatSuperframeConf::CONFIG_TYPE_2,                                      \
+                            "ConfigType_2",                                                        \
+                            SatSuperframeConf::CONFIG_TYPE_3,                                      \
+                            "ConfigType_3",                                                        \
+                            SatSuperframeConf::CONFIG_TYPE_4,                                      \
+                            "ConfigType_4"))                                                       \
         .AddAttribute(                                                                             \
             "MaxCarrierSubdivision",                                                               \
             "The maximum amount of subdivision for a single carrier (ConfigType_3 only).",         \

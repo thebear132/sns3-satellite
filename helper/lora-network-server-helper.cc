@@ -20,7 +20,7 @@
  * Modified by: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "ns3/lora-network-server-helper.h"
+#include "lora-network-server-helper.h"
 
 #include "ns3/double.h"
 #include "ns3/log.h"
