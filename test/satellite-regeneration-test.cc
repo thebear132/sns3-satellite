@@ -1999,8 +1999,8 @@ SatRegenerationTest8::DoRun(void)
 }
 
 // The TestSuite class names the TestSuite as sat-regeneration-test, identifies what type of
-// TestSuite (SYSTEM), and enables the TestCases to be run. Typically, only the constructor for this
-// class must be defined
+// TestSuite (Type::SYSTEM), and enables the TestCases to be run. Typically, only the constructor
+// for this class must be defined
 //
 class SatRegenerationTestSuite : public TestSuite
 {
@@ -2009,46 +2009,51 @@ class SatRegenerationTestSuite : public TestSuite
 };
 
 SatRegenerationTestSuite::SatRegenerationTestSuite()
-    : TestSuite("sat-regeneration-test", SYSTEM)
+    : TestSuite("sat-regeneration-test", Type::SYSTEM)
 {
-    AddTestCase(new SatRegenerationTest1, TestCase::QUICK); // Test delay with regeneration phy
-    AddTestCase(new SatRegenerationTest2, TestCase::QUICK); // Test losses with regeneration phy
-    AddTestCase(new SatRegenerationTest3, TestCase::QUICK); // Test collisions with regeneration phy
-    AddTestCase(new SatRegenerationTest4, TestCase::QUICK); // Test regeneration link
-    AddTestCase(new SatRegenerationTest5, TestCase::QUICK); // Test ACM loop on regeneration link
-    AddTestCase(new SatRegenerationTest6, TestCase::QUICK); // Test regeneration network
-    AddTestCase(new SatRegenerationTest7, TestCase::QUICK); // Test ACM loop on regeneration network
+    AddTestCase(new SatRegenerationTest1,
+                TestCase::Duration::QUICK); // Test delay with regeneration phy
+    AddTestCase(new SatRegenerationTest2,
+                TestCase::Duration::QUICK); // Test losses with regeneration phy
+    AddTestCase(new SatRegenerationTest3,
+                TestCase::Duration::QUICK); // Test collisions with regeneration phy
+    AddTestCase(new SatRegenerationTest4, TestCase::Duration::QUICK); // Test regeneration link
+    AddTestCase(new SatRegenerationTest5,
+                TestCase::Duration::QUICK); // Test ACM loop on regeneration link
+    AddTestCase(new SatRegenerationTest6, TestCase::Duration::QUICK); // Test regeneration network
+    AddTestCase(new SatRegenerationTest7,
+                TestCase::Duration::QUICK); // Test ACM loop on regeneration network
 
     // Test all regeneration combinations, and check if packets are correctly received or not on
     // each satellite layer
     AddTestCase(new SatRegenerationTest8(SatEnums::TRANSPARENT, SatEnums::TRANSPARENT),
-                TestCase::QUICK);
+                TestCase::Duration::QUICK);
     AddTestCase(new SatRegenerationTest8(SatEnums::TRANSPARENT, SatEnums::REGENERATION_PHY),
-                TestCase::QUICK);
+                TestCase::Duration::QUICK);
     AddTestCase(new SatRegenerationTest8(SatEnums::TRANSPARENT, SatEnums::REGENERATION_LINK),
-                TestCase::QUICK);
+                TestCase::Duration::QUICK);
     AddTestCase(new SatRegenerationTest8(SatEnums::TRANSPARENT, SatEnums::REGENERATION_NETWORK),
-                TestCase::QUICK);
+                TestCase::Duration::QUICK);
     AddTestCase(new SatRegenerationTest8(SatEnums::REGENERATION_PHY, SatEnums::TRANSPARENT),
-                TestCase::QUICK);
+                TestCase::Duration::QUICK);
     AddTestCase(new SatRegenerationTest8(SatEnums::REGENERATION_PHY, SatEnums::REGENERATION_PHY),
-                TestCase::QUICK);
+                TestCase::Duration::QUICK);
     AddTestCase(new SatRegenerationTest8(SatEnums::REGENERATION_PHY, SatEnums::REGENERATION_LINK),
-                TestCase::QUICK);
+                TestCase::Duration::QUICK);
     AddTestCase(
         new SatRegenerationTest8(SatEnums::REGENERATION_PHY, SatEnums::REGENERATION_NETWORK),
-        TestCase::QUICK);
+        TestCase::Duration::QUICK);
     AddTestCase(new SatRegenerationTest8(SatEnums::REGENERATION_NETWORK, SatEnums::TRANSPARENT),
-                TestCase::QUICK);
+                TestCase::Duration::QUICK);
     AddTestCase(
         new SatRegenerationTest8(SatEnums::REGENERATION_NETWORK, SatEnums::REGENERATION_PHY),
-        TestCase::QUICK);
+        TestCase::Duration::QUICK);
     AddTestCase(
         new SatRegenerationTest8(SatEnums::REGENERATION_NETWORK, SatEnums::REGENERATION_LINK),
-        TestCase::QUICK);
+        TestCase::Duration::QUICK);
     AddTestCase(
         new SatRegenerationTest8(SatEnums::REGENERATION_NETWORK, SatEnums::REGENERATION_NETWORK),
-        TestCase::QUICK);
+        TestCase::Duration::QUICK);
 }
 
 // Allocate an instance of this TestSuite

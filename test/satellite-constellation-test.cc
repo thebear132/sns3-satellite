@@ -896,8 +896,8 @@ SatConstellationTest4::DoRun(void)
 }
 
 // The TestSuite class names the TestSuite as sat-constellation-test, identifies what type of
-// TestSuite (SYSTEM), and enables the TestCases to be run. Typically, only the constructor for this
-// class must be defined
+// TestSuite (Type::SYSTEM), and enables the TestCases to be run. Typically, only the constructor
+// for this class must be defined
 //
 class SatConstellationTestSuite : public TestSuite
 {
@@ -906,13 +906,15 @@ class SatConstellationTestSuite : public TestSuite
 };
 
 SatConstellationTestSuite::SatConstellationTestSuite()
-    : TestSuite("sat-constellation-test", SYSTEM)
+    : TestSuite("sat-constellation-test", Type::SYSTEM)
 {
-    AddTestCase(new SatConstellationTest1, TestCase::QUICK); // Test topology loading
-    AddTestCase(new SatConstellationTest2, TestCase::QUICK); // Test good throughputs without ISLs
-    AddTestCase(new SatConstellationTest3, TestCase::QUICK); // Test good throughputs with ISLs
+    AddTestCase(new SatConstellationTest1, TestCase::Duration::QUICK); // Test topology loading
+    AddTestCase(new SatConstellationTest2,
+                TestCase::Duration::QUICK); // Test good throughputs without ISLs
+    AddTestCase(new SatConstellationTest3,
+                TestCase::Duration::QUICK); // Test good throughputs with ISLs
     AddTestCase(new SatConstellationTest4,
-                TestCase::QUICK); // Test topology loading with huge constellation
+                TestCase::Duration::QUICK); // Test topology loading with huge constellation
 }
 
 // Allocate an instance of this TestSuite

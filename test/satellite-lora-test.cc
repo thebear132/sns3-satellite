@@ -863,13 +863,13 @@ class SatLoraTestSuite : public TestSuite
 };
 
 SatLoraTestSuite::SatLoraTestSuite()
-    : TestSuite("sat-lora-test", UNIT)
+    : TestSuite("sat-lora-test", Type::UNIT)
 {
-    AddTestCase(new SatLoraFirstWindowTestCase, TestCase::QUICK);
-    AddTestCase(new SatLoraSecondWindowTestCase, TestCase::QUICK);
-    AddTestCase(new SatLoraOutOfWindowWindowTestCase, TestCase::QUICK);
-    AddTestCase(new SatLoraOutOfWindowWindowNoRetransmissionTestCase, TestCase::QUICK);
-    AddTestCase(new SatLoraCbrTestCase, TestCase::QUICK);
+    AddTestCase(new SatLoraFirstWindowTestCase, TestCase::Duration::QUICK);
+    AddTestCase(new SatLoraSecondWindowTestCase, TestCase::Duration::QUICK);
+    AddTestCase(new SatLoraOutOfWindowWindowTestCase, TestCase::Duration::QUICK);
+    AddTestCase(new SatLoraOutOfWindowWindowNoRetransmissionTestCase, TestCase::Duration::QUICK);
+    AddTestCase(new SatLoraCbrTestCase, TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

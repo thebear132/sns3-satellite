@@ -175,9 +175,9 @@ class SatRleTraceSuite : public TestSuite
 };
 
 SatRleTraceSuite::SatRleTraceSuite()
-    : TestSuite("sat-rle-test", UNIT)
+    : TestSuite("sat-rle-test", Type::UNIT)
 {
-    AddTestCase(new SatRleTestCase, TestCase::QUICK);
+    AddTestCase(new SatRleTestCase, TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

@@ -152,9 +152,9 @@ class GeoCoordinateTestSuite : public TestSuite
 };
 
 GeoCoordinateTestSuite::GeoCoordinateTestSuite()
-    : TestSuite("geo-coordinate-test", UNIT)
+    : TestSuite("geo-coordinate-test", Type::UNIT)
 {
-    AddTestCase(new GeoCoordinateTestCase, TestCase::QUICK);
+    AddTestCase(new GeoCoordinateTestCase, TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

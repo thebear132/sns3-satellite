@@ -186,10 +186,10 @@ main(int argc, char* argv[])
             InetSocketAddress(helper->GetUserAddress(gwUsers.Get(cbrGwUserId)), port));
         cbrHelper.SetAttribute("Interval", StringValue(interval));
         cbrHelper.SetAttribute("PacketSize", UintegerValue(packetSize));
+        cbrHelper.SetAttribute("Tos", UintegerValue(cbrTos));
 
         // Set destination addresses
         InetSocketAddress cbrDest(helper->GetUserAddress(gwUsers.Get(cbrGwUserId)), port);
-        cbrDest.SetTos(cbrTos);
 
         // Cbr and Sink applications creation. CBR to UT users and sinks to GW users.
         gwCbrSinkApps.Add(cbrSinkHelper.Install(gwUsers.Get(cbrGwUserId)));
@@ -241,7 +241,6 @@ main(int argc, char* argv[])
 
         // Set destination addresses
         InetSocketAddress onOffDest(helper->GetUserAddress(gwUsers.Get(onOffGwUserId)), port);
-        onOffDest.SetTos(onOffTos);
 
         // Cbr and Sink applications creation
         gwOnOffSinkApps.Add(onOffSinkHelper.Install(gwUsers.Get(onOffGwUserId)));
@@ -251,6 +250,7 @@ main(int argc, char* argv[])
         for (uint32_t i = 0; i < utOnOffUsers.GetN(); i++)
         {
             onOffHelper.SetAttribute("Remote", AddressValue(Address(onOffDest)));
+            onOffHelper.SetAttribute("Tos", UintegerValue(onOffTos));
             onOffSinkHelper.SetAttribute("Local", AddressValue(Address(onOffDest)));
 
             utOnOffApps.Add(onOffHelper.Install(utOnOffUsers.Get(i)));

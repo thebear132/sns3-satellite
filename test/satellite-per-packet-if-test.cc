@@ -929,30 +929,30 @@ class SatPerPacketIfTestSuite : public TestSuite
 };
 
 SatPerPacketIfTestSuite::SatPerPacketIfTestSuite()
-    : TestSuite("sat-per-packet-if-test", SYSTEM)
+    : TestSuite("sat-per-packet-if-test", Type::SYSTEM)
 {
-    AddTestCase(new SatPerPacketFwdLinkUserTestCase, TestCase::QUICK);
+    AddTestCase(new SatPerPacketFwdLinkUserTestCase, TestCase::Duration::QUICK);
     AddTestCase(new SatPerPacketFwdLinkUserTestCase("DummyFrames.", SatEnums::FADING_OFF, true),
-                TestCase::QUICK);
+                TestCase::Duration::QUICK);
     AddTestCase(
         new SatPerPacketFwdLinkUserTestCase("Markov_Fading.", SatEnums::FADING_MARKOV, false),
-        TestCase::QUICK);
+        TestCase::Duration::QUICK);
     AddTestCase(new SatPerPacketFwdLinkUserTestCase("Markov_Fading, DummyFrames.",
                                                     SatEnums::FADING_MARKOV,
                                                     true),
-                TestCase::QUICK);
-    AddTestCase(new SatPerPacketFwdLinkFullTestCase, TestCase::QUICK);
+                TestCase::Duration::QUICK);
+    AddTestCase(new SatPerPacketFwdLinkFullTestCase, TestCase::Duration::QUICK);
 
     AddTestCase(
         new SatPerPacketFwdLinkFullTestCase("Markov_Fading.", SatEnums::FADING_MARKOV, false),
-        TestCase::QUICK);
-    AddTestCase(new SatPerPacketRtnLinkUserTestCase, TestCase::QUICK);
+        TestCase::Duration::QUICK);
+    AddTestCase(new SatPerPacketRtnLinkUserTestCase, TestCase::Duration::QUICK);
     AddTestCase(new SatPerPacketRtnLinkUserTestCase("Markov_Fading.", SatEnums::FADING_MARKOV),
-                TestCase::QUICK);
+                TestCase::Duration::QUICK);
 
-    AddTestCase(new SatPerPacketRtnLinkFullTestCase, TestCase::QUICK);
+    AddTestCase(new SatPerPacketRtnLinkFullTestCase, TestCase::Duration::QUICK);
     AddTestCase(new SatPerPacketRtnLinkFullTestCase("Markov_Fading.", SatEnums::FADING_MARKOV),
-                TestCase::QUICK);
+                TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

@@ -1070,8 +1070,8 @@ SimpleUnicast8::DoRun(void)
 }
 
 // The TestSuite class names the TestSuite as sat-simple-unicast, identifies what type of TestSuite
-// (SYSTEM), and enables the TestCases to be run.  Typically, only the constructor for this class
-// must be defined
+// (Type::SYSTEM), and enables the TestCases to be run.  Typically, only the constructor for this
+// class must be defined
 //
 class SimpleUnicastTestSuite : public TestSuite
 {
@@ -1080,31 +1080,31 @@ class SimpleUnicastTestSuite : public TestSuite
 };
 
 SimpleUnicastTestSuite::SimpleUnicastTestSuite()
-    : TestSuite("sat-simple-unicast", SYSTEM)
+    : TestSuite("sat-simple-unicast", Type::SYSTEM)
 {
     // add simple-unicast-1 case to suite sat-simple-unicast
-    AddTestCase(new SimpleUnicast1, TestCase::QUICK);
+    AddTestCase(new SimpleUnicast1, TestCase::Duration::QUICK);
 
     // add simple-unicast-2 case to suite sat-simple-unicast
-    AddTestCase(new SimpleUnicast2, TestCase::QUICK);
+    AddTestCase(new SimpleUnicast2, TestCase::Duration::QUICK);
 
     // add simple_unicast-3 case to suite sat-simple-unicast
-    AddTestCase(new SimpleUnicast3, TestCase::QUICK);
+    AddTestCase(new SimpleUnicast3, TestCase::Duration::QUICK);
 
     // add simple-unicast-4 case to suite sat-simple-unicast
-    AddTestCase(new SimpleUnicast4, TestCase::QUICK);
+    AddTestCase(new SimpleUnicast4, TestCase::Duration::QUICK);
 
     // add simple-unicast-5 case to suite sat-simple-unicast
-    AddTestCase(new SimpleUnicast5, TestCase::QUICK);
+    AddTestCase(new SimpleUnicast5, TestCase::Duration::QUICK);
 
     // add simple-unicast-6 case to suite sat-simple-unicast
-    AddTestCase(new SimpleUnicast6, TestCase::QUICK);
+    AddTestCase(new SimpleUnicast6, TestCase::Duration::QUICK);
 
     // add simple-unicast-7 case to suite sat-simple-unicast
-    AddTestCase(new SimpleUnicast7, TestCase::QUICK);
+    AddTestCase(new SimpleUnicast7, TestCase::Duration::QUICK);
 
     // add simple-unicast-8 case to suite sat-simple-unicast
-    AddTestCase(new SimpleUnicast8, TestCase::QUICK);
+    AddTestCase(new SimpleUnicast8, TestCase::Duration::QUICK);
 }
 
 // Allocate an instance of this TestSuite

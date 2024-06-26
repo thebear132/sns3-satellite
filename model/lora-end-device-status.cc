@@ -407,7 +407,7 @@ LoraEndDeviceStatus::AddMACCommand(Ptr<LorawanMacCommand> macCommand)
 bool
 LoraEndDeviceStatus::HasReceiveWindowOpportunityScheduled()
 {
-    return m_receiveWindowEvent.IsRunning();
+    return m_receiveWindowEvent.IsPending();
 }
 
 void

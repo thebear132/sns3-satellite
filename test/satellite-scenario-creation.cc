@@ -337,8 +337,8 @@ ScenarioCreationUser::DoRun(void)
 }
 
 // The TestSuite class names the TestSuite as sat-scenario-creation, identifies what type of
-// TestSuite (SYSTEM), and enables the TestCases to be run. Typically, only the constructor for this
-// class must be defined
+// TestSuite (Type::SYSTEM), and enables the TestCases to be run. Typically, only the constructor
+// for this class must be defined
 //
 class ScenarioCreationTestSuite : public TestSuite
 {
@@ -347,19 +347,19 @@ class ScenarioCreationTestSuite : public TestSuite
 };
 
 ScenarioCreationTestSuite::ScenarioCreationTestSuite()
-    : TestSuite("sat-scenario-creation", SYSTEM)
+    : TestSuite("sat-scenario-creation", Type::SYSTEM)
 {
     // add ScenarioCreationSimple case to suite sat-scenario-creation
-    AddTestCase(new ScenarioCreationSimple, TestCase::QUICK);
+    AddTestCase(new ScenarioCreationSimple, TestCase::Duration::QUICK);
 
     // add ScenarioCreationLarger case to suite sat-scenario-creation
-    AddTestCase(new ScenarioCreationLarger, TestCase::QUICK);
+    AddTestCase(new ScenarioCreationLarger, TestCase::Duration::QUICK);
 
     // add ScenarioCreationFull case to suite sat-scenario-creation
-    AddTestCase(new ScenarioCreationFull, TestCase::QUICK);
+    AddTestCase(new ScenarioCreationFull, TestCase::Duration::QUICK);
 
     // add ScenarioCreationUser case to suite sat-scenario-creation
-    AddTestCase(new ScenarioCreationUser, TestCase::QUICK);
+    AddTestCase(new ScenarioCreationUser, TestCase::Duration::QUICK);
 }
 
 // Allocate an instance of this TestSuite

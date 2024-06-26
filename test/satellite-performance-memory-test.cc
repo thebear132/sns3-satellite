@@ -170,8 +170,8 @@ Pm1::DoRun(void)
 }
 
 // The TestSuite class names the TestSuite as sat-perf-mem, identifies what type of TestSuite
-// (SYSTEM), and enables the TestCases to be run.  Typically, only the constructor for this class
-// must be defined
+// (Type::SYSTEM), and enables the TestCases to be run.  Typically, only the constructor for this
+// class must be defined
 //
 class PerfMemTestSuite : public TestSuite
 {
@@ -180,10 +180,10 @@ class PerfMemTestSuite : public TestSuite
 };
 
 PerfMemTestSuite::PerfMemTestSuite()
-    : TestSuite("sat-perf-mem", SYSTEM)
+    : TestSuite("sat-perf-mem", Type::SYSTEM)
 {
     // add pm-1 case to suite sat-perf-mem
-    AddTestCase(new Pm1, TestCase::QUICK);
+    AddTestCase(new Pm1, TestCase::Duration::QUICK);
 }
 
 // Allocate an instance of this TestSuite

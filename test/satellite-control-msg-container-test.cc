@@ -303,10 +303,10 @@ class SatCtrlMsgContainerTestSuite : public TestSuite
 };
 
 SatCtrlMsgContainerTestSuite::SatCtrlMsgContainerTestSuite()
-    : TestSuite("sat-ctrl-msg-container-unit-test", UNIT)
+    : TestSuite("sat-ctrl-msg-container-unit-test", Type::UNIT)
 {
-    AddTestCase(new SatCtrlMsgContDelOnTestCase, TestCase::QUICK);
-    AddTestCase(new SatCtrlMsgContDelOffTestCase, TestCase::QUICK);
+    AddTestCase(new SatCtrlMsgContDelOnTestCase, TestCase::Duration::QUICK);
+    AddTestCase(new SatCtrlMsgContDelOffTestCase, TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

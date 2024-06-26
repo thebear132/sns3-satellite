@@ -138,9 +138,9 @@ class SatFreeSpaceLossTestSuite : public TestSuite
 };
 
 SatFreeSpaceLossTestSuite::SatFreeSpaceLossTestSuite()
-    : TestSuite("sat-fsl-test", UNIT)
+    : TestSuite("sat-fsl-test", Type::UNIT)
 {
-    AddTestCase(new SatFreeSpaceLossTestCase, TestCase::QUICK);
+    AddTestCase(new SatFreeSpaceLossTestCase, TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

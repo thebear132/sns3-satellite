@@ -605,7 +605,7 @@ SatReturnLinkEncapsulatorArq::ReassembleAndReceive()
                                       << ", status: " << it->second->m_rxStatus);
 
         // If timer is running, cancel it.
-        if (it->second->m_waitingTimer.IsRunning())
+        if (it->second->m_waitingTimer.IsPending())
         {
             it->second->m_waitingTimer.Cancel();
         }

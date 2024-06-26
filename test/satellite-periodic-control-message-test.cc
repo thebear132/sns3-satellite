@@ -183,8 +183,8 @@ SatPeriodicControlMessageTest1::DoRun(void)
 }
 
 // The TestSuite class names the TestSuite as sat-periodic-control-message-test, identifies what
-// type of TestSuite (SYSTEM), and enables the TestCases to be run.  Typically, only the constructor
-// for this class must be defined
+// type of TestSuite (Type::SYSTEM), and enables the TestCases to be run.  Typically, only the
+// constructor for this class must be defined
 //
 class SatPeriodicControlMessageTestSuite : public TestSuite
 {
@@ -193,9 +193,9 @@ class SatPeriodicControlMessageTestSuite : public TestSuite
 };
 
 SatPeriodicControlMessageTestSuite::SatPeriodicControlMessageTestSuite()
-    : TestSuite("sat-periodic-control-message-test", SYSTEM)
+    : TestSuite("sat-periodic-control-message-test", Type::SYSTEM)
 {
-    AddTestCase(new SatPeriodicControlMessageTest1, TestCase::QUICK);
+    AddTestCase(new SatPeriodicControlMessageTest1, TestCase::Duration::QUICK);
 }
 
 // Allocate an instance of this TestSuite

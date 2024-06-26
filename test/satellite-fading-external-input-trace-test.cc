@@ -148,9 +148,9 @@ class SatFadingExternalInputTraceTestSuite : public TestSuite
 };
 
 SatFadingExternalInputTraceTestSuite::SatFadingExternalInputTraceTestSuite()
-    : TestSuite("sat-fading-external-input-trace-test", UNIT)
+    : TestSuite("sat-fading-external-input-trace-test", Type::UNIT)
 {
-    AddTestCase(new SatFadingExternalInputTraceTestCase, TestCase::QUICK);
+    AddTestCase(new SatFadingExternalInputTraceTestCase, TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

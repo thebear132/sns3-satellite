@@ -175,8 +175,8 @@ SatCraTest1::DoRun(void)
 }
 
 // The TestSuite class names the TestSuite as sat-cra-test, identifies what type of TestSuite
-// (SYSTEM), and enables the TestCases to be run.  Typically, only the constructor for this class
-// must be defined
+// (Type::SYSTEM), and enables the TestCases to be run.  Typically, only the constructor for this
+// class must be defined
 //
 class SatCraTestSuite : public TestSuite
 {
@@ -185,9 +185,9 @@ class SatCraTestSuite : public TestSuite
 };
 
 SatCraTestSuite::SatCraTestSuite()
-    : TestSuite("sat-cra-test", SYSTEM)
+    : TestSuite("sat-cra-test", Type::SYSTEM)
 {
-    AddTestCase(new SatCraTest1, TestCase::QUICK);
+    AddTestCase(new SatCraTest1, TestCase::Duration::QUICK);
 }
 
 // Allocate an instance of this TestSuite

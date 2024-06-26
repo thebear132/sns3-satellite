@@ -312,10 +312,10 @@ class SatInterferenceTestSuite : public TestSuite
 };
 
 SatInterferenceTestSuite::SatInterferenceTestSuite()
-    : TestSuite("sat-if-unit-test", UNIT)
+    : TestSuite("sat-if-unit-test", Type::UNIT)
 {
-    AddTestCase(new SatConstantInterferenceTestCase, TestCase::QUICK);
-    AddTestCase(new SatPerPacketInterferenceTestCase, TestCase::QUICK);
+    AddTestCase(new SatConstantInterferenceTestCase, TestCase::Duration::QUICK);
+    AddTestCase(new SatPerPacketInterferenceTestCase, TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

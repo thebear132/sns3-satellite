@@ -1353,7 +1353,7 @@ SatControlMsgContainer::Read(uint32_t recvId)
         {
             if (it == m_ctrlMsgs.begin())
             {
-                if (m_storeTimeout.IsRunning())
+                if (m_storeTimeout.IsPending())
                 {
                     m_storeTimeout.Cancel();
                 }

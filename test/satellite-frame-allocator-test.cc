@@ -807,9 +807,9 @@ class SatFrameAllocatorTestSuite : public TestSuite
 };
 
 SatFrameAllocatorTestSuite::SatFrameAllocatorTestSuite()
-    : TestSuite("sat-frame-allocator-test", UNIT)
+    : TestSuite("sat-frame-allocator-test", Type::UNIT)
 {
-    AddTestCase(new SatFrameAllocatorTestCase, TestCase::QUICK);
+    AddTestCase(new SatFrameAllocatorTestCase, TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

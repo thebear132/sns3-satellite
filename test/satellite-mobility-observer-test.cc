@@ -500,9 +500,9 @@ class SatMobilityObserverTestSuite : public TestSuite
 };
 
 SatMobilityObserverTestSuite::SatMobilityObserverTestSuite()
-    : TestSuite("sat-mobility-observer-test", UNIT)
+    : TestSuite("sat-mobility-observer-test", Type::UNIT)
 {
-    AddTestCase(new SatMobilityObserverTestCase, TestCase::QUICK);
+    AddTestCase(new SatMobilityObserverTestCase, TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

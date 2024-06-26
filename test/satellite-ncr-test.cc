@@ -701,8 +701,8 @@ SatNcrTest3::ChangeTxStatus(bool enable)
 }
 
 // The TestSuite class names the TestSuite as sat-ncr-test, identifies what type of TestSuite
-// (SYSTEM), and enables the TestCases to be run.  Typically, only the constructor for this class
-// must be defined
+// (Type::SYSTEM), and enables the TestCases to be run.  Typically, only the constructor for this
+// class must be defined
 //
 class SatNcrTestSuite : public TestSuite
 {
@@ -711,14 +711,14 @@ class SatNcrTestSuite : public TestSuite
 };
 
 SatNcrTestSuite::SatNcrTestSuite()
-    : TestSuite("sat-ncr-test", SYSTEM)
+    : TestSuite("sat-ncr-test", Type::SYSTEM)
 {
-    AddTestCase(new SatNcrTest1, TestCase::QUICK);
-    AddTestCase(new SatNcrTest2, TestCase::QUICK);
-    AddTestCase(new SatNcrTest3(SatEnums::TRANSPARENT), TestCase::QUICK);
-    AddTestCase(new SatNcrTest3(SatEnums::REGENERATION_PHY), TestCase::QUICK);
-    AddTestCase(new SatNcrTest3(SatEnums::REGENERATION_LINK), TestCase::QUICK);
-    AddTestCase(new SatNcrTest3(SatEnums::REGENERATION_NETWORK), TestCase::QUICK);
+    AddTestCase(new SatNcrTest1, TestCase::Duration::QUICK);
+    AddTestCase(new SatNcrTest2, TestCase::Duration::QUICK);
+    AddTestCase(new SatNcrTest3(SatEnums::TRANSPARENT), TestCase::Duration::QUICK);
+    AddTestCase(new SatNcrTest3(SatEnums::REGENERATION_PHY), TestCase::Duration::QUICK);
+    AddTestCase(new SatNcrTest3(SatEnums::REGENERATION_LINK), TestCase::Duration::QUICK);
+    AddTestCase(new SatNcrTest3(SatEnums::REGENERATION_NETWORK), TestCase::Duration::QUICK);
 }
 
 // Allocate an instance of this TestSuite

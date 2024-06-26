@@ -208,9 +208,9 @@ class SatRequestManagerTestSuite : public TestSuite
 };
 
 SatRequestManagerTestSuite::SatRequestManagerTestSuite()
-    : TestSuite("sat-rm-test", UNIT)
+    : TestSuite("sat-rm-test", Type::UNIT)
 {
-    AddTestCase(new SatBaseTestCase, TestCase::QUICK);
+    AddTestCase(new SatBaseTestCase, TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

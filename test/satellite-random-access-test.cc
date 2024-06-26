@@ -398,8 +398,8 @@ SatSlottedAlohaTest1::DoRun(void)
 }
 
 // The TestSuite class names the TestSuite as sat-random-access-test, identifies what type of
-// TestSuite (SYSTEM), and enables the TestCases to be run.  Typically, only the constructor for
-// this class must be defined
+// TestSuite (Type::SYSTEM), and enables the TestCases to be run.  Typically, only the constructor
+// for this class must be defined
 //
 class SatRandomAccessTestSuite : public TestSuite
 {
@@ -408,11 +408,11 @@ class SatRandomAccessTestSuite : public TestSuite
 };
 
 SatRandomAccessTestSuite::SatRandomAccessTestSuite()
-    : TestSuite("sat-random-access-test", SYSTEM)
+    : TestSuite("sat-random-access-test", Type::SYSTEM)
 {
-    AddTestCase(new SatCrdsaTest1, TestCase::QUICK);
+    AddTestCase(new SatCrdsaTest1, TestCase::Duration::QUICK);
 
-    AddTestCase(new SatSlottedAlohaTest1, TestCase::QUICK);
+    AddTestCase(new SatSlottedAlohaTest1, TestCase::Duration::QUICK);
 }
 
 // Allocate an instance of this TestSuite

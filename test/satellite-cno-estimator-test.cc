@@ -418,11 +418,11 @@ class SatBasicCnoEstimatorTestSuite : public TestSuite
 };
 
 SatBasicCnoEstimatorTestSuite::SatBasicCnoEstimatorTestSuite()
-    : TestSuite("sat-cno-estimator-unit-test", UNIT)
+    : TestSuite("sat-cno-estimator-unit-test", Type::UNIT)
 {
-    AddTestCase(new SatBasicEstimatorLastTestCase, TestCase::QUICK);
-    AddTestCase(new SatBasicEstimatorMinTestCase, TestCase::QUICK);
-    AddTestCase(new SatBasicEstimatorAverageTestCase, TestCase::QUICK);
+    AddTestCase(new SatBasicEstimatorLastTestCase, TestCase::Duration::QUICK);
+    AddTestCase(new SatBasicEstimatorMinTestCase, TestCase::Duration::QUICK);
+    AddTestCase(new SatBasicEstimatorAverageTestCase, TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

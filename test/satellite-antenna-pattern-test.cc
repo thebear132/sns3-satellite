@@ -147,9 +147,9 @@ class SatAntennaPatternTestSuite : public TestSuite
 };
 
 SatAntennaPatternTestSuite::SatAntennaPatternTestSuite()
-    : TestSuite("sat-antenna-gain-pattern-test", UNIT)
+    : TestSuite("sat-antenna-gain-pattern-test", Type::UNIT)
 {
-    AddTestCase(new SatAntennaPatternTestCase, TestCase::QUICK);
+    AddTestCase(new SatAntennaPatternTestCase, TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

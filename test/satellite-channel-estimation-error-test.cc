@@ -141,10 +141,10 @@ class SatChannelEstimationErrorTestSuite : public TestSuite
 };
 
 SatChannelEstimationErrorTestSuite::SatChannelEstimationErrorTestSuite()
-    : TestSuite("sat-channel-estimation-error-test", UNIT)
+    : TestSuite("sat-channel-estimation-error-test", Type::UNIT)
 {
-    AddTestCase(new SatFwdChannelEstimationErrorTestCase, TestCase::QUICK);
-    AddTestCase(new SatRtnChannelEstimationErrorTestCase, TestCase::QUICK);
+    AddTestCase(new SatFwdChannelEstimationErrorTestCase, TestCase::Duration::QUICK);
+    AddTestCase(new SatRtnChannelEstimationErrorTestCase, TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

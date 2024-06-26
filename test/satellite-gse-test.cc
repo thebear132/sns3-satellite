@@ -186,9 +186,9 @@ class SatGseTraceSuite : public TestSuite
 };
 
 SatGseTraceSuite::SatGseTraceSuite()
-    : TestSuite("sat-gse-test", UNIT)
+    : TestSuite("sat-gse-test", Type::UNIT)
 {
-    AddTestCase(new SatGseTestCase, TestCase::QUICK);
+    AddTestCase(new SatGseTestCase, TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

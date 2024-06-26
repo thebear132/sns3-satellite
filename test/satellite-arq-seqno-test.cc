@@ -109,9 +109,9 @@ class SatArqSeqNoTraceSuite : public TestSuite
 };
 
 SatArqSeqNoTraceSuite::SatArqSeqNoTraceSuite()
-    : TestSuite("sat-arq-seqno-test", UNIT)
+    : TestSuite("sat-arq-seqno-test", Type::UNIT)
 {
-    AddTestCase(new SatSeqNoTestCase, TestCase::QUICK);
+    AddTestCase(new SatSeqNoTestCase, TestCase::Duration::QUICK);
 }
 
 // Do allocate an instance of this TestSuite

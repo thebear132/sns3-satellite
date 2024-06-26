@@ -563,8 +563,8 @@ SatHandoverTest2::DoRun(void)
 }
 
 // The TestSuite class names the TestSuite as sat-handover-test, identifies what type of
-// TestSuite (SYSTEM), and enables the TestCases to be run. Typically, only the constructor for this
-// class must be defined
+// TestSuite (Type::SYSTEM), and enables the TestCases to be run. Typically, only the constructor
+// for this class must be defined
 //
 class SatHandoverTestSuite : public TestSuite
 {
@@ -573,13 +573,14 @@ class SatHandoverTestSuite : public TestSuite
 };
 
 SatHandoverTestSuite::SatHandoverTestSuite()
-    : TestSuite("sat-handover-test", SYSTEM)
+    : TestSuite("sat-handover-test", Type::SYSTEM)
 {
+    AddTestCase(new SatHandoverTest1,
+                TestCase::Duration::QUICK); // This case tests that a application throughputs
+                                            // PerEntity are correct.
     AddTestCase(
-        new SatHandoverTest1,
-        TestCase::QUICK); // This case tests that a application throughputs PerEntity are correct.
-    AddTestCase(new SatHandoverTest2,
-                TestCase::QUICK); // This case tests that communication remains after GW handover.
+        new SatHandoverTest2,
+        TestCase::Duration::QUICK); // This case tests that communication remains after GW handover.
 }
 
 // Allocate an instance of this TestSuite
