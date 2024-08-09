@@ -434,12 +434,12 @@ SatRegenerationTest2::DoRun(void)
     Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
 
     /// Set constant 10% losses on Uplink
-    Config::SetDefault("ns3::SatGeoHelper::FwdLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::FwdLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_CONSTANT));
-    Config::SetDefault("ns3::SatGeoHelper::FwdLinkConstantErrorRate", DoubleValue(0.1));
-    Config::SetDefault("ns3::SatGeoHelper::RtnLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::FwdLinkConstantErrorRate", DoubleValue(0.1));
+    Config::SetDefault("ns3::SatOrbiterHelper::RtnLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_CONSTANT));
-    Config::SetDefault("ns3::SatGeoHelper::RtnLinkConstantErrorRate", DoubleValue(0.1));
+    Config::SetDefault("ns3::SatOrbiterHelper::RtnLinkConstantErrorRate", DoubleValue(0.1));
 
     // Enable SatMac traces
     Config::SetDefault("ns3::SatPhy::EnableStatisticsTags", BooleanValue(true));
@@ -782,9 +782,9 @@ SatRegenerationTest3::DoRun(void)
     Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed",
                        BooleanValue(false));
 
-    Config::SetDefault("ns3::SatGeoHelper::FwdLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::FwdLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_NONE));
-    Config::SetDefault("ns3::SatGeoHelper::RtnLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::RtnLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_AVI));
     Config::SetDefault("ns3::SatBeamHelper::RaCollisionModel",
                        EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));

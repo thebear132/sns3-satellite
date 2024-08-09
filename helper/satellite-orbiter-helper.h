@@ -20,8 +20,8 @@
  * Author: Mathias Ettinger <mettinger@viveris.toulouse.fr>
  */
 
-#ifndef SAT_GEO_HELPER_H
-#define SAT_GEO_HELPER_H
+#ifndef SAT_ORBITER_HELPER_H
+#define SAT_ORBITER_HELPER_H
 
 #include "ns3/error-model.h"
 #include "ns3/net-device-container.h"
@@ -50,7 +50,7 @@ namespace ns3
  *        Handles needed configuration for the Geo Satellite node.
  *
  */
-class SatGeoHelper : public Object
+class SatOrbiterHelper : public Object
 {
   public:
     /**
@@ -75,13 +75,13 @@ class SatGeoHelper : public Object
     /**
      * Default constructor.
      */
-    SatGeoHelper();
+    SatOrbiterHelper();
 
     /**
-     * Create a SatGeoHelper to make life easier when creating Satellite point to
+     * Create a SatOrbiterHelper to make life easier when creating Satellite point to
      * point network connections.
      */
-    SatGeoHelper(SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
+    SatOrbiterHelper(SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                  uint32_t rtnLinkCarrierCount,
                  uint32_t fwdLinkCarrierCount,
                  Ptr<SatSuperframeSeq> seq,
@@ -89,7 +89,7 @@ class SatGeoHelper : public Object
                  SatMac::ReadCtrlMsgCallback rtnReadCb,
                  RandomAccessSettings_s randomAccessSettings);
 
-    virtual ~SatGeoHelper()
+    virtual ~SatOrbiterHelper()
     {
     }
 
@@ -109,7 +109,7 @@ class SatGeoHelper : public Object
      * \param value the value of the attribute to set
      *
      * Set these attributes on each ns3::SatGeoNetDevice created
-     * by SatGeoHelper::Install
+     * by SatOrbiterHelper::Install
      */
     void SetDeviceAttribute(std::string name, const AttributeValue& value);
 
@@ -120,7 +120,7 @@ class SatGeoHelper : public Object
      * \param value the value of the attribute to set
      *
      * Set these attributes on each ns3::SatPhy (user) created
-     * by SatGeoHelper::Install
+     * by SatOrbiterHelper::Install
      */
     void SetUserPhyAttribute(std::string name, const AttributeValue& value);
 
@@ -131,7 +131,7 @@ class SatGeoHelper : public Object
      * \param value the value of the attribute to set
      *
      * Set these attributes on each ns3::SatPhy (feeder) created
-     * by SatGeoHelper::Install
+     * by SatOrbiterHelper::Install
      */
     void SetFeederPhyAttribute(std::string name, const AttributeValue& value);
 

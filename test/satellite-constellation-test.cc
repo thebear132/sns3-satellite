@@ -817,7 +817,7 @@ SatConstellationTest4::DoRun(void)
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue(false));
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionPeriod",
                        TimeValue(MilliSeconds(10)));
-    Config::SetDefault("ns3::SatGeoHelper::IslArbiterType", EnumValue(SatEnums::UNICAST));
+    Config::SetDefault("ns3::SatOrbiterHelper::IslArbiterType", EnumValue(SatEnums::UNICAST));
     Config::SetDefault("ns3::SatHelper::GwUsers", UintegerValue(3));
 
     /// When using 72 beams, we need a 72*nbSats network addresses for beams, so we take margin

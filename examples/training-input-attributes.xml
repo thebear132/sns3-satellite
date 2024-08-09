@@ -424,8 +424,8 @@
  <default name="ns3::SatConf::FwdCarrierAllocatedBandwidth" value="1.25e+08"/>
  <default name="ns3::SatConf::FwdCarrierRollOff" value="0.2"/>
  <default name="ns3::SatConf::FwdCarrierSpacing" value="0"/>
- <default name="ns3::SatGeoHelper::DaFwdLinkInterferenceModel" value="Constant"/>
- <default name="ns3::SatGeoHelper::DaRtnLinkInterferenceModel" value="Constant"/>
+ <default name="ns3::SatOrbiterHelper::DaFwdLinkInterferenceModel" value="Constant"/>
+ <default name="ns3::SatOrbiterHelper::DaRtnLinkInterferenceModel" value="Constant"/>
  <default name="ns3::SatGwHelper::RtnLinkConstantErrorRate" value="0.01"/>
  <default name="ns3::SatGwHelper::RtnLinkErrorModel" value="AVI"/>
  <default name="ns3::SatGwHelper::DaRtnLinkInterferenceModel" value="Constant"/>

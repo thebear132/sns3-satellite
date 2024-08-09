@@ -188,9 +188,9 @@ main(int argc, char* argv[])
                        BooleanValue(false));
 
     // Configure RA
-    Config::SetDefault("ns3::SatGeoHelper::FwdLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::FwdLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_AVI));
-    Config::SetDefault("ns3::SatGeoHelper::RtnLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::RtnLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_AVI));
     Config::SetDefault("ns3::SatBeamHelper::RandomAccessModel", EnumValue(SatEnums::RA_MODEL_ESSA));
     if (interferenceModePerPacket)

@@ -303,7 +303,7 @@ SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
     SatMac::SendCtrlMsgCallback fwdSendCtrlCb =
         MakeCallback(&SatControlMsgContainer::Send, fwdCtrlMsgContainer);
 
-    SatGeoHelper::RandomAccessSettings_s geoRaSettings;
+    SatOrbiterHelper::RandomAccessSettings_s geoRaSettings;
     geoRaSettings.m_raFwdInterferenceModel = m_raInterferenceModel;
     geoRaSettings.m_raRtnInterferenceModel = m_raInterferenceModel;
     geoRaSettings.m_raInterferenceEliminationModel = m_raInterferenceEliminationModel;
@@ -329,12 +329,12 @@ SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
     {
         geoRaSettings.m_raRtnInterferenceModel = SatPhyRxCarrierConf::IF_TRACE;
         gwRaSettings.m_raInterferenceModel = SatPhyRxCarrierConf::IF_TRACE;
-        Config::SetDefault("ns3::SatGeoHelper::DaRtnLinkInterferenceModel", StringValue("Trace"));
+        Config::SetDefault("ns3::SatOrbiterHelper::DaRtnLinkInterferenceModel", StringValue("Trace"));
         Config::SetDefault("ns3::SatGwHelper::DaRtnLinkInterferenceModel", StringValue("Trace"));
     }
 
     // create needed low level satellite helpers
-    m_geoHelper = CreateObject<SatGeoHelper>(bandwidthConverterCb,
+    m_orbiterHelper = CreateObject<SatOrbiterHelper>(bandwidthConverterCb,
                                              rtnLinkCarrierCount,
                                              fwdLinkCarrierCount,
                                              seq,
@@ -439,12 +439,12 @@ SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
     // DVB-S2 link results for FWD link RRM
     m_gwHelper->Initialize(linkResultsReturnLink, linkResultsFwd, m_dvbVersion, useScpc);
     // link results on satellite, to use if regeneration
-    m_geoHelper->Initialize(linkResultsFwd, linkResultsReturnLink);
+    m_orbiterHelper->Initialize(linkResultsFwd, linkResultsReturnLink);
     // DVB-RCS2 link results for RTN link waveform configurations
     m_superframeSeq->GetWaveformConf()->InitializeEbNoRequirements(linkResultsReturnLink);
 
     m_geoNodes = geoNodes;
-    m_geoHelper->Install(m_geoNodes);
+    m_orbiterHelper->Install(m_geoNodes);
 
     m_ncc = CreateObject<SatNcc>();
 
@@ -510,7 +510,7 @@ SatBeamHelper::DoDispose()
     m_beamFreqs.clear();
     m_markovConf = nullptr;
     m_ncc = nullptr;
-    m_geoHelper = nullptr;
+    m_orbiterHelper = nullptr;
     m_gwHelper = nullptr;
     m_utHelper = nullptr;
     m_antennaGainPatterns = nullptr;
@@ -607,7 +607,7 @@ SatBeamHelper::Install(NodeContainer ut,
     }
 
     // attach channels to geo satellite device
-    m_geoHelper->AttachChannels(geoNode->GetDevice(0),
+    m_orbiterHelper->AttachChannels(geoNode->GetDevice(0),
                                 feederLink.first,
                                 feederLink.second,
                                 userLink.first,
@@ -932,7 +932,7 @@ SatBeamHelper::SetIslRoutes()
 {
     NS_LOG_FUNCTION(this);
 
-    m_geoHelper->SetIslRoutes(m_geoNodes, m_isls);
+    m_orbiterHelper->SetIslRoutes(m_geoNodes, m_isls);
 }
 
 uint32_t
@@ -988,11 +988,11 @@ SatBeamHelper::GetGwHelper() const
     return m_gwHelper;
 }
 
-Ptr<SatGeoHelper>
-SatBeamHelper::GetGeoHelper() const
+Ptr<SatOrbiterHelper>
+SatBeamHelper::GetOrbiterHelper() const
 {
     NS_LOG_FUNCTION(this);
-    return m_geoHelper;
+    return m_orbiterHelper;
 }
 
 NodeContainer
@@ -1257,7 +1257,7 @@ SatBeamHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBas
     NS_LOG_FUNCTION(this);
 
     TraceConnect("Creation", "SatBeamHelper", cb);
-    m_geoHelper->EnableCreationTraces(stream, cb);
+    m_orbiterHelper->EnableCreationTraces(stream, cb);
     m_gwHelper->EnableCreationTraces(stream, cb);
     m_utHelper->EnableCreationTraces(stream, cb);
 }

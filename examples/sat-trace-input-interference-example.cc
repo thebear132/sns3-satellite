@@ -78,9 +78,9 @@ main(int argc, char* argv[])
     /// Enable interference density input trace
     Config::SetDefault("ns3::SatGwHelper::DaRtnLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_TRACE));
-    Config::SetDefault("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::DaRtnLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_TRACE));
-    Config::SetDefault("ns3::SatGeoHelper::DaFwdLinkInterferenceModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::DaFwdLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_TRACE));
     Config::SetDefault("ns3::SatUtHelper::DaFwdLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_TRACE));

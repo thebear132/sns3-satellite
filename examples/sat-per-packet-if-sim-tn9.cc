@@ -133,9 +133,9 @@ main(int argc, char* argv[])
     // Per-packet interference
     Config::SetDefault("ns3::SatUtHelper::DaFwdLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET));
-    Config::SetDefault("ns3::SatGeoHelper::DaFwdLinkInterferenceModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::DaFwdLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET));
-    Config::SetDefault("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::DaRtnLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET));
     Config::SetDefault("ns3::SatGwHelper::DaRtnLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET));

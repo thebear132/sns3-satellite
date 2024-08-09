@@ -188,9 +188,9 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatRandomAccessConf::SlottedAlohaSignalingOverheadInBytes",
                        UintegerValue(3));
 
-    Config::SetDefault("ns3::SatGeoHelper::FwdLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::FwdLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_AVI));
-    Config::SetDefault("ns3::SatGeoHelper::RtnLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::RtnLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_AVI));
 
     if (randomAccess == "Essa")
@@ -214,7 +214,7 @@ main(int argc, char* argv[])
                            EnumValue(SatPhyRxCarrierConf::SIC_RESIDUAL));
         Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults",
                            EnumValue(SatEnums::LR_FSIM));
-        Config::SetDefault("ns3::SatGeoHelper::RtnLinkErrorModel",
+        Config::SetDefault("ns3::SatOrbiterHelper::RtnLinkErrorModel",
                            EnumValue(SatPhyRxCarrierConf::EM_AVI));
 
         Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));

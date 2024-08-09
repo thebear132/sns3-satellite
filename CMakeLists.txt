@@ -188,7 +188,6 @@ set(source_files
     helper/satellite-beam-user-info.cc
     helper/satellite-cno-helper.cc
     helper/satellite-conf.cc
-    helper/satellite-geo-helper.cc
     helper/satellite-group-helper.cc
     helper/satellite-gw-helper.cc
     helper/satellite-gw-helper-dvb.cc
@@ -197,6 +196,7 @@ set(source_files
     helper/satellite-isl-arbiter-unicast-helper.cc
     helper/satellite-lora-conf.cc
     helper/satellite-on-off-helper.cc
+    helper/satellite-orbiter-helper.cc
     helper/satellite-point-to-point-isl-helper.cc
     helper/satellite-traffic-helper.cc
     helper/satellite-user-helper.cc
@@ -435,7 +435,6 @@ set(header_files
     helper/satellite-beam-user-info.h
     helper/satellite-cno-helper.h
     helper/satellite-conf.h
-    helper/satellite-geo-helper.h
     helper/satellite-group-helper.h
     helper/satellite-gw-helper.h
     helper/satellite-gw-helper-dvb.h
@@ -444,6 +443,7 @@ set(header_files
     helper/satellite-isl-arbiter-unicast-helper.h
     helper/satellite-lora-conf.h
     helper/satellite-on-off-helper.h
+    helper/satellite-orbiter-helper.h
     helper/satellite-point-to-point-isl-helper.h
     helper/satellite-traffic-helper.h
     helper/satellite-user-helper.h

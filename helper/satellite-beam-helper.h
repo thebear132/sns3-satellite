@@ -23,7 +23,7 @@
 #ifndef SATELLITE_BEAM_HELPER_H
 #define SATELLITE_BEAM_HELPER_H
 
-#include "satellite-geo-helper.h"
+#include "satellite-orbiter-helper.h"
 #include "satellite-gw-helper.h"
 #include "satellite-ut-helper.h"
 
@@ -53,7 +53,7 @@ class PropagationDelayModel;
 
 /**
  * \brief SatBeamHelper builds a set Satellite beams with needed objects and configuration.
- *        It utilizes SatUtHelper, SatGwHelper and SatGeoHelper to create needed objects.
+ *        It utilizes SatUtHelper, SatGwHelper and SatOrbiterHelper to create needed objects.
  *
  *        SatBeamHelper creates needed routes between nodes inside satellite network.
  *
@@ -355,7 +355,7 @@ class SatBeamHelper : public Object
     /**
      * \return pointer to Geo helper.
      */
-    Ptr<SatGeoHelper> GetGeoHelper() const;
+    Ptr<SatOrbiterHelper> GetOrbiterHelper() const;
 
     /**
      * \return pointer to the NCC.
@@ -420,7 +420,7 @@ class SatBeamHelper : public Object
     Ptr<SatSuperframeSeq> m_superframeSeq;
 
     ObjectFactory m_channelFactory;
-    Ptr<SatGeoHelper> m_geoHelper;
+    Ptr<SatOrbiterHelper> m_orbiterHelper;
     Ptr<SatGwHelper> m_gwHelper;
     Ptr<SatUtHelper> m_utHelper;
     NodeContainer m_geoNodes;

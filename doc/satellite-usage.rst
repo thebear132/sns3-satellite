@@ -365,9 +365,9 @@ satellite switch to deliver packets through satellite node. The GEO helper attri
     =================================================================   ==================================================================================
     Name of attribute                                                   Description
     =================================================================   ==================================================================================
-    ns3::SatGeoHelper:: DaFwdLinkInterferenceModel                      Forward link interference model for dedicated access.
-    ns3::SatGeoHelper:: DaRtnLinkInterferenceModel                      Return link interference model for dedicated access
-    ns3::SatGeoHelper:: Creation                                        Creation traces.
+    ns3::SatOrbiterHelper:: DaFwdLinkInterferenceModel                      Forward link interference model for dedicated access.
+    ns3::SatOrbiterHelper:: DaRtnLinkInterferenceModel                      Return link interference model for dedicated access
+    ns3::SatOrbiterHelper:: Creation                                        Creation traces.
     =================================================================   ==================================================================================
 
 
@@ -789,9 +789,9 @@ Interference attributes are presented in :ref:`tab-interference`.
     +---------------------------------------------+
     |Name of the attribute                        |
     +=============================================+
-    |ns3::SatGeoHelper::DaFwdLinkInterferenceModel|
+    |ns3::SatOrbiterHelper::DaFwdLinkInterferenceModel|
     +---------------------------------------------+
-    |ns3::SatGeoHelper::DaRtnLinkInterferenceModel|
+    |ns3::SatOrbiterHelper::DaRtnLinkInterferenceModel|
     +---------------------------------------------+
     |ns3::SatGwHelper::DaRtnLinkInterferenceModel |
     +---------------------------------------------+

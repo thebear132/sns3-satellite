@@ -300,7 +300,7 @@ SatPerPacketFwdLinkUserTestCase::DoRun(void)
 
     Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue(1));
     Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue(1));
-    Config::SetDefault("ns3::SatGeoHelper::DaFwdLinkInterferenceModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::DaFwdLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET));
     Config::SetDefault("ns3::SatUtHelper::DaFwdLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET));
@@ -496,7 +496,7 @@ SatPerPacketFwdLinkFullTestCase::DoRun(void)
 
     Config::SetDefault("ns3::SatHelper::UtCount", UintegerValue(1));
     Config::SetDefault("ns3::SatHelper::UtUsers", UintegerValue(1));
-    Config::SetDefault("ns3::SatGeoHelper::DaFwdLinkInterferenceModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::DaFwdLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET));
     Config::SetDefault("ns3::SatUtHelper::DaFwdLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET));
@@ -691,7 +691,7 @@ SatPerPacketRtnLinkUserTestCase::DoRun(void)
     // Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(13));
     Config::SetDefault("ns3::SatGwHelper::DaRtnLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET));
-    Config::SetDefault("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::DaRtnLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET));
     Config::SetDefault("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue(true));
 
@@ -857,7 +857,7 @@ SatPerPacketRtnLinkFullTestCase::DoRun(void)
     // Config::SetDefault("ns3::SatWaveformConf::DefaultWfId", UintegerValue(13));
     Config::SetDefault("ns3::SatGwHelper::DaRtnLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET));
-    Config::SetDefault("ns3::SatGeoHelper::DaRtnLinkInterferenceModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::DaRtnLinkInterferenceModel",
                        EnumValue(SatPhyRxCarrierConf::IF_PER_PACKET));
     Config::SetDefault("ns3::SatPhyRxCarrierConf::EnableIntfOutputTrace", BooleanValue(true));
 
