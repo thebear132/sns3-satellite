@@ -71,7 +71,8 @@ main(int argc, char* argv[])
                        EnumValue(SatEnums::REGENERATION_NETWORK));
 
     Config::SetDefault("ns3::SatGwMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
-    Config::SetDefault("ns3::SatGeoMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
+    Config::SetDefault("ns3::SatOrbiterMac::DisableSchedulingIfNoDeviceConnected",
+                       BooleanValue(true));
 
     Ptr<SimulationHelper> simulationHelper =
         CreateObject<SimulationHelper>("sat-beam-position-tracer");

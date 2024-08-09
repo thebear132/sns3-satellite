@@ -18,12 +18,13 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "satellite-geo-feeder-mac.h"
+#include "satellite-orbiter-user-mac.h"
 
 #include "satellite-address-tag.h"
 #include "satellite-mac.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-time-tag.h"
+#include "satellite-uplink-info-tag.h"
 #include "satellite-utils.h"
 
 #include <ns3/double.h>
@@ -33,72 +34,75 @@
 #include <ns3/simulator.h>
 #include <ns3/uinteger.h>
 
-NS_LOG_COMPONENT_DEFINE("SatGeoFeederMac");
+NS_LOG_COMPONENT_DEFINE("SatOrbiterUserMac");
 
 namespace ns3
 {
 
-NS_OBJECT_ENSURE_REGISTERED(SatGeoFeederMac);
+NS_OBJECT_ENSURE_REGISTERED(SatOrbiterUserMac);
 
 TypeId
-SatGeoFeederMac::GetTypeId(void)
+SatOrbiterUserMac::GetTypeId(void)
 {
-    static TypeId tid =
-        TypeId("ns3::SatGeoFeederMac")
-            .SetParent<SatGeoMac>()
-            .AddConstructor<SatGeoFeederMac>()
-            .AddAttribute("GuardTime",
-                          "Guard time in this SCPC scheduler",
-                          TimeValue(MicroSeconds(1)),
-                          MakeTimeAccessor(&SatGeoMac::GetGuardTime, &SatGeoMac::SetGuardTime),
-                          MakeTimeChecker());
+    static TypeId tid = TypeId("ns3::SatOrbiterUserMac")
+                            .SetParent<SatOrbiterMac>()
+                            .AddConstructor<SatOrbiterUserMac>()
+                            .AddAttribute("GuardTime",
+                                          "Guard time in this fwd user link scheduler",
+                                          TimeValue(MicroSeconds(1)),
+                                          MakeTimeAccessor(&SatOrbiterMac::GetGuardTime,
+                                                           &SatOrbiterMac::SetGuardTime),
+                                          MakeTimeChecker());
     return tid;
 }
 
 TypeId
-SatGeoFeederMac::GetInstanceTypeId(void) const
+SatOrbiterUserMac::GetInstanceTypeId(void) const
 {
     NS_LOG_FUNCTION(this);
 
     return GetTypeId();
 }
 
-SatGeoFeederMac::SatGeoFeederMac(void)
+SatOrbiterUserMac::SatOrbiterUserMac(void)
 {
     NS_LOG_FUNCTION(this);
-    NS_FATAL_ERROR("SatGeoFeederMac default constructor is not allowed to use");
+    NS_FATAL_ERROR("SatOrbiterUserMac default constructor is not allowed to use");
 }
 
-SatGeoFeederMac::SatGeoFeederMac(uint32_t satId,
-                                 uint32_t beamId,
-                                 SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                                 SatEnums::RegenerationMode_t returnLinkRegenerationMode)
-    : SatGeoMac(satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode)
+SatOrbiterUserMac::SatOrbiterUserMac(uint32_t satId,
+                                     uint32_t beamId,
+                                     SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                                     SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+    : SatOrbiterMac(satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode)
 {
     NS_LOG_FUNCTION(this << satId << beamId);
 }
 
-SatGeoFeederMac::~SatGeoFeederMac()
+SatOrbiterUserMac::~SatOrbiterUserMac()
 {
     NS_LOG_FUNCTION(this);
 }
 
 void
-SatGeoFeederMac::DoDispose()
+SatOrbiterUserMac::DoDispose()
 {
     NS_LOG_FUNCTION(this);
+
+    m_peers.clear();
+
     Object::DoDispose();
 }
 
 void
-SatGeoFeederMac::DoInitialize()
+SatOrbiterUserMac::DoInitialize()
 {
     NS_LOG_FUNCTION(this);
     Object::DoInitialize();
 }
 
 void
-SatGeoFeederMac::EnquePacket(Ptr<Packet> packet)
+SatOrbiterUserMac::EnquePacket(Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
 
@@ -114,7 +118,7 @@ SatGeoFeederMac::EnquePacket(Ptr<Packet> packet)
     SatMacTag mTag;
     success &= packet->RemovePacketTag(mTag);
 
-    if (m_returnLinkRegenerationMode != SatEnums::REGENERATION_NETWORK)
+    if (m_forwardLinkRegenerationMode != SatEnums::REGENERATION_NETWORK)
     {
         // MAC tag and E2E address tag found
         if (success)
@@ -138,12 +142,12 @@ SatGeoFeederMac::EnquePacket(Ptr<Packet> packet)
 }
 
 void
-SatGeoFeederMac::Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams)
+SatOrbiterUserMac::Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParameters> rxParams)
 {
     NS_LOG_FUNCTION(this);
 
-    if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_LINK ||
-        m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK ||
+        m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
         // Add packet trace entry:
         m_packetTrace(Simulator::Now(),
@@ -152,7 +156,7 @@ SatGeoFeederMac::Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParamet
                       m_nodeInfo->GetNodeId(),
                       m_nodeInfo->GetMacAddress(),
                       SatEnums::LL_MAC,
-                      SatEnums::LD_FORWARD,
+                      SatEnums::LD_RETURN,
                       SatUtils::GetPacketInfo(packets));
 
         RxTraces(packets);
@@ -206,7 +210,7 @@ SatGeoFeederMac::Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParamet
         }
     }
 
-    if (m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
+    if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
         for (SatPhy::PacketContainer_t::iterator i = rxParams->m_packetsInBurst.begin();
              i != rxParams->m_packetsInBurst.end();
@@ -239,7 +243,7 @@ SatGeoFeederMac::Receive(SatPhy::PacketContainer_t packets, Ptr<SatSignalParamet
 }
 
 void
-SatGeoFeederMac::ReceiveSignalingPacket(Ptr<Packet> packet)
+SatOrbiterUserMac::ReceiveSignalingPacket(Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
 
@@ -281,25 +285,25 @@ SatGeoFeederMac::ReceiveSignalingPacket(Ptr<Packet> packet)
         break;
     }
     default: {
-        NS_FATAL_ERROR("Control message unkonwn on feeder MAC");
+        NS_FATAL_ERROR("Control message unkonwn on user MAC");
     }
     }
 }
 
 SatEnums::SatLinkDir_t
-SatGeoFeederMac::GetSatLinkTxDir()
-{
-    return SatEnums::LD_RETURN;
-}
-
-SatEnums::SatLinkDir_t
-SatGeoFeederMac::GetSatLinkRxDir()
+SatOrbiterUserMac::GetSatLinkTxDir()
 {
     return SatEnums::LD_FORWARD;
 }
 
+SatEnums::SatLinkDir_t
+SatOrbiterUserMac::GetSatLinkRxDir()
+{
+    return SatEnums::LD_RETURN;
+}
+
 Address
-SatGeoFeederMac::GetRxUtAddress(Ptr<Packet> packet)
+SatOrbiterUserMac::GetRxUtAddress(Ptr<Packet> packet)
 {
     NS_LOG_FUNCTION(this << packet);
 
@@ -309,34 +313,57 @@ SatGeoFeederMac::GetRxUtAddress(Ptr<Packet> packet)
     if (packet->PeekPacketTag(addressE2ETag))
     {
         NS_LOG_DEBUG(this << " contains a SatE2E tag");
-        utAddr = addressE2ETag.GetE2EDestAddress();
+        utAddr = addressE2ETag.GetE2ESourceAddress();
     }
 
     return utAddr;
 }
 
 bool
-SatGeoFeederMac::AddPeer(Mac48Address address)
+SatOrbiterUserMac::AddPeer(Mac48Address address)
 {
     NS_LOG_FUNCTION(this << address);
 
-    return false;
+    NS_ASSERT(m_peers.find(address) == m_peers.end());
+
+    if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
+    {
+        NS_LOG_INFO("Start beam " << m_beamId);
+        m_peers.insert(address);
+        StartPeriodicTransmissions();
+    }
+    else
+    {
+        m_peers.insert(address);
+    }
+
+    return true;
 }
 
 bool
-SatGeoFeederMac::RemovePeer(Mac48Address address)
+SatOrbiterUserMac::RemovePeer(Mac48Address address)
 {
     NS_LOG_FUNCTION(this << address);
 
-    return false;
+    NS_ASSERT(m_peers.find(address) != m_peers.end());
+
+    m_peers.erase(address);
+
+    if (m_disableSchedulingIfNoDeviceConnected && !HasPeer())
+    {
+        NS_LOG_INFO("Stop beam " << m_beamId);
+        StopPeriodicTransmissions();
+    }
+
+    return true;
 }
 
 bool
-SatGeoFeederMac::HasPeer()
+SatOrbiterUserMac::HasPeer()
 {
     NS_LOG_FUNCTION(this);
 
-    return true;
+    return !m_peers.empty();
 }
 
 } // namespace ns3

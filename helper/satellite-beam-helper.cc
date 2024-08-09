@@ -329,18 +329,19 @@ SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
     {
         geoRaSettings.m_raRtnInterferenceModel = SatPhyRxCarrierConf::IF_TRACE;
         gwRaSettings.m_raInterferenceModel = SatPhyRxCarrierConf::IF_TRACE;
-        Config::SetDefault("ns3::SatOrbiterHelper::DaRtnLinkInterferenceModel", StringValue("Trace"));
+        Config::SetDefault("ns3::SatOrbiterHelper::DaRtnLinkInterferenceModel",
+                           StringValue("Trace"));
         Config::SetDefault("ns3::SatGwHelper::DaRtnLinkInterferenceModel", StringValue("Trace"));
     }
 
     // create needed low level satellite helpers
     m_orbiterHelper = CreateObject<SatOrbiterHelper>(bandwidthConverterCb,
-                                             rtnLinkCarrierCount,
-                                             fwdLinkCarrierCount,
-                                             seq,
-                                             fwdReadCtrlCb,
-                                             rtnReadCtrlCb,
-                                             geoRaSettings);
+                                                     rtnLinkCarrierCount,
+                                                     fwdLinkCarrierCount,
+                                                     seq,
+                                                     fwdReadCtrlCb,
+                                                     rtnReadCtrlCb,
+                                                     geoRaSettings);
 
     switch (m_standard)
     {
@@ -608,18 +609,18 @@ SatBeamHelper::Install(NodeContainer ut,
 
     // attach channels to geo satellite device
     m_orbiterHelper->AttachChannels(geoNode->GetDevice(0),
-                                feederLink.first,
-                                feederLink.second,
-                                userLink.first,
-                                userLink.second,
-                                m_antennaGainPatterns->GetAntennaGainPattern(beamId),
-                                m_antennaGainPatterns->GetAntennaGainPattern(feederBeamId),
-                                m_ncc,
-                                satId,
-                                gwId,
-                                beamId,
-                                m_forwardLinkRegenerationMode,
-                                m_returnLinkRegenerationMode);
+                                    feederLink.first,
+                                    feederLink.second,
+                                    userLink.first,
+                                    userLink.second,
+                                    m_antennaGainPatterns->GetAntennaGainPattern(beamId),
+                                    m_antennaGainPatterns->GetAntennaGainPattern(feederBeamId),
+                                    m_ncc,
+                                    satId,
+                                    gwId,
+                                    beamId,
+                                    m_forwardLinkRegenerationMode,
+                                    m_returnLinkRegenerationMode);
 
     Ptr<SatMobilityModel> gwMobility = gwNode->GetObject<SatMobilityModel>();
     NS_ASSERT(gwMobility != nullptr);

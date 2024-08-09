@@ -18,8 +18,8 @@
  * Author: Bastien TAURAN <bastien.tauran@viveris.fr>
  */
 
-#ifndef SATELLITE_GEO_LLC_H_
-#define SATELLITE_GEO_LLC_H_
+#ifndef SATELLITE_ORBITER_LLC_H
+#define SATELLITE_ORBITER_LLC_H
 
 #include "satellite-base-encapsulator.h"
 #include "satellite-llc.h"
@@ -30,11 +30,11 @@ namespace ns3
 
 /**
  * \ingroup satellite
- * \brief SatGeoLlc holds the GEO implementation of LLC layer. SatGeoLlc is inherited from
- * SatLlc base class and implements the needed changes from the base class related to
- * SAT LLC packet transmissions and receptions.
+ * \brief SatOrbiterLlc holds the orbiter implementation of LLC layer. SatOrbiterLlc is inherited
+ * from SatLlc base class and implements the needed changes from the base class related to SAT LLC
+ * packet transmissions and receptions.
  */
-class SatGeoLlc : public SatLlc
+class SatOrbiterLlc : public SatLlc
 {
   public:
     /**
@@ -43,24 +43,24 @@ class SatGeoLlc : public SatLlc
     static TypeId GetTypeId(void);
 
     /**
-     * Construct a SatGeoLlc, should not be used
+     * Construct a SatOrbiterLlc, should not be used
      */
-    SatGeoLlc();
+    SatOrbiterLlc();
 
     /**
-     * Construct a SatGeoLlc
+     * Construct a SatOrbiterLlc
      * \param forwardLinkRegenerationMode Forward link regeneration model
      * \param returnLinkRegenerationMode Return link regeneration model
      */
-    SatGeoLlc(SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-              SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+    SatOrbiterLlc(SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                  SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
     /**
-     * Destroy a SatGeoLlc
+     * Destroy a SatOrbiterLlc
      *
-     * This is the destructor for the SatGeoLlc.
+     * This is the destructor for the SatOrbiterLlc.
      */
-    virtual ~SatGeoLlc();
+    virtual ~SatOrbiterLlc();
 
     /**
      * \brief Called from higher layer (SatNetDevice) to enque packet to LLC
@@ -146,7 +146,7 @@ class SatGeoLlc : public SatLlc
      * \param cb callback to invoke whenever a packet has been received and must
      *        be forwarded to the higher layers.
      */
-    void SetReceiveSatelliteCallback(SatGeoLlc::ReceiveSatelliteCallback cb);
+    void SetReceiveSatelliteCallback(SatOrbiterLlc::ReceiveSatelliteCallback cb);
 
   protected:
     /**
@@ -178,4 +178,4 @@ class SatGeoLlc : public SatLlc
 
 } // namespace ns3
 
-#endif /* SATELLITE_GEO_LLC_H_ */
+#endif /* SATELLITE_ORBITER_LLC_H */

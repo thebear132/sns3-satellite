@@ -34,14 +34,14 @@
 #include "ns3/pointer.h"
 #include "ns3/satellite-channel-estimation-error-container.h"
 #include "ns3/satellite-const-variables.h"
-#include "ns3/satellite-geo-feeder-llc.h"
-#include "ns3/satellite-geo-feeder-mac.h"
 #include "ns3/satellite-geo-feeder-phy.h"
 #include "ns3/satellite-geo-net-device.h"
-#include "ns3/satellite-geo-user-llc.h"
-#include "ns3/satellite-geo-user-mac.h"
 #include "ns3/satellite-geo-user-phy.h"
 #include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-orbiter-feeder-llc.h"
+#include "ns3/satellite-orbiter-feeder-mac.h"
+#include "ns3/satellite-orbiter-user-llc.h"
+#include "ns3/satellite-orbiter-user-mac.h"
 #include "ns3/satellite-phy-rx-carrier-conf.h"
 #include "ns3/satellite-phy-rx.h"
 #include "ns3/satellite-phy-tx.h"
@@ -90,33 +90,33 @@ SatOrbiterHelper::GetTypeId(void)
                                           "PerPacket",
                                           SatPhyRxCarrierConf::IF_PER_FRAGMENT,
                                           "PerFragment"))
-            .AddAttribute(
-                "FwdLinkErrorModel",
-                "Forward feeder link error model",
-                EnumValue(SatPhyRxCarrierConf::EM_NONE),
-                MakeEnumAccessor<SatPhyRxCarrierConf::ErrorModel>(&SatOrbiterHelper::m_fwdErrorModel),
-                MakeEnumChecker(SatPhyRxCarrierConf::EM_NONE,
-                                "None",
-                                SatPhyRxCarrierConf::EM_CONSTANT,
-                                "Constant",
-                                SatPhyRxCarrierConf::EM_AVI,
-                                "AVI"))
+            .AddAttribute("FwdLinkErrorModel",
+                          "Forward feeder link error model",
+                          EnumValue(SatPhyRxCarrierConf::EM_NONE),
+                          MakeEnumAccessor<SatPhyRxCarrierConf::ErrorModel>(
+                              &SatOrbiterHelper::m_fwdErrorModel),
+                          MakeEnumChecker(SatPhyRxCarrierConf::EM_NONE,
+                                          "None",
+                                          SatPhyRxCarrierConf::EM_CONSTANT,
+                                          "Constant",
+                                          SatPhyRxCarrierConf::EM_AVI,
+                                          "AVI"))
             .AddAttribute("FwdLinkConstantErrorRate",
                           "Constant error rate on forward feeder link",
                           DoubleValue(0.0),
                           MakeDoubleAccessor(&SatOrbiterHelper::m_fwdDaConstantErrorRate),
                           MakeDoubleChecker<double>())
-            .AddAttribute(
-                "RtnLinkErrorModel",
-                "Return user link error model",
-                EnumValue(SatPhyRxCarrierConf::EM_NONE),
-                MakeEnumAccessor<SatPhyRxCarrierConf::ErrorModel>(&SatOrbiterHelper::m_rtnErrorModel),
-                MakeEnumChecker(SatPhyRxCarrierConf::EM_NONE,
-                                "None",
-                                SatPhyRxCarrierConf::EM_CONSTANT,
-                                "Constant",
-                                SatPhyRxCarrierConf::EM_AVI,
-                                "AVI"))
+            .AddAttribute("RtnLinkErrorModel",
+                          "Return user link error model",
+                          EnumValue(SatPhyRxCarrierConf::EM_NONE),
+                          MakeEnumAccessor<SatPhyRxCarrierConf::ErrorModel>(
+                              &SatOrbiterHelper::m_rtnErrorModel),
+                          MakeEnumChecker(SatPhyRxCarrierConf::EM_NONE,
+                                          "None",
+                                          SatPhyRxCarrierConf::EM_CONSTANT,
+                                          "Constant",
+                                          SatPhyRxCarrierConf::EM_AVI,
+                                          "AVI"))
             .AddAttribute("RtnLinkConstantErrorRate",
                           "Constant error rate on return user link",
                           DoubleValue(0.0),
@@ -165,12 +165,12 @@ SatOrbiterHelper::SatOrbiterHelper()
 }
 
 SatOrbiterHelper::SatOrbiterHelper(SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
-                           uint32_t rtnLinkCarrierCount,
-                           uint32_t fwdLinkCarrierCount,
-                           Ptr<SatSuperframeSeq> seq,
-                           SatMac::ReadCtrlMsgCallback fwdReadCb,
-                           SatMac::ReadCtrlMsgCallback rtnReadCb,
-                           RandomAccessSettings_s randomAccessSettings)
+                                   uint32_t rtnLinkCarrierCount,
+                                   uint32_t fwdLinkCarrierCount,
+                                   Ptr<SatSuperframeSeq> seq,
+                                   SatMac::ReadCtrlMsgCallback fwdReadCb,
+                                   SatMac::ReadCtrlMsgCallback rtnReadCb,
+                                   RandomAccessSettings_s randomAccessSettings)
     : m_carrierBandwidthConverter(bandwidthConverterCb),
       m_fwdLinkCarrierCount(fwdLinkCarrierCount),
       m_rtnLinkCarrierCount(rtnLinkCarrierCount),
@@ -272,7 +272,7 @@ SatOrbiterHelper::Install(Ptr<Node> n)
 
     NS_ASSERT(m_deviceCount[n->GetId()] == 0);
 
-    // Create SatGeoNetDevice
+    // Create SatOrbiterNetDevice
     Ptr<SatGeoNetDevice> satDev = m_deviceFactory.Create<SatGeoNetDevice>();
 
     satDev->SetAddress(Mac48Address::Allocate());
@@ -298,18 +298,18 @@ SatOrbiterHelper::Install(std::string aName)
 
 void
 SatOrbiterHelper::AttachChannels(Ptr<NetDevice> d,
-                             Ptr<SatChannel> ff,
-                             Ptr<SatChannel> fr,
-                             Ptr<SatChannel> uf,
-                             Ptr<SatChannel> ur,
-                             Ptr<SatAntennaGainPattern> userAgp,
-                             Ptr<SatAntennaGainPattern> feederAgp,
-                             Ptr<SatNcc> ncc,
-                             uint32_t satId,
-                             uint32_t gwId,
-                             uint32_t userBeamId,
-                             SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                             SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+                                 Ptr<SatChannel> ff,
+                                 Ptr<SatChannel> fr,
+                                 Ptr<SatChannel> uf,
+                                 Ptr<SatChannel> ur,
+                                 Ptr<SatAntennaGainPattern> userAgp,
+                                 Ptr<SatAntennaGainPattern> feederAgp,
+                                 Ptr<SatNcc> ncc,
+                                 uint32_t satId,
+                                 uint32_t gwId,
+                                 uint32_t userBeamId,
+                                 SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                                 SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
     NS_LOG_FUNCTION(this << d << ff << fr << uf << ur << userAgp << feederAgp << satId << gwId
                          << userBeamId);
@@ -343,15 +343,15 @@ SatOrbiterHelper::AttachChannels(Ptr<NetDevice> d,
 
 void
 SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
-                                   Ptr<SatChannel> ff,
-                                   Ptr<SatChannel> fr,
-                                   Ptr<SatAntennaGainPattern> feederAgp,
-                                   Ptr<SatNcc> ncc,
-                                   uint32_t satId,
-                                   uint32_t gwId,
-                                   uint32_t userBeamId,
-                                   SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                                   SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+                                       Ptr<SatChannel> ff,
+                                       Ptr<SatChannel> fr,
+                                       Ptr<SatAntennaGainPattern> feederAgp,
+                                       Ptr<SatNcc> ncc,
+                                       uint32_t satId,
+                                       uint32_t gwId,
+                                       uint32_t userBeamId,
+                                       SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                                       SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
     NS_LOG_FUNCTION(this << dev << ff << fr << feederAgp << satId << gwId << userBeamId
                          << forwardLinkRegenerationMode << returnLinkRegenerationMode);
@@ -360,7 +360,7 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
     params.m_satId = satId;
     params.m_beamId = userBeamId;
     params.m_device = dev;
-    params.m_standard = SatEnums::GEO;
+    params.m_standard = SatEnums::ORBITER;
 
     /**
      * Simple channel estimation, which does not do actually anything
@@ -403,15 +403,15 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
 
     fPhy->Initialize();
 
-    Ptr<SatGeoFeederMac> fMac;
-    Ptr<SatGeoLlc> fLlc;
+    Ptr<SatOrbiterFeederMac> fMac;
+    Ptr<SatOrbiterLlc> fLlc;
     bool startScheduler = false;
 
     // Create MAC layer
-    fMac = CreateObject<SatGeoFeederMac>(satId,
-                                         userBeamId,
-                                         forwardLinkRegenerationMode,
-                                         returnLinkRegenerationMode);
+    fMac = CreateObject<SatOrbiterFeederMac>(satId,
+                                             userBeamId,
+                                             forwardLinkRegenerationMode,
+                                             returnLinkRegenerationMode);
 
     Mac48Address feederAddress;
 
@@ -432,7 +432,7 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
     }
     case SatEnums::REGENERATION_LINK: {
         // Create LLC layer
-        fLlc = CreateObject<SatGeoLlc>(forwardLinkRegenerationMode, returnLinkRegenerationMode);
+        fLlc = CreateObject<SatOrbiterLlc>(forwardLinkRegenerationMode, returnLinkRegenerationMode);
 
         if (m_gwMacMap.count(std::make_pair(satId, gwId)))
         {
@@ -464,8 +464,8 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
     }
     case SatEnums::REGENERATION_NETWORK: {
         // Create LLC layer
-        fLlc =
-            CreateObject<SatGeoFeederLlc>(forwardLinkRegenerationMode, returnLinkRegenerationMode);
+        fLlc = CreateObject<SatOrbiterFeederLlc>(forwardLinkRegenerationMode,
+                                                 returnLinkRegenerationMode);
 
         if (m_gwMacMap.count(std::make_pair(satId, gwId)))
         {
@@ -504,7 +504,7 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
     {
     case SatEnums::TRANSPARENT:
     case SatEnums::REGENERATION_PHY: {
-        SatPhy::ReceiveCallback fCb = MakeCallback(&SatGeoFeederMac::Receive, fMac);
+        SatPhy::ReceiveCallback fCb = MakeCallback(&SatOrbiterFeederMac::Receive, fMac);
         fPhy->SetAttribute("ReceiveCb", CallbackValue(fCb));
 
         fMac->SetReceiveNetDeviceCallback(MakeCallback(&SatGeoNetDevice::ReceiveFeeder, dev));
@@ -512,10 +512,10 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
         break;
     }
     case SatEnums::REGENERATION_NETWORK: {
-        SatPhy::ReceiveCallback fCb = MakeCallback(&SatGeoFeederMac::Receive, fMac);
+        SatPhy::ReceiveCallback fCb = MakeCallback(&SatOrbiterFeederMac::Receive, fMac);
         fPhy->SetAttribute("ReceiveCb", CallbackValue(fCb));
 
-        fMac->SetReceiveCallback(MakeCallback(&SatGeoFeederLlc::Receive, fLlc));
+        fMac->SetReceiveCallback(MakeCallback(&SatOrbiterFeederLlc::Receive, fLlc));
 
         fLlc->SetReceiveSatelliteCallback(MakeCallback(&SatGeoNetDevice::ReceivePacketFeeder, dev));
 
@@ -552,7 +552,7 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
         // Attach the LLC Tx opportunity and scheduling context getter callbacks to
         // SatFwdLinkScheduler
         scpcScheduler->SetTxOpportunityCallback(
-            MakeCallback(&SatGeoLlc::NotifyTxOpportunity, fLlc));
+            MakeCallback(&SatOrbiterLlc::NotifyTxOpportunity, fLlc));
         scpcScheduler->SetSchedContextCallback(MakeCallback(&SatLlc::GetSchedulingContexts, fLlc));
 
         break;
@@ -564,14 +564,14 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
 
 void
 SatOrbiterHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
-                                 Ptr<SatChannel> uf,
-                                 Ptr<SatChannel> ur,
-                                 Ptr<SatAntennaGainPattern> userAgp,
-                                 Ptr<SatNcc> ncc,
-                                 uint32_t satId,
-                                 uint32_t userBeamId,
-                                 SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                                 SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+                                     Ptr<SatChannel> uf,
+                                     Ptr<SatChannel> ur,
+                                     Ptr<SatAntennaGainPattern> userAgp,
+                                     Ptr<SatNcc> ncc,
+                                     uint32_t satId,
+                                     uint32_t userBeamId,
+                                     SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                                     SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
     NS_LOG_FUNCTION(this << dev << uf << ur << userAgp << satId << userBeamId
                          << forwardLinkRegenerationMode << returnLinkRegenerationMode);
@@ -580,7 +580,7 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
     params.m_satId = satId;
     params.m_beamId = userBeamId;
     params.m_device = dev;
-    params.m_standard = SatEnums::GEO;
+    params.m_standard = SatEnums::ORBITER;
 
     /**
      * Simple channel estimation, which does not do actually anything
@@ -623,13 +623,13 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
 
     uPhy->Initialize();
 
-    Ptr<SatGeoUserMac> uMac;
-    Ptr<SatGeoLlc> uLlc;
+    Ptr<SatOrbiterUserMac> uMac;
+    Ptr<SatOrbiterLlc> uLlc;
 
-    uMac = CreateObject<SatGeoUserMac>(satId,
-                                       userBeamId,
-                                       forwardLinkRegenerationMode,
-                                       returnLinkRegenerationMode);
+    uMac = CreateObject<SatOrbiterUserMac>(satId,
+                                           userBeamId,
+                                           forwardLinkRegenerationMode,
+                                           returnLinkRegenerationMode);
 
     Mac48Address userAddress;
 
@@ -650,7 +650,7 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
     }
     case SatEnums::REGENERATION_LINK: {
         // Create LLC layer
-        uLlc = CreateObject<SatGeoLlc>(forwardLinkRegenerationMode, returnLinkRegenerationMode);
+        uLlc = CreateObject<SatOrbiterLlc>(forwardLinkRegenerationMode, returnLinkRegenerationMode);
 
         dev->AddUserMac(uMac, userBeamId);
 
@@ -671,7 +671,8 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
     }
     case SatEnums::REGENERATION_NETWORK: {
         // Create LLC layer
-        uLlc = CreateObject<SatGeoUserLlc>(forwardLinkRegenerationMode, returnLinkRegenerationMode);
+        uLlc = CreateObject<SatOrbiterUserLlc>(forwardLinkRegenerationMode,
+                                               returnLinkRegenerationMode);
 
         dev->AddUserMac(uMac, userBeamId);
 
@@ -716,7 +717,8 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
 
         // Attach the LLC Tx opportunity and scheduling context getter callbacks to
         // SatFwdLinkScheduler
-        fwdScheduler->SetTxOpportunityCallback(MakeCallback(&SatGeoLlc::NotifyTxOpportunity, uLlc));
+        fwdScheduler->SetTxOpportunityCallback(
+            MakeCallback(&SatOrbiterLlc::NotifyTxOpportunity, uLlc));
         fwdScheduler->SetSchedContextCallback(MakeCallback(&SatLlc::GetSchedulingContexts, uLlc));
 
         break;
@@ -738,7 +740,7 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
         break;
     }
     case SatEnums::REGENERATION_LINK: {
-        SatPhy::ReceiveCallback uCb = MakeCallback(&SatGeoUserMac::Receive, uMac);
+        SatPhy::ReceiveCallback uCb = MakeCallback(&SatOrbiterUserMac::Receive, uMac);
         uPhy->SetAttribute("ReceiveCb", CallbackValue(uCb));
 
         uMac->SetReceiveNetDeviceCallback(MakeCallback(&SatGeoNetDevice::ReceiveUser, dev));
@@ -746,10 +748,10 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
         break;
     }
     case SatEnums::REGENERATION_NETWORK: {
-        SatPhy::ReceiveCallback uCb = MakeCallback(&SatGeoUserMac::Receive, uMac);
+        SatPhy::ReceiveCallback uCb = MakeCallback(&SatOrbiterUserMac::Receive, uMac);
         uPhy->SetAttribute("ReceiveCb", CallbackValue(uCb));
 
-        uMac->SetReceiveCallback(MakeCallback(&SatGeoUserLlc::Receive, uLlc));
+        uMac->SetReceiveCallback(MakeCallback(&SatOrbiterUserLlc::Receive, uLlc));
 
         uLlc->SetReceiveSatelliteCallback(MakeCallback(&SatGeoNetDevice::ReceivePacketUser, dev));
 
@@ -776,7 +778,8 @@ SatOrbiterHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, Callback
 }
 
 void
-SatOrbiterHelper::SetIslRoutes(NodeContainer geoNodes, std::vector<std::pair<uint32_t, uint32_t>> isls)
+SatOrbiterHelper::SetIslRoutes(NodeContainer geoNodes,
+                               std::vector<std::pair<uint32_t, uint32_t>> isls)
 {
     NS_LOG_FUNCTION(this);
 

@@ -18,7 +18,7 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "satellite-geo-mac.h"
+#include "satellite-orbiter-mac.h"
 
 #include "satellite-address-tag.h"
 #include "satellite-mac.h"
@@ -34,51 +34,52 @@
 #include <ns3/simulator.h>
 #include <ns3/uinteger.h>
 
-NS_LOG_COMPONENT_DEFINE("SatGeoMac");
+NS_LOG_COMPONENT_DEFINE("SatOrbiterMac");
 
 namespace ns3
 {
 
-NS_OBJECT_ENSURE_REGISTERED(SatGeoMac);
+NS_OBJECT_ENSURE_REGISTERED(SatOrbiterMac);
 
 TypeId
-SatGeoMac::GetTypeId(void)
+SatOrbiterMac::GetTypeId(void)
 {
     static TypeId tid =
-        TypeId("ns3::SatGeoMac")
+        TypeId("ns3::SatOrbiterMac")
             .SetParent<SatMac>()
-            .AddAttribute("DisableSchedulingIfNoDeviceConnected",
-                          "If true, the periodic calls of StartTransmission are not called when no "
-                          "devices are connected to this MAC",
-                          BooleanValue(false),
-                          MakeBooleanAccessor(&SatGeoMac::m_disableSchedulingIfNoDeviceConnected),
-                          MakeBooleanChecker())
+            .AddAttribute(
+                "DisableSchedulingIfNoDeviceConnected",
+                "If true, the periodic calls of StartTransmission are not called when no "
+                "devices are connected to this MAC",
+                BooleanValue(false),
+                MakeBooleanAccessor(&SatOrbiterMac::m_disableSchedulingIfNoDeviceConnected),
+                MakeBooleanChecker())
             .AddTraceSource("BBFrameTxTrace",
                             "Trace for transmitted BB Frames.",
-                            MakeTraceSourceAccessor(&SatGeoMac::m_bbFrameTxTrace),
+                            MakeTraceSourceAccessor(&SatOrbiterMac::m_bbFrameTxTrace),
                             "ns3::SatBbFrame::BbFrameCallback");
 
     return tid;
 }
 
 TypeId
-SatGeoMac::GetInstanceTypeId(void) const
+SatOrbiterMac::GetInstanceTypeId(void) const
 {
     NS_LOG_FUNCTION(this);
 
     return GetTypeId();
 }
 
-SatGeoMac::SatGeoMac(void)
+SatOrbiterMac::SatOrbiterMac(void)
 {
     NS_LOG_FUNCTION(this);
-    NS_FATAL_ERROR("SatGeoMac default constructor is not allowed to use");
+    NS_FATAL_ERROR("SatOrbiterMac default constructor is not allowed to use");
 }
 
-SatGeoMac::SatGeoMac(uint32_t satId,
-                     uint32_t beamId,
-                     SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                     SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+SatOrbiterMac::SatOrbiterMac(uint32_t satId,
+                             uint32_t beamId,
+                             SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                             SatEnums::RegenerationMode_t returnLinkRegenerationMode)
     : SatMac(satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode),
       m_disableSchedulingIfNoDeviceConnected(false),
       m_fwdScheduler(),
@@ -90,27 +91,27 @@ SatGeoMac::SatGeoMac(uint32_t satId,
     NS_LOG_FUNCTION(this);
 }
 
-SatGeoMac::~SatGeoMac()
+SatOrbiterMac::~SatOrbiterMac()
 {
     NS_LOG_FUNCTION(this);
 }
 
 void
-SatGeoMac::DoDispose()
+SatOrbiterMac::DoDispose()
 {
     NS_LOG_FUNCTION(this);
     Object::DoDispose();
 }
 
 void
-SatGeoMac::DoInitialize()
+SatOrbiterMac::DoInitialize()
 {
     NS_LOG_FUNCTION(this);
     Object::DoInitialize();
 }
 
 void
-SatGeoMac::StartPeriodicTransmissions()
+SatOrbiterMac::StartPeriodicTransmissions()
 {
     NS_LOG_FUNCTION(this);
 
@@ -130,16 +131,16 @@ SatGeoMac::StartPeriodicTransmissions()
 
     if (m_fwdScheduler == nullptr)
     {
-        NS_FATAL_ERROR("Scheduler not set for GEO MAC!!!");
+        NS_FATAL_ERROR("Scheduler not set for orbiter MAC!!!");
     }
 
     m_llc->ClearQueues();
 
-    Simulator::Schedule(Seconds(0), &SatGeoMac::StartTransmission, this, 0);
+    Simulator::Schedule(Seconds(0), &SatOrbiterMac::StartTransmission, this, 0);
 }
 
 void
-SatGeoMac::StartTransmission(uint32_t carrierId)
+SatOrbiterMac::StartTransmission(uint32_t carrierId)
 {
     NS_LOG_FUNCTION(this << carrierId);
 
@@ -173,7 +174,7 @@ SatGeoMac::StartTransmission(uint32_t carrierId)
     else
     {
         /**
-         * GEO MAC is disabled, thus get the duration of the default BB frame
+         * Orbiter MAC is disabled, thus get the duration of the default BB frame
          * and try again then.
          */
 
@@ -183,15 +184,15 @@ SatGeoMac::StartTransmission(uint32_t carrierId)
 
     if (m_periodicTransmissionEnabled)
     {
-        Simulator::Schedule(txDuration, &SatGeoMac::StartTransmission, this, 0);
+        Simulator::Schedule(txDuration, &SatOrbiterMac::StartTransmission, this, 0);
     }
 }
 
 void
-SatGeoMac::SendPacket(SatPhy::PacketContainer_t packets,
-                      uint32_t carrierId,
-                      Time duration,
-                      SatSignalParameters::txInfo_s txInfo)
+SatOrbiterMac::SendPacket(SatPhy::PacketContainer_t packets,
+                          uint32_t carrierId,
+                          Time duration,
+                          SatSignalParameters::txInfo_s txInfo)
 {
     NS_LOG_FUNCTION(this);
 
@@ -221,7 +222,7 @@ SatGeoMac::SendPacket(SatPhy::PacketContainer_t packets,
 }
 
 void
-SatGeoMac::RxTraces(SatPhy::PacketContainer_t packets)
+SatOrbiterMac::RxTraces(SatPhy::PacketContainer_t packets)
 {
     NS_LOG_FUNCTION(this);
 
@@ -267,45 +268,45 @@ SatGeoMac::RxTraces(SatPhy::PacketContainer_t packets)
 }
 
 void
-SatGeoMac::SetFwdScheduler(Ptr<SatFwdLinkScheduler> fwdScheduler)
+SatOrbiterMac::SetFwdScheduler(Ptr<SatFwdLinkScheduler> fwdScheduler)
 {
     m_fwdScheduler = fwdScheduler;
 }
 
 void
-SatGeoMac::SetLlc(Ptr<SatGeoLlc> llc)
+SatOrbiterMac::SetLlc(Ptr<SatOrbiterLlc> llc)
 {
     m_llc = llc;
 }
 
 Time
-SatGeoMac::GetGuardTime() const
+SatOrbiterMac::GetGuardTime() const
 {
     return m_guardTime;
 }
 
 void
-SatGeoMac::SetGuardTime(Time guardTime)
+SatOrbiterMac::SetGuardTime(Time guardTime)
 {
     m_guardTime = guardTime;
 }
 
 void
-SatGeoMac::SetTransmitCallback(TransmitCallback cb)
+SatOrbiterMac::SetTransmitCallback(TransmitCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
     m_txCallback = cb;
 }
 
 void
-SatGeoMac::SetReceiveNetDeviceCallback(ReceiveNetDeviceCallback cb)
+SatOrbiterMac::SetReceiveNetDeviceCallback(ReceiveNetDeviceCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
     m_rxNetDeviceCallback = cb;
 }
 
 void
-SatGeoMac::StopPeriodicTransmissions()
+SatOrbiterMac::StopPeriodicTransmissions()
 {
     NS_LOG_FUNCTION(this);
 

@@ -18,21 +18,21 @@
  * Author: Bastien TAURAN <bastien.tauran@viveris.fr>
  */
 
-#ifndef SATELLITE_GEO_FEEDER_LLC_H_
-#define SATELLITE_GEO_FEEDER_LLC_H_
+#ifndef SATELLITE_ORBITER_USER_LLC_H
+#define SATELLITE_ORBITER_USER_LLC_H
 
-#include "satellite-geo-llc.h"
+#include "satellite-orbiter-llc.h"
 
 namespace ns3
 {
 
 /**
  * \ingroup satellite
- * \brief SatGeoFeederLlc holds the GEO feeder implementation of LLC layer. SatGeoFeederLlc is
- * inherited from SatGeoLlc base class and implements the needed changes from the base class related
- * to SAT feeder LLC packet transmissions and receptions.
+ * \brief SatOrbiterUserLlc holds the orbiter user implementation of LLC layer. SatOrbiterUserLlc is
+ * inherited from SatOrbiterLlc base class and implements the needed changes from the base class
+ * related to SAT user LLC packet transmissions and receptions.
  */
-class SatGeoFeederLlc : public SatGeoLlc
+class SatOrbiterUserLlc : public SatOrbiterLlc
 {
   public:
     /**
@@ -41,24 +41,24 @@ class SatGeoFeederLlc : public SatGeoLlc
     static TypeId GetTypeId(void);
 
     /**
-     * Construct a SatGeoFeederLlc, should not be used
+     * Construct a SatOrbiterUserLlc, should not be used
      */
-    SatGeoFeederLlc();
+    SatOrbiterUserLlc();
 
     /**
-     * Construct a SatGeoFeederLlc
+     * Construct a ELLITE_ORBITER_USER_LLC_HSatOrbiterUserLlc
      * \param forwardLinkRegenerationMode Forward link regeneration model
      * \param returnLinkRegenerationMode Return link regeneration model
      */
-    SatGeoFeederLlc(SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                    SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+    SatOrbiterUserLlc(SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                      SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
     /**
-     * Destroy a SatGeoFeederLlc
+     * Destroy a SatOrbiterUserLlc
      *
-     * This is the destructor for the SatGeoFeederLlc.
+     * This is the destructor for the SatOrbiterUserLlc.
      */
-    virtual ~SatGeoFeederLlc();
+    virtual ~SatOrbiterUserLlc();
 
   protected:
     /**
@@ -67,7 +67,7 @@ class SatGeoFeederLlc : public SatGeoLlc
     virtual void DoDispose();
 
     /**
-     * \brief Method to create a new encapsulator 'on-a-need-basis' dynamically.
+     * \brief Virtual method to create a new encapsulator 'on-a-need-basis' dynamically.
      * \param key Encapsulator key class
      */
     virtual void CreateEncap(Ptr<EncapKey> key);
@@ -81,4 +81,4 @@ class SatGeoFeederLlc : public SatGeoLlc
 
 } // namespace ns3
 
-#endif /* SATELLITE_GEO_FEEDER_LLC_H_ */
+#endif /* SATELLITE_ORBITER_USER_LLC_H */

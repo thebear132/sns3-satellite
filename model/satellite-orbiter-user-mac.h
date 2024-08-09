@@ -18,13 +18,13 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#ifndef SATELLITE_GEO_USER_MAC_H
-#define SATELLITE_GEO_USER_MAC_H
+#ifndef SATELLITE_ORBITER_USER_MAC_H
+#define SATELLITE_ORBITER_USER_MAC_H
 
 #include "satellite-fwd-link-scheduler.h"
-#include "satellite-geo-mac.h"
-#include "satellite-geo-user-llc.h"
 #include "satellite-mac.h"
+#include "satellite-orbiter-mac.h"
+#include "satellite-orbiter-user-llc.h"
 #include "satellite-phy.h"
 #include "satellite-signal-parameters.h"
 
@@ -40,36 +40,36 @@ namespace ns3
 /**
  * \ingroup satellite
  *
- * The SatGeoUserMac models the user link MAC layer of the
+ * The SatOrbiterUserMac models the user link MAC layer of the
  * satellite node.
  */
-class SatGeoUserMac : public SatGeoMac
+class SatOrbiterUserMac : public SatOrbiterMac
 {
   public:
     /**
      * Default constructor
      */
-    SatGeoUserMac(void);
+    SatOrbiterUserMac(void);
 
     /**
-     * Construct a SatGeoUserMac
+     * Construct a SatOrbiterUserMac
      *
-     * This is the constructor for the SatGeoUserMac
+     * This is the constructor for the SatOrbiterUserMac
      *
      * \param satId ID of sat for UT
      * \param beamId ID of beam for UT
      * \param forwardLinkRegenerationMode Forward link regeneration mode
      * \param returnLinkRegenerationMode Return link regeneration mode
      */
-    SatGeoUserMac(uint32_t satId,
-                  uint32_t beamId,
-                  SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                  SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+    SatOrbiterUserMac(uint32_t satId,
+                      uint32_t beamId,
+                      SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                      SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
     /**
-     * Destructor for SatGeoUserMac
+     * Destructor for SatOrbiterUserMac
      */
-    virtual ~SatGeoUserMac();
+    virtual ~SatOrbiterUserMac();
 
     /**
      * inherited from Object
@@ -151,4 +151,4 @@ class SatGeoUserMac : public SatGeoMac
 
 } // namespace ns3
 
-#endif /* SATELLITE_GEO_USER_MAC_H */
+#endif /* SATELLITE_ORBITER_USER_MAC_H */

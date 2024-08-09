@@ -23,8 +23,8 @@
 #ifndef SATELLITE_BEAM_HELPER_H
 #define SATELLITE_BEAM_HELPER_H
 
-#include "satellite-orbiter-helper.h"
 #include "satellite-gw-helper.h"
+#include "satellite-orbiter-helper.h"
 #include "satellite-ut-helper.h"
 
 #include <ns3/ipv4-address-helper.h>

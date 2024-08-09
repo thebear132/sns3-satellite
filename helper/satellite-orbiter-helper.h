@@ -31,9 +31,9 @@
 #include "ns3/satellite-bbframe-conf.h"
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-fwd-link-scheduler.h"
-#include "ns3/satellite-geo-feeder-mac.h"
 #include "ns3/satellite-geo-net-device.h"
 #include "ns3/satellite-ncc.h"
+#include "ns3/satellite-orbiter-feeder-mac.h"
 #include "ns3/satellite-phy.h"
 #include "ns3/satellite-scpc-scheduler.h"
 #include "ns3/satellite-superframe-sequence.h"
@@ -46,8 +46,8 @@ namespace ns3
 {
 
 /**
- * \brief Creates needed objects for Geo Satellite node like SatGeoNetDevice objects.
- *        Handles needed configuration for the Geo Satellite node.
+ * \brief Creates needed objects for Satellite node like SatorbiterNetDevice objects.
+ *        Handles needed configuration for the Satellite node.
  *
  */
 class SatOrbiterHelper : public Object
@@ -82,19 +82,19 @@ class SatOrbiterHelper : public Object
      * point network connections.
      */
     SatOrbiterHelper(SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
-                 uint32_t rtnLinkCarrierCount,
-                 uint32_t fwdLinkCarrierCount,
-                 Ptr<SatSuperframeSeq> seq,
-                 SatMac::ReadCtrlMsgCallback fwdReadCb,
-                 SatMac::ReadCtrlMsgCallback rtnReadCb,
-                 RandomAccessSettings_s randomAccessSettings);
+                     uint32_t rtnLinkCarrierCount,
+                     uint32_t fwdLinkCarrierCount,
+                     Ptr<SatSuperframeSeq> seq,
+                     SatMac::ReadCtrlMsgCallback fwdReadCb,
+                     SatMac::ReadCtrlMsgCallback rtnReadCb,
+                     RandomAccessSettings_s randomAccessSettings);
 
     virtual ~SatOrbiterHelper()
     {
     }
 
     /*
-     * Initializes the GEO helper based on attributes.
+     * Initializes the orbiter helper based on attributes.
      * Link results are used only if satellite is regenerative.
      * \param lrFwd DVB-S2 or DVB-S2X link results
      * \param lrRcs2 return link results
@@ -108,7 +108,7 @@ class SatOrbiterHelper : public Object
      * \param name the name of the attribute to set
      * \param value the value of the attribute to set
      *
-     * Set these attributes on each ns3::SatGeoNetDevice created
+     * Set these attributes on each ns3::SatOrbiterNetDevice created
      * by SatOrbiterHelper::Install
      */
     void SetDeviceAttribute(std::string name, const AttributeValue& value);
@@ -138,7 +138,7 @@ class SatOrbiterHelper : public Object
     /**
      * \param c a set of nodes
      *
-     * This method creates a ns3::SatGeoNetDevices with the requested attributes
+     * This method creates a ns3::SatOrbiterNetDevices with the requested attributes
      * and associate the resulting ns3::NetDevices with the ns3::Nodes.
      *
      * \return container to the created devices
@@ -148,7 +148,7 @@ class SatOrbiterHelper : public Object
     /**
      * \param n a node
      *
-     * This method creates a ns3::SatGeoNetDevice with the requested attributes
+     * This method creates a ns3::SatOrbiterNetDevice with the requested attributes
      * and associate the resulting ns3::NetDevice with the ns3::Node.
      *
      * \return pointer to the created device
@@ -158,7 +158,7 @@ class SatOrbiterHelper : public Object
     /**
      * \param aName name of a node
      *
-     * This method creates a ns3::SatGeoNetDevice with the requested attributes
+     * This method creates a ns3::SatOrbiterNetDevice with the requested attributes
      * and associate the resulting ns3::NetDevice with the ns3::Node.
      *
      * \return pointer to the created device
@@ -257,7 +257,7 @@ class SatOrbiterHelper : public Object
 
   private:
     /**
-     * GEO satellites node id
+     * Satellites node id
      */
     std::vector<uint32_t> m_nodeIds;
 
@@ -338,7 +338,7 @@ class SatOrbiterHelper : public Object
     /**
      * Map used in regenerative mode to store if MAC already created for a given pair SAT ID / GW ID
      */
-    std::map<std::pair<uint32_t, uint32_t>, Ptr<SatGeoFeederMac>> m_gwMacMap;
+    std::map<std::pair<uint32_t, uint32_t>, Ptr<SatOrbiterFeederMac>> m_gwMacMap;
 
     /**
      * Arbiter in use to route packets on ISLs
@@ -358,4 +358,4 @@ class SatOrbiterHelper : public Object
 
 } // namespace ns3
 
-#endif /* SAT_GEO_HELPER_H */
+#endif /* SAT_ORBITER_HELPER_H */

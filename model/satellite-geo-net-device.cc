@@ -22,13 +22,13 @@
 
 #include "satellite-address-tag.h"
 #include "satellite-channel.h"
-#include "satellite-geo-feeder-mac.h"
 #include "satellite-geo-feeder-phy.h"
-#include "satellite-geo-user-mac.h"
 #include "satellite-geo-user-phy.h"
 #include "satellite-ground-station-address-tag.h"
 #include "satellite-id-mapper.h"
 #include "satellite-mac.h"
+#include "satellite-orbiter-feeder-mac.h"
+#include "satellite-orbiter-user-mac.h"
 #include "satellite-phy-rx.h"
 #include "satellite-phy-tx.h"
 #include "satellite-phy.h"
@@ -203,7 +203,7 @@ SatGeoNetDevice::ReceivePacketUser(Ptr<Packet> packet, const Address& userAddres
             packet->AddPacketTag(SatDevLinkTimeTag(Simulator::Now()));
         }
 
-        DynamicCast<SatGeoFeederMac>(m_feederMac[satUplinkInfoTag.GetBeamId()])
+        DynamicCast<SatOrbiterFeederMac>(m_feederMac[satUplinkInfoTag.GetBeamId()])
             ->EnquePacket(packet);
     }
     else
@@ -283,7 +283,8 @@ SatGeoNetDevice::ReceivePacketFeeder(Ptr<Packet> packet, const Address& feederAd
             packet->AddPacketTag(SatDevLinkTimeTag(Simulator::Now()));
         }
 
-        DynamicCast<SatGeoUserMac>(m_userMac[satUplinkInfoTag.GetBeamId()])->EnquePacket(packet);
+        DynamicCast<SatOrbiterUserMac>(m_userMac[satUplinkInfoTag.GetBeamId()])
+            ->EnquePacket(packet);
     }
     if ((m_utConnected.count(destination) == 0 || destination.IsBroadcast()) &&
         m_islNetDevices.size() > 0)
@@ -311,7 +312,7 @@ SatGeoNetDevice::ReceiveUser(SatPhy::PacketContainer_t /*packets*/,
              it != rxParams->m_packetsInBurst.end();
              ++it)
         {
-            DynamicCast<SatGeoFeederMac>(m_feederMac[rxParams->m_beamId])->EnquePacket(*it);
+            DynamicCast<SatOrbiterFeederMac>(m_feederMac[rxParams->m_beamId])->EnquePacket(*it);
         }
 
         break;
@@ -409,7 +410,7 @@ SatGeoNetDevice::SendControlMsgToFeeder(Ptr<SatControlMessage> msg,
              it != rxParams->m_packetsInBurst.end();
              ++it)
         {
-            DynamicCast<SatGeoFeederMac>(m_feederMac[rxParams->m_beamId])->EnquePacket(*it);
+            DynamicCast<SatOrbiterFeederMac>(m_feederMac[rxParams->m_beamId])->EnquePacket(*it);
         }
         break;
     }
@@ -824,7 +825,8 @@ SatGeoNetDevice::ConnectGw(Mac48Address gwAddress, uint32_t beamId)
 
     if (m_feederMac.find(beamId) != m_feederMac.end())
     {
-        Ptr<SatGeoFeederMac> geoFeederMac = DynamicCast<SatGeoFeederMac>(GetFeederMac(beamId));
+        Ptr<SatOrbiterFeederMac> geoFeederMac =
+            DynamicCast<SatOrbiterFeederMac>(GetFeederMac(beamId));
         NS_ASSERT(geoFeederMac != nullptr);
         {
             geoFeederMac->AddPeer(gwAddress);
@@ -844,7 +846,8 @@ SatGeoNetDevice::DisconnectGw(Mac48Address gwAddress, uint32_t beamId)
 
     if (m_feederMac.find(beamId) != m_feederMac.end())
     {
-        Ptr<SatGeoFeederMac> geoFeederMac = DynamicCast<SatGeoFeederMac>(GetFeederMac(beamId));
+        Ptr<SatOrbiterFeederMac> geoFeederMac =
+            DynamicCast<SatOrbiterFeederMac>(GetFeederMac(beamId));
         NS_ASSERT(geoFeederMac != nullptr);
         {
             geoFeederMac->RemovePeer(gwAddress);
@@ -880,7 +883,7 @@ SatGeoNetDevice::ConnectUt(Mac48Address utAddress, uint32_t beamId)
 
     if (m_userMac.find(beamId) != m_userMac.end())
     {
-        Ptr<SatGeoUserMac> geoUserMac = DynamicCast<SatGeoUserMac>(GetUserMac(beamId));
+        Ptr<SatOrbiterUserMac> geoUserMac = DynamicCast<SatOrbiterUserMac>(GetUserMac(beamId));
         NS_ASSERT(geoUserMac != nullptr);
         {
             geoUserMac->AddPeer(utAddress);
@@ -900,7 +903,7 @@ SatGeoNetDevice::DisconnectUt(Mac48Address utAddress, uint32_t beamId)
 
     if (m_userMac.find(beamId) != m_userMac.end())
     {
-        Ptr<SatGeoUserMac> geoUserMac = DynamicCast<SatGeoUserMac>(GetUserMac(beamId));
+        Ptr<SatOrbiterUserMac> geoUserMac = DynamicCast<SatOrbiterUserMac>(GetUserMac(beamId));
         NS_ASSERT(geoUserMac != nullptr);
         {
             geoUserMac->RemovePeer(utAddress);
@@ -1023,7 +1026,7 @@ SatGeoNetDevice::ReceiveFromIsl(Ptr<Packet> packet, Mac48Address destination)
             packet->AddPacketTag(SatDevLinkTimeTag(Simulator::Now()));
         }
 
-        DynamicCast<SatGeoFeederMac>(m_feederMac[satUplinkInfoTag.GetBeamId()])
+        DynamicCast<SatOrbiterFeederMac>(m_feederMac[satUplinkInfoTag.GetBeamId()])
             ->EnquePacket(packet);
     }
     else
@@ -1043,7 +1046,7 @@ SatGeoNetDevice::ReceiveFromIsl(Ptr<Packet> packet, Mac48Address destination)
                 packet->AddPacketTag(SatDevLinkTimeTag(Simulator::Now()));
             }
 
-            DynamicCast<SatGeoUserMac>(m_userMac[satUplinkInfoTag.GetBeamId()])
+            DynamicCast<SatOrbiterUserMac>(m_userMac[satUplinkInfoTag.GetBeamId()])
                 ->EnquePacket(packet);
         }
         if ((m_utConnected.count(destination) == 0 || destination.IsBroadcast()) &&

@@ -134,7 +134,7 @@ class SatEnums
         DVB_UT,
         LORA_GW,
         LORA_UT,
-        GEO
+        ORBITER
     } SatLoraNodeType_t;
 
     /**
