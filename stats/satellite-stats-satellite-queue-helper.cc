@@ -35,11 +35,11 @@
 #include <ns3/object-map.h>
 #include <ns3/object-vector.h>
 #include <ns3/probe.h>
-#include <ns3/satellite-geo-feeder-phy.h>
 #include <ns3/satellite-geo-net-device.h>
-#include <ns3/satellite-geo-user-phy.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-orbiter-feeder-phy.h>
+#include <ns3/satellite-orbiter-user-phy.h>
 #include <ns3/satellite-phy.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
@@ -627,7 +627,7 @@ SatStatsRtnFeederQueueBytesHelper::DoInstallProbes()
         SaveAddressAndIdentifier(*it);
     }
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
     Callback<void, uint32_t, const Address&> callback =
         MakeCallback(&SatStatsRtnFeederQueueBytesHelper::QueueSizeCallback, this);
 
@@ -637,17 +637,17 @@ SatStatsRtnFeederQueueBytesHelper::DoInstallProbes()
         Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
         NS_ASSERT(satGeoDev != nullptr);
         Ptr<SatPhy> satPhy;
-        std::map<uint32_t, Ptr<SatPhy>> satGeoFeederPhys = satGeoDev->GetFeederPhy();
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin();
-             it2 != satGeoFeederPhys.end();
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterFeederPhys = satGeoDev->GetFeederPhy();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterFeederPhys.begin();
+             it2 != satOrbiterFeederPhys.end();
              ++it2)
         {
             satPhy = it2->second;
             NS_ASSERT(satPhy != nullptr);
-            Ptr<SatGeoFeederPhy> satGeoFeederPhy = satPhy->GetObject<SatGeoFeederPhy>();
-            NS_ASSERT(satGeoFeederPhy != nullptr);
+            Ptr<SatOrbiterFeederPhy> satOrbiterFeederPhy = satPhy->GetObject<SatOrbiterFeederPhy>();
+            NS_ASSERT(satOrbiterFeederPhy != nullptr);
 
-            if (satGeoFeederPhy->TraceConnectWithoutContext("QueueSizeBytes", callback))
+            if (satOrbiterFeederPhy->TraceConnectWithoutContext("QueueSizeBytes", callback))
             {
                 NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
                                  << " device #" << satGeoDev->GetIfIndex());
@@ -700,7 +700,7 @@ SatStatsRtnFeederQueuePacketsHelper::DoInstallProbes()
         SaveAddressAndIdentifier(*it);
     }
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
     Callback<void, uint32_t, const Address&> callback =
         MakeCallback(&SatStatsRtnFeederQueuePacketsHelper::QueueSizeCallback, this);
 
@@ -710,17 +710,17 @@ SatStatsRtnFeederQueuePacketsHelper::DoInstallProbes()
         Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
         NS_ASSERT(satGeoDev != nullptr);
         Ptr<SatPhy> satPhy;
-        std::map<uint32_t, Ptr<SatPhy>> satGeoFeederPhys = satGeoDev->GetFeederPhy();
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin();
-             it2 != satGeoFeederPhys.end();
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterFeederPhys = satGeoDev->GetFeederPhy();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterFeederPhys.begin();
+             it2 != satOrbiterFeederPhys.end();
              ++it2)
         {
             satPhy = it2->second;
             NS_ASSERT(satPhy != nullptr);
-            Ptr<SatGeoFeederPhy> satGeoFeederPhy = satPhy->GetObject<SatGeoFeederPhy>();
-            NS_ASSERT(satGeoFeederPhy != nullptr);
+            Ptr<SatOrbiterFeederPhy> satOrbiterFeederPhy = satPhy->GetObject<SatOrbiterFeederPhy>();
+            NS_ASSERT(satOrbiterFeederPhy != nullptr);
 
-            if (satGeoFeederPhy->TraceConnectWithoutContext("QueueSizePackets", callback))
+            if (satOrbiterFeederPhy->TraceConnectWithoutContext("QueueSizePackets", callback))
             {
                 NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
                                  << " device #" << satGeoDev->GetIfIndex());
@@ -772,7 +772,7 @@ SatStatsFwdUserQueueBytesHelper::DoInstallProbes()
         SaveAddressAndIdentifier(*it);
     }
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
     Callback<void, uint32_t, const Address&> callback =
         MakeCallback(&SatStatsFwdUserQueueBytesHelper::QueueSizeCallback, this);
 
@@ -782,17 +782,17 @@ SatStatsFwdUserQueueBytesHelper::DoInstallProbes()
         Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
         NS_ASSERT(satGeoDev != nullptr);
         Ptr<SatPhy> satPhy;
-        std::map<uint32_t, Ptr<SatPhy>> satGeoUserPhys = satGeoDev->GetUserPhy();
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin();
-             it2 != satGeoUserPhys.end();
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhys = satGeoDev->GetUserPhy();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterUserPhys.begin();
+             it2 != satOrbiterUserPhys.end();
              ++it2)
         {
             satPhy = it2->second;
             NS_ASSERT(satPhy != nullptr);
-            Ptr<SatGeoUserPhy> satGeoUserPhy = satPhy->GetObject<SatGeoUserPhy>();
-            NS_ASSERT(satGeoUserPhy != nullptr);
+            Ptr<SatOrbiterUserPhy> satOrbiterUserPhy = satPhy->GetObject<SatOrbiterUserPhy>();
+            NS_ASSERT(satOrbiterUserPhy != nullptr);
 
-            if (satGeoUserPhy->TraceConnectWithoutContext("QueueSizeBytes", callback))
+            if (satOrbiterUserPhy->TraceConnectWithoutContext("QueueSizeBytes", callback))
             {
                 NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
                                  << " device #" << satGeoDev->GetIfIndex());
@@ -844,7 +844,7 @@ SatStatsFwdUserQueuePacketsHelper::DoInstallProbes()
         SaveAddressAndIdentifier(*it);
     }
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
     Callback<void, uint32_t, const Address&> callback =
         MakeCallback(&SatStatsFwdUserQueuePacketsHelper::QueueSizeCallback, this);
 
@@ -854,17 +854,17 @@ SatStatsFwdUserQueuePacketsHelper::DoInstallProbes()
         Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
         NS_ASSERT(satGeoDev != nullptr);
         Ptr<SatPhy> satPhy;
-        std::map<uint32_t, Ptr<SatPhy>> satGeoUserPhys = satGeoDev->GetUserPhy();
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin();
-             it2 != satGeoUserPhys.end();
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhys = satGeoDev->GetUserPhy();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterUserPhys.begin();
+             it2 != satOrbiterUserPhys.end();
              ++it2)
         {
             satPhy = it2->second;
             NS_ASSERT(satPhy != nullptr);
-            Ptr<SatGeoUserPhy> satGeoUserPhy = satPhy->GetObject<SatGeoUserPhy>();
-            NS_ASSERT(satGeoUserPhy != nullptr);
+            Ptr<SatOrbiterUserPhy> satOrbiterUserPhy = satPhy->GetObject<SatOrbiterUserPhy>();
+            NS_ASSERT(satOrbiterUserPhy != nullptr);
 
-            if (satGeoUserPhy->TraceConnectWithoutContext("QueueSizePackets", callback))
+            if (satOrbiterUserPhy->TraceConnectWithoutContext("QueueSizePackets", callback))
             {
                 NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
                                  << " device #" << satGeoDev->GetIfIndex());

@@ -22,13 +22,13 @@
 
 #include "satellite-address-tag.h"
 #include "satellite-channel.h"
-#include "satellite-geo-feeder-phy.h"
-#include "satellite-geo-user-phy.h"
 #include "satellite-ground-station-address-tag.h"
 #include "satellite-id-mapper.h"
 #include "satellite-mac.h"
 #include "satellite-orbiter-feeder-mac.h"
+#include "satellite-orbiter-feeder-phy.h"
 #include "satellite-orbiter-user-mac.h"
+#include "satellite-orbiter-user-phy.h"
 #include "satellite-phy-rx.h"
 #include "satellite-phy-tx.h"
 #include "satellite-phy.h"
@@ -304,7 +304,8 @@ SatGeoNetDevice::ReceiveUser(SatPhy::PacketContainer_t /*packets*/,
     {
     case SatEnums::TRANSPARENT:
     case SatEnums::REGENERATION_PHY: {
-        DynamicCast<SatGeoFeederPhy>(m_feederPhy[rxParams->m_beamId])->SendPduWithParams(rxParams);
+        DynamicCast<SatOrbiterFeederPhy>(m_feederPhy[rxParams->m_beamId])
+            ->SendPduWithParams(rxParams);
         break;
     }
     case SatEnums::REGENERATION_LINK: {
@@ -338,7 +339,7 @@ SatGeoNetDevice::ReceiveFeeder(SatPhy::PacketContainer_t /*packets*/,
     {
     case SatEnums::TRANSPARENT:
     case SatEnums::REGENERATION_PHY: {
-        DynamicCast<SatGeoUserPhy>(m_userPhy[rxParams->m_beamId])->SendPduWithParams(rxParams);
+        DynamicCast<SatOrbiterUserPhy>(m_userPhy[rxParams->m_beamId])->SendPduWithParams(rxParams);
         break;
     }
     case SatEnums::REGENERATION_NETWORK: {
@@ -401,7 +402,8 @@ SatGeoNetDevice::SendControlMsgToFeeder(Ptr<SatControlMessage> msg,
     {
     case SatEnums::TRANSPARENT:
     case SatEnums::REGENERATION_PHY: {
-        DynamicCast<SatGeoFeederPhy>(m_feederPhy[rxParams->m_beamId])->SendPduWithParams(rxParams);
+        DynamicCast<SatOrbiterFeederPhy>(m_feederPhy[rxParams->m_beamId])
+            ->SendPduWithParams(rxParams);
         break;
     }
     case SatEnums::REGENERATION_LINK:

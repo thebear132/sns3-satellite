@@ -48,7 +48,7 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_NETWORK));
 
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
 
     Config::SetDefault("ns3::SatHelper::HandoversEnabled", BooleanValue(true));
     Config::SetDefault("ns3::SatHandoverModule::NumberClosestSats", UintegerValue(2));

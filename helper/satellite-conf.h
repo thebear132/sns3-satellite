@@ -164,7 +164,7 @@ class SatConf : public Object
      *
      * \return Geo satellite position.
      */
-    GeoCoordinate GetGeoSatPosition() const;
+    GeoCoordinate GetSatPosition() const;
 
     /**
      * Get the simulation start time for scenarios using SGP4 model.
@@ -287,7 +287,7 @@ class SatConf : public Object
     /**
      * Geodetic positions of the Geo Satellite
      */
-    PositionContainer_t m_geoSatPosition;
+    PositionContainer_t m_satPosition;
 
     /**
      * TLE information for a satellite constellation

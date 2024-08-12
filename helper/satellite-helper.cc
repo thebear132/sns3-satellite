@@ -261,14 +261,14 @@ SatHelper::SatHelper(std::string scenarioPath)
         for (uint32_t i = 0; i < tles.size(); i++)
         {
             // create Geo Satellite node, set mobility to it
-            Ptr<Node> geoSatNode = CreateObject<Node>();
+            Ptr<Node> satNode = CreateObject<Node>();
 
-            SetSatMobility(geoSatNode, tles[i]);
+            SetSatMobility(satNode, tles[i]);
 
-            Ptr<SatMobilityModel> mobility = geoSatNode->GetObject<SatMobilityModel>();
+            Ptr<SatMobilityModel> mobility = satNode->GetObject<SatMobilityModel>();
             m_antennaGainPatterns->ConfigureBeamsMobility(i, mobility);
 
-            geoNodes.Add(geoSatNode);
+            geoNodes.Add(satNode);
         }
     }
     else
@@ -286,14 +286,14 @@ SatHelper::SatHelper(std::string scenarioPath)
                               m_waveformConfDirectoryName);
 
         // create Geo Satellite node, set mobility to it
-        Ptr<Node> geoSatNode = CreateObject<Node>();
+        Ptr<Node> satNode = CreateObject<Node>();
 
-        SetGeoSatMobility(geoSatNode);
+        SetSatMobility(satNode);
 
-        Ptr<SatMobilityModel> mobility = geoSatNode->GetObject<SatMobilityModel>();
+        Ptr<SatMobilityModel> mobility = satNode->GetObject<SatMobilityModel>();
         m_antennaGainPatterns->ConfigureBeamsMobility(0, mobility);
 
-        geoNodes.Add(geoSatNode);
+        geoNodes.Add(satNode);
     }
 
     m_beamHelper =
@@ -806,7 +806,7 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
                 for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
                 {
                     (*it)->AggregateObject(
-                        CreateObject<SatHandoverModule>(*it, GeoSatNodes(), m_antennaGainPatterns));
+                        CreateObject<SatHandoverModule>(*it, SatNodes(), m_antennaGainPatterns));
                 }
             }
 
@@ -855,14 +855,14 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
             if (m_satConstellationEnabled)
             {
                 DynamicCast<SatGeoNetDevice>(
-                    m_beamHelper->GetGeoSatNodes().Get(feederSatId)->GetDevice(0))
+                    m_beamHelper->GetSatNodes().Get(feederSatId)->GetDevice(0))
                     ->ConnectGw(Mac48Address::ConvertFrom(netDevices.first->GetAddress()),
                                 feederBeamId);
             }
             else
             {
                 DynamicCast<SatGeoNetDevice>(
-                    m_beamHelper->GetGeoSatNodes().Get(feederSatId)->GetDevice(0))
+                    m_beamHelper->GetSatNodes().Get(feederSatId)->GetDevice(0))
                     ->ConnectGw(Mac48Address::ConvertFrom(netDevices.first->GetAddress()),
                                 feederBeamId);
                 m_userHelper->PopulateBeamRoutings(uts,
@@ -873,8 +873,7 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
             for (uint32_t utIndex = 0; utIndex < uts.GetN(); utIndex++)
             {
-                DynamicCast<SatGeoNetDevice>(
-                    m_beamHelper->GetGeoSatNodes().Get(satId)->GetDevice(0))
+                DynamicCast<SatGeoNetDevice>(m_beamHelper->GetSatNodes().Get(satId)->GetDevice(0))
                     ->ConnectUt(
                         Mac48Address::ConvertFrom(netDevices.second.Get(utIndex)->GetAddress()),
                         beamId);
@@ -1047,11 +1046,10 @@ SatHelper::GetGwAddressInSingleUt(uint32_t utId)
     // be different than UT beam ID)
     uint32_t usedBeamId = 0;
     uint32_t gwSatGeoNetDeviceCount = 0;
-    for (uint32_t ndId = 0; ndId < m_beamHelper->GetGeoSatNodes().Get(gwSatId)->GetNDevices();
-         ndId++)
+    for (uint32_t ndId = 0; ndId < m_beamHelper->GetSatNodes().Get(gwSatId)->GetNDevices(); ndId++)
     {
-        Ptr<SatGeoNetDevice> gwNd = DynamicCast<SatGeoNetDevice>(
-            m_beamHelper->GetGeoSatNodes().Get(gwSatId)->GetDevice(ndId));
+        Ptr<SatGeoNetDevice> gwNd =
+            DynamicCast<SatGeoNetDevice>(m_beamHelper->GetSatNodes().Get(gwSatId)->GetDevice(ndId));
         if (gwNd)
         {
             gwSatGeoNetDeviceCount++;
@@ -1182,7 +1180,7 @@ SatHelper::LoadMobileUtFromFile(const std::string& filename)
     if (!m_handoversEnabled)
     {
         utNode->AggregateObject(
-            CreateObject<SatHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
+            CreateObject<SatHandoverModule>(utNode, SatNodes(), m_antennaGainPatterns));
     }
     return utNode;
 }
@@ -1207,7 +1205,7 @@ SatHelper::LoadMobileUtFromFile(uint32_t satId, const std::string& filename)
     if (!m_handoversEnabled)
     {
         utNode->AggregateObject(
-            CreateObject<SatHandoverModule>(utNode, GeoSatNodes(), m_antennaGainPatterns));
+            CreateObject<SatHandoverModule>(utNode, SatNodes(), m_antennaGainPatterns));
     }
     return utNode;
 }
@@ -1250,7 +1248,7 @@ SatHelper::SetGwMobility(NodeContainer gwNodes)
         if (m_handoversEnabled)
         {
             Ptr<SatHandoverModule> ho =
-                CreateObject<SatHandoverModule>(gwNode, GeoSatNodes(), m_antennaGainPatterns);
+                CreateObject<SatHandoverModule>(gwNode, SatNodes(), m_antennaGainPatterns);
             NS_LOG_DEBUG("Created Handover Module " << ho << " for GW node " << gwNode);
             gwNode->AggregateObject(ho);
         }
@@ -1291,12 +1289,11 @@ SatHelper::SetUtMobility(NodeContainer uts, uint32_t satId, uint32_t beamId)
     for (uint32_t i = 0; i < uts.GetN(); ++i)
     {
         GeoCoordinate position = uts.Get(i)->GetObject<SatMobilityModel>()->GetGeoPosition();
-        NS_LOG_INFO(
-            "Installing mobility observer on Ut Node at "
-            << position << " with antenna gain of "
-            << m_antennaGainPatterns->GetAntennaGainPattern(beamId)->GetAntennaGain_lin(
-                   position,
-                   m_beamHelper->GetGeoSatNodes().Get(satId)->GetObject<SatMobilityModel>()));
+        NS_LOG_INFO("Installing mobility observer on Ut Node at "
+                    << position << " with antenna gain of "
+                    << m_antennaGainPatterns->GetAntennaGainPattern(beamId)->GetAntennaGain_lin(
+                           position,
+                           m_beamHelper->GetSatNodes().Get(satId)->GetObject<SatMobilityModel>()));
     }
 }
 
@@ -1332,12 +1329,11 @@ SatHelper::SetUtMobilityFromPosition(
     for (uint32_t i = 0; i < uts.GetN(); ++i)
     {
         GeoCoordinate position = uts.Get(i)->GetObject<SatMobilityModel>()->GetGeoPosition();
-        NS_LOG_INFO(
-            "Installing mobility observer on Ut Node at "
-            << position << " with antenna gain of "
-            << m_antennaGainPatterns->GetAntennaGainPattern(beamId)->GetAntennaGain_lin(
-                   position,
-                   m_beamHelper->GetGeoSatNodes().Get(satId)->GetObject<SatMobilityModel>()));
+        NS_LOG_INFO("Installing mobility observer on Ut Node at "
+                    << position << " with antenna gain of "
+                    << m_antennaGainPatterns->GetAntennaGainPattern(beamId)->GetAntennaGain_lin(
+                           position,
+                           m_beamHelper->GetSatNodes().Get(satId)->GetObject<SatMobilityModel>()));
     }
 }
 
@@ -1350,11 +1346,11 @@ SatHelper::GetBeamAllocator(uint32_t beamId)
     if (m_satConstellationEnabled)
     {
         satPosition =
-            m_beamHelper->GetGeoSatNodes().Get(0)->GetObject<SatMobilityModel>()->GetPosition();
+            m_beamHelper->GetSatNodes().Get(0)->GetObject<SatMobilityModel>()->GetPosition();
     }
     else
     {
-        satPosition = m_satConf->GetGeoSatPosition();
+        satPosition = m_satConf->GetSatPosition();
     }
     Ptr<SatSpotBeamPositionAllocator> beamAllocator =
         CreateObject<SatSpotBeamPositionAllocator>(beamId, m_antennaGainPatterns, satPosition);
@@ -1367,15 +1363,15 @@ SatHelper::GetBeamAllocator(uint32_t beamId)
 }
 
 void
-SatHelper::SetGeoSatMobility(Ptr<Node> node)
+SatHelper::SetSatMobility(Ptr<Node> node)
 {
     NS_LOG_FUNCTION(this << node);
     MobilityHelper mobility;
 
-    Ptr<SatListPositionAllocator> geoSatPosAllocator = CreateObject<SatListPositionAllocator>();
-    geoSatPosAllocator->Add(m_satConf->GetGeoSatPosition());
+    Ptr<SatListPositionAllocator> satPosAllocator = CreateObject<SatListPositionAllocator>();
+    satPosAllocator->Add(m_satConf->GetSatPosition());
 
-    mobility.SetPositionAllocator(geoSatPosAllocator);
+    mobility.SetPositionAllocator(satPosAllocator);
     mobility.SetMobilityModel("ns3::SatConstantPositionMobilityModel");
     mobility.Install(node);
 }
@@ -1417,7 +1413,7 @@ SatHelper::InstallMobilityObserver(uint32_t satId, NodeContainer nodes) const
         {
             Ptr<SatMobilityModel> ownMobility = (*i)->GetObject<SatMobilityModel>();
             Ptr<SatMobilityModel> satMobility =
-                m_beamHelper->GetGeoSatNodes().Get(satId)->GetObject<SatMobilityModel>();
+                m_beamHelper->GetSatNodes().Get(satId)->GetObject<SatMobilityModel>();
 
             NS_ASSERT(ownMobility != nullptr);
             NS_ASSERT(satMobility != nullptr);
@@ -1592,7 +1588,7 @@ SatHelper::PrintTopology(std::ostream& os) const
     os << "==================" << std::endl;
 
     os << "Satellites" << std::endl;
-    NodeContainer satNodes = m_beamHelper->GetGeoSatNodes();
+    NodeContainer satNodes = m_beamHelper->GetSatNodes();
     for (uint32_t i = 0; i < satNodes.GetN(); i++)
     {
         Ptr<Node> node = satNodes.Get(i);

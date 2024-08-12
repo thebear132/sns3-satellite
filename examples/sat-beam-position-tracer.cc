@@ -42,7 +42,7 @@ void
 GetBeamPositions(Ptr<SatHelper> satHelper)
 {
     Ptr<SatAntennaGainPatternContainer> antennaGainPatterns = satHelper->GetAntennaGainPatterns();
-    NodeContainer satNodes = satHelper->GeoSatNodes();
+    NodeContainer satNodes = satHelper->SatNodes();
     uint32_t beamCount = satHelper->GetBeamCount();
     for (uint32_t satId = 0; satId < satNodes.GetN(); satId++)
     {

@@ -1066,7 +1066,7 @@ SatStatsFwdPhyDelayHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -1579,7 +1579,7 @@ SatStatsRtnPhyDelayHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {

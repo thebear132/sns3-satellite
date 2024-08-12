@@ -408,8 +408,8 @@ SatGwMac::StartTransmission(uint32_t carrierId)
 
             m_updateIslCallback();
 
-            Ptr<SatGeoNetDevice> geoNetDevice =
-                DynamicCast<SatGeoNetDevice>(m_geoNodesCallback().Get(m_feederSatId)->GetDevice(0));
+            Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice>(
+                m_orbiterNodesCallback().Get(m_feederSatId)->GetDevice(0));
             Mac48Address satFeederAddress = geoNetDevice->GetSatelliteFeederAddress(m_beamId);
             SetSatelliteAddress(satFeederAddress);
             if (m_gwLlcSetSatelliteAddress.IsNull() == false)
@@ -897,10 +897,10 @@ SatGwMac::SetBeamCallback(SatGwMac::PhyBeamCallback cb)
 }
 
 void
-SatGwMac::SetGeoNodesCallback(SatGwMac::GeoNodesCallback cb)
+SatGwMac::SetOrbiterNodesCallback(SatGwMac::OrbiterNodesCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
-    m_geoNodesCallback = cb;
+    m_orbiterNodesCallback = cb;
 }
 
 void

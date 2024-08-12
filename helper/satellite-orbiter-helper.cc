@@ -34,14 +34,13 @@
 #include "ns3/pointer.h"
 #include "ns3/satellite-channel-estimation-error-container.h"
 #include "ns3/satellite-const-variables.h"
-#include "ns3/satellite-geo-feeder-phy.h"
-#include "ns3/satellite-geo-net-device.h"
-#include "ns3/satellite-geo-user-phy.h"
 #include "ns3/satellite-id-mapper.h"
 #include "ns3/satellite-orbiter-feeder-llc.h"
 #include "ns3/satellite-orbiter-feeder-mac.h"
+#include "ns3/satellite-orbiter-feeder-phy.h"
 #include "ns3/satellite-orbiter-user-llc.h"
 #include "ns3/satellite-orbiter-user-mac.h"
+#include "ns3/satellite-orbiter-user-phy.h"
 #include "ns3/satellite-phy-rx-carrier-conf.h"
 #include "ns3/satellite-phy-rx.h"
 #include "ns3/satellite-phy-tx.h"
@@ -239,7 +238,7 @@ SatOrbiterHelper::SetUserPhyAttribute(std::string n1, const AttributeValue& v1)
 {
     NS_LOG_FUNCTION(this << n1);
 
-    Config::SetDefault("ns3::SatGeoUserPhy::" + n1, v1);
+    Config::SetDefault("ns3::SatOrbiterUserPhy::" + n1, v1);
 }
 
 void
@@ -247,7 +246,7 @@ SatOrbiterHelper::SetFeederPhyAttribute(std::string n1, const AttributeValue& v1
 {
     NS_LOG_FUNCTION(this << n1);
 
-    Config::SetDefault("ns3::SatGeoFeederPhy::" + n1, v1);
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::" + n1, v1);
 }
 
 NetDeviceContainer
@@ -385,7 +384,7 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
     params.m_txCh = fr;
     params.m_rxCh = ff;
 
-    Ptr<SatGeoFeederPhy> fPhy = CreateObject<SatGeoFeederPhy>(
+    Ptr<SatOrbiterFeederPhy> fPhy = CreateObject<SatOrbiterFeederPhy>(
         params,
         m_fwdLinkResults,
         parametersFeeder,
@@ -535,7 +534,7 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
     }
     case SatEnums::REGENERATION_LINK:
     case SatEnums::REGENERATION_NETWORK: {
-        fMac->SetTransmitCallback(MakeCallback(&SatGeoFeederPhy::SendPduWithParams, fPhy));
+        fMac->SetTransmitCallback(MakeCallback(&SatOrbiterFeederPhy::SendPduWithParams, fPhy));
 
         double carrierBandwidth = m_carrierBandwidthConverter(SatEnums::RETURN_FEEDER_CH,
                                                               0,
@@ -605,7 +604,7 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
     params.m_txCh = uf;
     params.m_rxCh = ur;
 
-    Ptr<SatGeoUserPhy> uPhy = CreateObject<SatGeoUserPhy>(
+    Ptr<SatOrbiterUserPhy> uPhy = CreateObject<SatOrbiterUserPhy>(
         params,
         m_rtnLinkResults,
         parametersUser,
@@ -704,7 +703,7 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
         break;
     }
     case SatEnums::REGENERATION_NETWORK: {
-        uMac->SetTransmitCallback(MakeCallback(&SatGeoUserPhy::SendPduWithParams, uPhy));
+        uMac->SetTransmitCallback(MakeCallback(&SatOrbiterUserPhy::SendPduWithParams, uPhy));
 
         double carrierBandwidth = m_carrierBandwidthConverter(SatEnums::FORWARD_USER_CH,
                                                               0,
@@ -778,7 +777,7 @@ SatOrbiterHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, Callback
 }
 
 void
-SatOrbiterHelper::SetIslRoutes(NodeContainer geoNodes,
+SatOrbiterHelper::SetIslRoutes(NodeContainer satNodes,
                                std::vector<std::pair<uint32_t, uint32_t>> isls)
 {
     NS_LOG_FUNCTION(this);
@@ -787,7 +786,7 @@ SatOrbiterHelper::SetIslRoutes(NodeContainer geoNodes,
     {
     case SatEnums::UNICAST: {
         Ptr<SatIslArbiterUnicastHelper> satIslArbiterHelper =
-            CreateObject<SatIslArbiterUnicastHelper>(geoNodes, isls);
+            CreateObject<SatIslArbiterUnicastHelper>(satNodes, isls);
         satIslArbiterHelper->InstallArbiters();
         break;
     }

@@ -593,7 +593,7 @@ SatStatsFwdFeederLinkModcodHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
     Callback<void, uint32_t, const Address&> callback =
         MakeCallback(&SatStatsFwdFeederLinkModcodHelper::RxLinkModcodCallback, this);
 
@@ -703,7 +703,7 @@ SatStatsFwdUserLinkModcodHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
     Callback<void, uint32_t, const Address&> callback =
         MakeCallback(&SatStatsFwdUserLinkModcodHelper::RxLinkModcodCallback, this);
 
@@ -813,7 +813,7 @@ SatStatsRtnFeederLinkModcodHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -923,7 +923,7 @@ SatStatsRtnUserLinkModcodHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
     Callback<void, uint32_t, const Address&> callback =
         MakeCallback(&SatStatsRtnUserLinkModcodHelper::RxLinkModcodCallback, this);
 

@@ -96,9 +96,9 @@ main(int argc, char* argv[])
         Ptr<SatHelper> satHelper =
             simulationHelper->CreateSatScenario(SatHelper::FULL, mobileUtTraceFile);
         satMobility =
-            satHelper->GetBeamHelper()->GetGeoSatNodes().Get(0)->GetObject<SatMobilityModel>();
+            satHelper->GetBeamHelper()->GetSatNodes().Get(0)->GetObject<SatMobilityModel>();
 
-        uint32_t satNb = satHelper->GeoSatNodes().GetN();
+        uint32_t satNb = satHelper->SatNodes().GetN();
         for (uint32_t i = 0; i < satNb; i++)
         {
             Ptr<Node> node = satHelper->LoadMobileUtFromFile(mobileUtTraceFile);

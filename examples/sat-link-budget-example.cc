@@ -151,13 +151,13 @@ main(int argc, char* argv[])
     NodeContainer gw = helper->GwNodes();
     Ptr<SatMobilityModel> gwMob = gw.Get(0)->GetObject<SatMobilityModel>();
 
-    Ptr<Node> geo = helper->GeoSatNodes().Get(0);
-    Ptr<SatMobilityModel> geoMob = geo->GetObject<SatMobilityModel>();
+    Ptr<Node> sat = helper->SatNodes().Get(0);
+    Ptr<SatMobilityModel> satMob = sat->GetObject<SatMobilityModel>();
 
     // print used parameters using log info
     NS_LOG_INFO("--- satellite-link-budget-example ---");
     NS_LOG_INFO(" Beam ID: " << beamId);
-    NS_LOG_INFO(" Geo position: " << geoMob->GetGeoPosition() << " " << geoMob->GetPosition());
+    NS_LOG_INFO(" Sat position: " << satMob->GetGeoPosition() << " " << satMob->GetPosition());
     NS_LOG_INFO(" GW position: " << gwMob->GetGeoPosition() << " " << gwMob->GetPosition());
     NS_LOG_INFO(" UT position: " << utMob->GetGeoPosition() << " " << utMob->GetPosition());
     NS_LOG_INFO("  ");

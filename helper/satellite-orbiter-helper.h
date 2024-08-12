@@ -250,10 +250,10 @@ class SatOrbiterHelper : public Object
     /**
      * Set ISL routes
      *
-     * \param List of all satellite nodes
+     * \param satNodes List of all satellite nodes
      * \param isls List of all ISLs
      */
-    void SetIslRoutes(NodeContainer geoNodes, std::vector<std::pair<uint32_t, uint32_t>> isls);
+    void SetIslRoutes(NodeContainer satNodes, std::vector<std::pair<uint32_t, uint32_t>> isls);
 
   private:
     /**

@@ -203,13 +203,13 @@ class SatGwMac : public SatMac
      * Callback to get all satellite nodes
      * \return All satellites of the simulation
      */
-    typedef Callback<NodeContainer> GeoNodesCallback;
+    typedef Callback<NodeContainer> OrbiterNodesCallback;
 
     /**
      * Method to set callback to get all satellite nodes
      * \param cb callback to invoke to get all satellite nodes
      */
-    void SetGeoNodesCallback(SatGwMac::GeoNodesCallback cb);
+    void SetOrbiterNodesCallback(SatGwMac::OrbiterNodesCallback cb);
 
     /**
      * Callback to set geo satellite feeder address on LLC
@@ -448,7 +448,7 @@ class SatGwMac : public SatMac
     /**
      * Callback to get all satellite nodes
      */
-    SatGwMac::GeoNodesCallback m_geoNodesCallback;
+    SatGwMac::OrbiterNodesCallback m_orbiterNodesCallback;
 
     /**
      * Callback to set satellite address on LLC

@@ -100,8 +100,8 @@ main(int argc, char* argv[])
                        EnumValue(forwardLinkRegenerationMode));
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(returnLinkRegenerationMode));
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
-    Config::SetDefault("ns3::SatGeoUserPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterUserPhy::QueueSize", UintegerValue(100000));
 
     /// Enable ACM
     Config::SetDefault("ns3::SatBbFrameConf::AcmEnabled", BooleanValue(true));

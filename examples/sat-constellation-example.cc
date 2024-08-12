@@ -65,8 +65,8 @@ main(int argc, char* argv[])
                        EnumValue(SatEnums::REGENERATION_NETWORK));
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_NETWORK));
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
-    Config::SetDefault("ns3::SatGeoUserPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterUserPhy::QueueSize", UintegerValue(100000));
 
     /// Use constellation
     Config::SetDefault("ns3::PointToPointIslHelper::IslDataRate",

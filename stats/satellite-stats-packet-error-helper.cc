@@ -249,7 +249,7 @@ SatStatsPacketErrorHelper::DoInstall()
         }
 
         // Connect to trace sources at SAT nodes.
-        NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+        NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
         for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
         {
             InstallProbeOnSatFeeder(*it);
@@ -285,7 +285,7 @@ SatStatsPacketErrorHelper::DoInstall()
         }
 
         // Connect to trace sources at SAT nodes.
-        NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+        NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
         for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
         {
             InstallProbeOnSatUser(*it);

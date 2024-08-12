@@ -33,14 +33,14 @@
 #include "ns3/packet-sink-helper.h"
 #include "ns3/packet-sink.h"
 #include "ns3/satellite-env-variables.h"
-#include "ns3/satellite-geo-feeder-phy.h"
 #include "ns3/satellite-geo-net-device.h"
-#include "ns3/satellite-geo-user-phy.h"
 #include "ns3/satellite-gw-mac.h"
 #include "ns3/satellite-helper.h"
 #include "ns3/satellite-id-mapper.h"
 #include "ns3/satellite-isl-arbiter-unicast.h"
 #include "ns3/satellite-isl-arbiter.h"
+#include "ns3/satellite-orbiter-feeder-phy.h"
+#include "ns3/satellite-orbiter-user-phy.h"
 #include "ns3/satellite-phy-rx-carrier.h"
 #include "ns3/satellite-ut-mac-state.h"
 #include "ns3/simulation-helper.h"
@@ -183,7 +183,7 @@ SatHandoverTest1::DoRun(void)
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_NETWORK));
 
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
 
     Config::SetDefault("ns3::SatHelper::HandoversEnabled", BooleanValue(true));
     Config::SetDefault("ns3::SatHandoverModule::NumberClosestSats", UintegerValue(2));
@@ -484,7 +484,7 @@ SatHandoverTest2::DoRun(void)
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_NETWORK));
 
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
 
     Config::SetDefault("ns3::SatHelper::HandoversEnabled", BooleanValue(true));
     Config::SetDefault("ns3::SatHandoverModule::NumberClosestSats", UintegerValue(2));

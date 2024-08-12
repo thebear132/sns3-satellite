@@ -33,14 +33,14 @@
 #include "ns3/packet-sink-helper.h"
 #include "ns3/packet-sink.h"
 #include "ns3/satellite-env-variables.h"
-#include "ns3/satellite-geo-feeder-phy.h"
 #include "ns3/satellite-geo-net-device.h"
-#include "ns3/satellite-geo-user-phy.h"
 #include "ns3/satellite-gw-mac.h"
 #include "ns3/satellite-helper.h"
 #include "ns3/satellite-id-mapper.h"
 #include "ns3/satellite-isl-arbiter-unicast.h"
 #include "ns3/satellite-isl-arbiter.h"
+#include "ns3/satellite-orbiter-feeder-phy.h"
+#include "ns3/satellite-orbiter-user-phy.h"
 #include "ns3/satellite-phy-rx-carrier.h"
 #include "ns3/satellite-ut-mac-state.h"
 #include "ns3/simulation-helper.h"
@@ -128,7 +128,7 @@ SatConstellationTest1::DoRun(void)
     simulationHelper->CreateSatScenario();
     m_helper = simulationHelper->GetSatelliteHelper();
 
-    NodeContainer sats = m_helper->GeoSatNodes();
+    NodeContainer sats = m_helper->SatNodes();
     NodeContainer gws = m_helper->GwNodes();
     NodeContainer uts = m_helper->UtNodes();
     NodeContainer gwUsers = m_helper->GetGwUsers();
@@ -837,7 +837,7 @@ SatConstellationTest4::DoRun(void)
     simulationHelper->CreateSatScenario();
     m_helper = simulationHelper->GetSatelliteHelper();
 
-    NodeContainer sats = m_helper->GeoSatNodes();
+    NodeContainer sats = m_helper->SatNodes();
     NodeContainer gws = m_helper->GwNodes();
     NodeContainer uts = m_helper->UtNodes();
     NodeContainer gwUsers = m_helper->GetGwUsers();

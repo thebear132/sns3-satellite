@@ -420,7 +420,7 @@ SatStatsHelper::CreateCollectorPerIdentifier(CollectorMap& collectorMap) const
     }
 
     case SatStatsHelper::IDENTIFIER_SAT: {
-        NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+        NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
 
         for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
         {
@@ -435,7 +435,7 @@ SatStatsHelper::CreateCollectorPerIdentifier(CollectorMap& collectorMap) const
     }
 
     case SatStatsHelper::IDENTIFIER_ISL: {
-        NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+        NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
 
         for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
         {

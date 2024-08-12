@@ -118,8 +118,8 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatBeamScheduler::CnoEstimationWindow", TimeValue(g_cnoInterval));
 
     Config::SetDefault("ns3::SatUtPhy::TxMaxPowerDbw", DoubleValue(g_txMaxPower));
-    Config::SetDefault("ns3::SatGeoUserPhy::TxMaxPowerDbw", DoubleValue(15.0));
-    Config::SetDefault("ns3::SatGeoFeederPhy::FixedAmplificationGainDb", DoubleValue(200.0));
+    Config::SetDefault("ns3::SatOrbiterUserPhy::TxMaxPowerDbw", DoubleValue(15.0));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::FixedAmplificationGainDb", DoubleValue(200.0));
 
     simulationHelper->ReadInputAttributesFromFile(inputFileNameWithPath);
 

@@ -595,7 +595,7 @@ SatStatsFwdFeederLinkRxPowerHelper::DoInstallProbes()
         SaveAddressAndIdentifier(*it);
     }
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -823,7 +823,7 @@ SatStatsRtnUserLinkRxPowerHelper::DoInstallProbes()
         SaveAddressAndIdentifier(*it);
     }
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {

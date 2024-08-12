@@ -242,7 +242,7 @@ SatStatsPacketDropRateHelper::InstallProbes()
     Callback<void, uint32_t, Ptr<Node>, Ptr<Node>, bool> callback =
         MakeCallback(&SatStatsPacketDropRateHelper::PacketDropRateCallback, this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
         Ptr<SatGeoNetDevice> satGeoNetDevice =

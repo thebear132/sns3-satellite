@@ -303,9 +303,9 @@ class SatHelper : public Object
         return m_beamHelper->GetUtNodes();
     }
 
-    inline NodeContainer GeoSatNodes()
+    inline NodeContainer SatNodes()
     {
-        return m_beamHelper->GetGeoSatNodes();
+        return m_beamHelper->GetSatNodes();
     }
 
     /**
@@ -597,7 +597,7 @@ class SatHelper : public Object
      *
      * \param node node pointer of Geo Satellite to set mobility
      */
-    void SetGeoSatMobility(Ptr<Node> node);
+    void SetSatMobility(Ptr<Node> node);
 
     /**
      * Sets SGP4 mobility to created Sat node.

@@ -245,7 +245,7 @@ SatBeamHelper::SatBeamHelper()
 }
 
 SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
-                             NodeContainer geoNodes,
+                             NodeContainer satNodes,
                              std::vector<std::pair<uint32_t, uint32_t>> isls,
                              SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                              uint32_t rtnLinkCarrierCount,
@@ -303,12 +303,12 @@ SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
     SatMac::SendCtrlMsgCallback fwdSendCtrlCb =
         MakeCallback(&SatControlMsgContainer::Send, fwdCtrlMsgContainer);
 
-    SatOrbiterHelper::RandomAccessSettings_s geoRaSettings;
-    geoRaSettings.m_raFwdInterferenceModel = m_raInterferenceModel;
-    geoRaSettings.m_raRtnInterferenceModel = m_raInterferenceModel;
-    geoRaSettings.m_raInterferenceEliminationModel = m_raInterferenceEliminationModel;
-    geoRaSettings.m_randomAccessModel = m_randomAccessModel;
-    geoRaSettings.m_raCollisionModel = m_raCollisionModel;
+    SatOrbiterHelper::RandomAccessSettings_s orbiterRaSettings;
+    orbiterRaSettings.m_raFwdInterferenceModel = m_raInterferenceModel;
+    orbiterRaSettings.m_raRtnInterferenceModel = m_raInterferenceModel;
+    orbiterRaSettings.m_raInterferenceEliminationModel = m_raInterferenceEliminationModel;
+    orbiterRaSettings.m_randomAccessModel = m_randomAccessModel;
+    orbiterRaSettings.m_raCollisionModel = m_raCollisionModel;
 
     SatGwHelper::RandomAccessSettings_s gwRaSettings;
     gwRaSettings.m_raInterferenceModel = m_raInterferenceModel;
@@ -327,7 +327,7 @@ SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
 
     if (m_enableTracesOnReturnLink)
     {
-        geoRaSettings.m_raRtnInterferenceModel = SatPhyRxCarrierConf::IF_TRACE;
+        orbiterRaSettings.m_raRtnInterferenceModel = SatPhyRxCarrierConf::IF_TRACE;
         gwRaSettings.m_raInterferenceModel = SatPhyRxCarrierConf::IF_TRACE;
         Config::SetDefault("ns3::SatOrbiterHelper::DaRtnLinkInterferenceModel",
                            StringValue("Trace"));
@@ -341,7 +341,7 @@ SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
                                                      seq,
                                                      fwdReadCtrlCb,
                                                      rtnReadCtrlCb,
-                                                     geoRaSettings);
+                                                     orbiterRaSettings);
 
     switch (m_standard)
     {
@@ -444,8 +444,8 @@ SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
     // DVB-RCS2 link results for RTN link waveform configurations
     m_superframeSeq->GetWaveformConf()->InitializeEbNoRequirements(linkResultsReturnLink);
 
-    m_geoNodes = geoNodes;
-    m_orbiterHelper->Install(m_geoNodes);
+    m_satNodes = satNodes;
+    m_orbiterHelper->Install(m_satNodes);
 
     m_ncc = CreateObject<SatNcc>();
 
@@ -592,9 +592,9 @@ SatBeamHelper::Install(NodeContainer ut,
     SatChannelPair::ChannelPair_t userLink =
         GetChannelPair(satId, beamId, fwdUlFreqId, rtnUlFreqId, true);
 
-    Ptr<Node> geoNode = m_geoNodes.Get(satId);
+    Ptr<Node> satNode = m_satNodes.Get(satId);
 
-    NS_ASSERT(geoNode != nullptr);
+    NS_ASSERT(satNode != nullptr);
 
     // Get the position of the GW serving this beam, get the best beam based on antenna patterns
     // for this position, and set the antenna patterns to the feeder PHY objects via
@@ -607,8 +607,8 @@ SatBeamHelper::Install(NodeContainer ut,
         feederBeamId = 1;
     }
 
-    // attach channels to geo satellite device
-    m_orbiterHelper->AttachChannels(geoNode->GetDevice(0),
+    // attach channels to satellite device
+    m_orbiterHelper->AttachChannels(satNode->GetDevice(0),
                                     feederLink.first,
                                     feederLink.second,
                                     userLink.first,
@@ -645,7 +645,7 @@ SatBeamHelper::Install(NodeContainer ut,
         m_utNode.insert(std::make_pair(std::make_pair(satId, beamId), *i));
     }
 
-    Ptr<NetDevice> gwNd = InstallFeeder(DynamicCast<SatGeoNetDevice>(geoNode->GetDevice(0)),
+    Ptr<NetDevice> gwNd = InstallFeeder(DynamicCast<SatGeoNetDevice>(satNode->GetDevice(0)),
                                         gwNode,
                                         gwId,
                                         satId,
@@ -666,7 +666,7 @@ SatBeamHelper::Install(NodeContainer ut,
             // If first time we create a Net Device for this GW ID, store it
             m_gwNdMap[gwId] = gwNd;
         }
-        utNd = InstallUser(DynamicCast<SatGeoNetDevice>(geoNode->GetDevice(0)),
+        utNd = InstallUser(DynamicCast<SatGeoNetDevice>(satNode->GetDevice(0)),
                            ut,
                            m_gwNdMap[gwId],
                            satId,
@@ -678,7 +678,7 @@ SatBeamHelper::Install(NodeContainer ut,
     }
     else
     {
-        utNd = InstallUser(DynamicCast<SatGeoNetDevice>(geoNode->GetDevice(0)),
+        utNd = InstallUser(DynamicCast<SatGeoNetDevice>(satNode->GetDevice(0)),
                            ut,
                            gwNd,
                            satId,
@@ -812,7 +812,7 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
     {
         Ptr<SatGwMac> gwMac = DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNd)->GetMac());
         Mac48Address satFeederAddress = geoNetDevice->GetSatelliteFeederAddress(beamId);
-        gwMac->SetGeoNodesCallback(MakeCallback(&SatBeamHelper::GetGeoSatNodes, this));
+        gwMac->SetOrbiterNodesCallback(MakeCallback(&SatBeamHelper::GetSatNodes, this));
         gwMac->SetSatelliteAddress(satFeederAddress);
     }
 
@@ -907,8 +907,8 @@ SatBeamHelper::InstallIsls()
          it != m_isls.end();
          it++)
     {
-        Ptr<Node> sat1 = m_geoNodes.Get(it->first);
-        Ptr<Node> sat2 = m_geoNodes.Get(it->second);
+        Ptr<Node> sat1 = m_satNodes.Get(it->first);
+        Ptr<Node> sat2 = m_satNodes.Get(it->second);
 
         // Install a p2p ISL link between these two satellites
         NetDeviceContainer netDevices = p2pIslHelper->Install(sat1, sat2);
@@ -917,14 +917,14 @@ SatBeamHelper::InstallIsls()
         Ptr<PointToPointIslNetDevice> islNdSat2 =
             DynamicCast<PointToPointIslNetDevice>(netDevices.Get(1));
 
-        Ptr<SatGeoNetDevice> geoNdSat1 = DynamicCast<SatGeoNetDevice>(sat1->GetDevice(0));
-        Ptr<SatGeoNetDevice> geoNdSat2 = DynamicCast<SatGeoNetDevice>(sat2->GetDevice(0));
+        Ptr<SatGeoNetDevice> satNdSat1 = DynamicCast<SatGeoNetDevice>(sat1->GetDevice(0));
+        Ptr<SatGeoNetDevice> satNdSat2 = DynamicCast<SatGeoNetDevice>(sat2->GetDevice(0));
 
-        geoNdSat1->AddIslsNetDevice(islNdSat1);
-        geoNdSat2->AddIslsNetDevice(islNdSat2);
+        satNdSat1->AddIslsNetDevice(islNdSat1);
+        satNdSat2->AddIslsNetDevice(islNdSat2);
 
-        islNdSat1->SetGeoNetDevice(geoNdSat1);
-        islNdSat2->SetGeoNetDevice(geoNdSat2);
+        islNdSat1->SetGeoNetDevice(satNdSat1);
+        islNdSat2->SetGeoNetDevice(satNdSat2);
     }
 }
 
@@ -933,7 +933,7 @@ SatBeamHelper::SetIslRoutes()
 {
     NS_LOG_FUNCTION(this);
 
-    m_orbiterHelper->SetIslRoutes(m_geoNodes, m_isls);
+    m_orbiterHelper->SetIslRoutes(m_satNodes, m_isls);
 }
 
 uint32_t
@@ -969,10 +969,10 @@ SatBeamHelper::GetGwNode(uint32_t gwId) const
 }
 
 NodeContainer
-SatBeamHelper::GetGeoSatNodes() const
+SatBeamHelper::GetSatNodes() const
 {
     NS_LOG_FUNCTION(this);
-    return m_geoNodes;
+    return m_satNodes;
 }
 
 Ptr<SatUtHelper>
@@ -1271,9 +1271,9 @@ SatBeamHelper::GetClosestSat(GeoCoordinate position)
     double distanceMin = std::numeric_limits<double>::max();
     uint32_t indexDistanceMin = 0;
 
-    for (uint32_t i = 0; i < m_geoNodes.GetN(); i++)
+    for (uint32_t i = 0; i < m_satNodes.GetN(); i++)
     {
-        GeoCoordinate satPos = m_geoNodes.Get(i)->GetObject<SatMobilityModel>()->GetGeoPosition();
+        GeoCoordinate satPos = m_satNodes.Get(i)->GetObject<SatMobilityModel>()->GetGeoPosition();
         double distance = CalculateDistance(position.ToVector(), satPos.ToVector());
         if (distance < distanceMin)
         {
@@ -1502,7 +1502,7 @@ SatBeamHelper::CreateBeamInfo() const
 
     oss << std::endl << " -- Geo Satellite position --" << std::endl;
 
-    Ptr<SatMobilityModel> model = m_geoNodes.Get(0)->GetObject<SatMobilityModel>();
+    Ptr<SatMobilityModel> model = m_satNodes.Get(0)->GetObject<SatMobilityModel>();
     GeoCoordinate pos = model->GetGeoPosition();
     oss << "latitude=" << pos.GetLatitude() << ", longitude=" << pos.GetLongitude()
         << ", altitude=" << pos.GetAltitude() << std::endl;
