@@ -44,12 +44,12 @@
 #include <ns3/satellite-enums.h>
 #include <ns3/satellite-fading-input-trace-container.h>
 #include <ns3/satellite-fading-input-trace.h>
-#include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-gw-llc.h>
 #include <ns3/satellite-gw-mac.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-lorawan-net-device.h>
 #include <ns3/satellite-mobility-model.h>
+#include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-packet-trace.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy-tx.h>
@@ -645,7 +645,7 @@ SatBeamHelper::Install(NodeContainer ut,
         m_utNode.insert(std::make_pair(std::make_pair(satId, beamId), *i));
     }
 
-    Ptr<NetDevice> gwNd = InstallFeeder(DynamicCast<SatGeoNetDevice>(satNode->GetDevice(0)),
+    Ptr<NetDevice> gwNd = InstallFeeder(DynamicCast<SatOrbiterNetDevice>(satNode->GetDevice(0)),
                                         gwNode,
                                         gwId,
                                         satId,
@@ -666,7 +666,7 @@ SatBeamHelper::Install(NodeContainer ut,
             // If first time we create a Net Device for this GW ID, store it
             m_gwNdMap[gwId] = gwNd;
         }
-        utNd = InstallUser(DynamicCast<SatGeoNetDevice>(satNode->GetDevice(0)),
+        utNd = InstallUser(DynamicCast<SatOrbiterNetDevice>(satNode->GetDevice(0)),
                            ut,
                            m_gwNdMap[gwId],
                            satId,
@@ -678,7 +678,7 @@ SatBeamHelper::Install(NodeContainer ut,
     }
     else
     {
-        utNd = InstallUser(DynamicCast<SatGeoNetDevice>(satNode->GetDevice(0)),
+        utNd = InstallUser(DynamicCast<SatOrbiterNetDevice>(satNode->GetDevice(0)),
                            ut,
                            gwNd,
                            satId,
@@ -701,7 +701,7 @@ SatBeamHelper::Install(NodeContainer ut,
 }
 
 Ptr<NetDevice>
-SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
+SatBeamHelper::InstallFeeder(Ptr<SatOrbiterNetDevice> orbiterNetDevice,
                              Ptr<Node> gwNode,
                              uint32_t gwId,
                              uint32_t satId,
@@ -770,7 +770,7 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
     if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK ||
         m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
-        satelliteUserAddress = geoNetDevice->GetSatelliteUserAddress(beamId);
+        satelliteUserAddress = orbiterNetDevice->GetSatelliteUserAddress(beamId);
     }
 
     switch (m_standard)
@@ -780,7 +780,7 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
             satId,
             beamId,
             DynamicCast<SatNetDevice>(gwNd),
-            geoNetDevice,
+            orbiterNetDevice,
             MakeCallback(&SatNetDevice::SendControlMsg, DynamicCast<SatNetDevice>(gwNd)),
             MakeCallback(&SatGwMac::TbtpSent,
                          DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNd)->GetMac())),
@@ -793,7 +793,7 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
         m_ncc->AddBeam(satId,
                        beamId,
                        DynamicCast<SatNetDevice>(gwNd),
-                       geoNetDevice,
+                       orbiterNetDevice,
                        MakeCallback(&SatLorawanNetDevice::SendControlMsg,
                                     DynamicCast<SatLorawanNetDevice>(gwNd)),
                        MakeNullCallback<void, Ptr<SatTbtpMessage>>(),
@@ -811,7 +811,7 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
         m_forwardLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
         Ptr<SatGwMac> gwMac = DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNd)->GetMac());
-        Mac48Address satFeederAddress = geoNetDevice->GetSatelliteFeederAddress(beamId);
+        Mac48Address satFeederAddress = orbiterNetDevice->GetSatelliteFeederAddress(beamId);
         gwMac->SetOrbiterNodesCallback(MakeCallback(&SatBeamHelper::GetSatNodes, this));
         gwMac->SetSatelliteAddress(satFeederAddress);
     }
@@ -821,7 +821,7 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
     {
         Ptr<SatGwMac> gwMac = DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNd)->GetMac());
         Ptr<SatGwLlc> gwLlc = DynamicCast<SatGwLlc>(DynamicCast<SatNetDevice>(gwNd)->GetLlc());
-        Mac48Address satFeederAddress = geoNetDevice->GetSatelliteFeederAddress(beamId);
+        Mac48Address satFeederAddress = orbiterNetDevice->GetSatelliteFeederAddress(beamId);
         gwMac->SetGwLlcSetSatelliteAddress(MakeCallback(&SatGwLlc::SetSatelliteAddress, gwLlc));
         gwLlc->SetSatelliteAddress(satFeederAddress);
     }
@@ -830,7 +830,7 @@ SatBeamHelper::InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
 }
 
 NetDeviceContainer
-SatBeamHelper::InstallUser(Ptr<SatGeoNetDevice> geoNetDevice,
+SatBeamHelper::InstallUser(Ptr<SatOrbiterNetDevice> orbiterNetDevice,
                            NodeContainer ut,
                            Ptr<NetDevice> gwNd,
                            uint32_t satId,
@@ -853,7 +853,7 @@ SatBeamHelper::InstallUser(Ptr<SatGeoNetDevice> geoNetDevice,
     if (m_returnLinkRegenerationMode == SatEnums::REGENERATION_LINK ||
         m_returnLinkRegenerationMode == SatEnums::REGENERATION_NETWORK)
     {
-        satUserAddress = geoNetDevice->GetUserMac(beamId)->GetAddress();
+        satUserAddress = orbiterNetDevice->GetUserMac(beamId)->GetAddress();
     }
 
     // install UTs
@@ -917,14 +917,14 @@ SatBeamHelper::InstallIsls()
         Ptr<PointToPointIslNetDevice> islNdSat2 =
             DynamicCast<PointToPointIslNetDevice>(netDevices.Get(1));
 
-        Ptr<SatGeoNetDevice> satNdSat1 = DynamicCast<SatGeoNetDevice>(sat1->GetDevice(0));
-        Ptr<SatGeoNetDevice> satNdSat2 = DynamicCast<SatGeoNetDevice>(sat2->GetDevice(0));
+        Ptr<SatOrbiterNetDevice> satNdSat1 = DynamicCast<SatOrbiterNetDevice>(sat1->GetDevice(0));
+        Ptr<SatOrbiterNetDevice> satNdSat2 = DynamicCast<SatOrbiterNetDevice>(sat2->GetDevice(0));
 
         satNdSat1->AddIslsNetDevice(islNdSat1);
         satNdSat2->AddIslsNetDevice(islNdSat2);
 
-        islNdSat1->SetGeoNetDevice(satNdSat1);
-        islNdSat2->SetGeoNetDevice(satNdSat2);
+        islNdSat1->SetOrbiterNetDevice(satNdSat1);
+        islNdSat2->SetOrbiterNetDevice(satNdSat2);
     }
 }
 

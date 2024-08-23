@@ -20,8 +20,8 @@
 
 #include "satellite-id-mapper.h"
 
-#include "satellite-geo-net-device.h"
 #include "satellite-net-device.h"
+#include "satellite-orbiter-net-device.h"
 
 #include <ns3/address.h>
 #include <ns3/log.h>
@@ -562,7 +562,7 @@ SatIdMapper::GetSatMacWithNode(Ptr<Node> satNode) const
     {
         Ptr<NetDevice> dev = satNode->GetDevice(0);
 
-        if (dev->GetObject<SatGeoNetDevice>() != nullptr)
+        if (dev->GetObject<SatOrbiterNetDevice>() != nullptr)
         {
             if (Mac48Address::IsMatchingType(dev->GetAddress()))
             {

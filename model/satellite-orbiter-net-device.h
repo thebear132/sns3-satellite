@@ -18,8 +18,8 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#ifndef SATELLITE_GEO_NET_DEVICE_H
-#define SATELLITE_GEO_NET_DEVICE_H
+#ifndef SATELLITE_ORBITER_NET_DEVICE_H
+#define SATELLITE_ORBITER_NET_DEVICE_H
 
 #include "satellite-channel.h"
 #include "satellite-isl-arbiter.h"
@@ -46,13 +46,13 @@ class SatIslArbiter;
 
 /**
  * \ingroup satellite
- * \brief SatGeoNetDevice to be utilized in geostationary satellite.
- * SatGeoNetDevice holds a set of phy layers towards user and feeder
+ * \brief SatOrbiterNetDevice to be utilized in geostationary satellite.
+ * SatOrbiterNetDevice holds a set of phy layers towards user and feeder
  * links; one pair of phy layers for each spot-beam. The SatNetDevice
  * implements a simple switching between all user and feeder links
  * modeling transparent payload.
  */
-class SatGeoNetDevice : public NetDevice
+class SatOrbiterNetDevice : public NetDevice
 {
   public:
     /**
@@ -64,7 +64,7 @@ class SatGeoNetDevice : public NetDevice
     /**
      * Default constructor.
      */
-    SatGeoNetDevice();
+    SatOrbiterNetDevice();
 
     /**
      * \brief Receive the packet from the lower layers, in network regeneration on return link
@@ -221,7 +221,7 @@ class SatGeoNetDevice : public NetDevice
     Mac48Address GetSatelliteUserAddress(uint32_t beamId);
 
     /**
-     * Attach a receive ErrorModel to the SatGeoNetDevice.
+     * Attach a receive ErrorModel to the SatOrbiterNetDevice.
      * \param em Ptr to the ErrorModel.
      */
     void SetReceiveErrorModel(Ptr<ErrorModel> em);
@@ -256,7 +256,7 @@ class SatGeoNetDevice : public NetDevice
 
     /**
      * The the list of MAC GW connected to this satellite.
-     * The SatGeoNetDevice will send to a GW if connected,
+     * The SatOrbiterNetDevice will send to a GW if connected,
      * otherwise it will send to ISLs.
      */
     std::set<Mac48Address> GetGwConnected();
@@ -277,7 +277,7 @@ class SatGeoNetDevice : public NetDevice
 
     /**
      * The the list of UT MAC connected to this satellite.
-     * The SatGeoNetDevice will send to a UT if connected,
+     * The SatOrbiterNetDevice will send to a UT if connected,
      * otherwise it will send to ISLs.
      */
     std::set<Mac48Address> GetUtConnected();
@@ -475,4 +475,4 @@ class SatGeoNetDevice : public NetDevice
 
 } // namespace ns3
 
-#endif /* SATELLITE_GEO_NET_DEVICE_H */
+#endif /* SATELLITE_ORBITER_NET_DEVICE_H */

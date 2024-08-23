@@ -18,7 +18,7 @@
  * Author: Sami Rantanen <sami.rantanen@magister.fi>
  */
 
-#include "satellite-geo-net-device.h"
+#include "satellite-orbiter-net-device.h"
 
 #include "satellite-address-tag.h"
 #include "satellite-channel.h"
@@ -48,91 +48,92 @@
 #include <ns3/trace-source-accessor.h>
 #include <ns3/uinteger.h>
 
-NS_LOG_COMPONENT_DEFINE("SatGeoNetDevice");
+NS_LOG_COMPONENT_DEFINE("SatOrbiterNetDevice");
 
 namespace ns3
 {
 
-NS_OBJECT_ENSURE_REGISTERED(SatGeoNetDevice);
+NS_OBJECT_ENSURE_REGISTERED(SatOrbiterNetDevice);
 
 TypeId
-SatGeoNetDevice::GetTypeId(void)
+SatOrbiterNetDevice::GetTypeId(void)
 {
     static TypeId tid =
-        TypeId("ns3::SatGeoNetDevice")
+        TypeId("ns3::SatOrbiterNetDevice")
             .SetParent<NetDevice>()
-            .AddConstructor<SatGeoNetDevice>()
+            .AddConstructor<SatOrbiterNetDevice>()
             .AddAttribute("ReceiveErrorModel",
                           "The receiver error model used to simulate packet loss",
                           PointerValue(),
-                          MakePointerAccessor(&SatGeoNetDevice::m_receiveErrorModel),
+                          MakePointerAccessor(&SatOrbiterNetDevice::m_receiveErrorModel),
                           MakePointerChecker<ErrorModel>())
             .AddAttribute("UserPhy",
                           "The User Phy objects attached to this device.",
                           ObjectMapValue(),
-                          MakeObjectMapAccessor(&SatGeoNetDevice::m_userPhy),
+                          MakeObjectMapAccessor(&SatOrbiterNetDevice::m_userPhy),
                           MakeObjectMapChecker<SatPhy>())
             .AddAttribute("FeederPhy",
                           "The Feeder Phy objects attached to this device.",
                           ObjectMapValue(),
-                          MakeObjectMapAccessor(&SatGeoNetDevice::m_feederPhy),
+                          MakeObjectMapAccessor(&SatOrbiterNetDevice::m_feederPhy),
                           MakeObjectMapChecker<SatPhy>())
             .AddAttribute("UserMac",
                           "The User MAC objects attached to this device.",
                           ObjectMapValue(),
-                          MakeObjectMapAccessor(&SatGeoNetDevice::m_userMac),
+                          MakeObjectMapAccessor(&SatOrbiterNetDevice::m_userMac),
                           MakeObjectMapChecker<SatMac>())
             .AddAttribute("FeederMac",
                           "The Feeder MAC objects attached to this device.",
                           ObjectMapValue(),
-                          MakeObjectMapAccessor(&SatGeoNetDevice::m_feederMac),
+                          MakeObjectMapAccessor(&SatOrbiterNetDevice::m_feederMac),
                           MakeObjectMapChecker<SatMac>())
             .AddAttribute("EnableStatisticsTags",
                           "If true, some tags will be added to each transmitted packet to assist "
                           "with statistics computation",
                           BooleanValue(false),
-                          MakeBooleanAccessor(&SatGeoNetDevice::m_isStatisticsTagsEnabled),
+                          MakeBooleanAccessor(&SatOrbiterNetDevice::m_isStatisticsTagsEnabled),
                           MakeBooleanChecker())
             .AddTraceSource("PacketTrace",
                             "Packet event trace",
-                            MakeTraceSourceAccessor(&SatGeoNetDevice::m_packetTrace),
+                            MakeTraceSourceAccessor(&SatOrbiterNetDevice::m_packetTrace),
                             "ns3::SatTypedefs::PacketTraceCallback")
             .AddTraceSource("Tx",
                             "A packet to be sent",
-                            MakeTraceSourceAccessor(&SatGeoNetDevice::m_txTrace),
+                            MakeTraceSourceAccessor(&SatOrbiterNetDevice::m_txTrace),
                             "ns3::Packet::TracedCallback")
             .AddTraceSource("SignallingTx",
                             "A signalling packet to be sent",
-                            MakeTraceSourceAccessor(&SatGeoNetDevice::m_signallingTxTrace),
+                            MakeTraceSourceAccessor(&SatOrbiterNetDevice::m_signallingTxTrace),
                             "ns3::SatTypedefs::PacketDestinationAddressCallback")
             .AddTraceSource("RxFeeder",
                             "A packet received on feeder",
-                            MakeTraceSourceAccessor(&SatGeoNetDevice::m_rxFeederTrace),
+                            MakeTraceSourceAccessor(&SatOrbiterNetDevice::m_rxFeederTrace),
                             "ns3::SatTypedefs::PacketSourceAddressCallback")
             .AddTraceSource("RxUser",
                             "A packet received on user",
-                            MakeTraceSourceAccessor(&SatGeoNetDevice::m_rxUserTrace),
+                            MakeTraceSourceAccessor(&SatOrbiterNetDevice::m_rxUserTrace),
                             "ns3::SatTypedefs::PacketSourceAddressCallback")
             .AddTraceSource("RxFeederLinkDelay",
                             "A packet is received with feeder link delay information",
-                            MakeTraceSourceAccessor(&SatGeoNetDevice::m_rxFeederLinkDelayTrace),
+                            MakeTraceSourceAccessor(&SatOrbiterNetDevice::m_rxFeederLinkDelayTrace),
                             "ns3::SatTypedefs::PacketDelayAddressCallback")
-            .AddTraceSource("RxFeederLinkJitter",
-                            "A packet is received with feeder link jitter information",
-                            MakeTraceSourceAccessor(&SatGeoNetDevice::m_rxFeederLinkJitterTrace),
-                            "ns3::SatTypedefs::PacketJitterAddressCallback")
+            .AddTraceSource(
+                "RxFeederLinkJitter",
+                "A packet is received with feeder link jitter information",
+                MakeTraceSourceAccessor(&SatOrbiterNetDevice::m_rxFeederLinkJitterTrace),
+                "ns3::SatTypedefs::PacketJitterAddressCallback")
             .AddTraceSource("RxUserLinkDelay",
                             "A packet is received with feeder link delay information",
-                            MakeTraceSourceAccessor(&SatGeoNetDevice::m_rxUserLinkDelayTrace),
+                            MakeTraceSourceAccessor(&SatOrbiterNetDevice::m_rxUserLinkDelayTrace),
                             "ns3::SatTypedefs::PacketDelayAddressCallback")
             .AddTraceSource("RxUserLinkJitter",
                             "A packet is received with feeder link jitter information",
-                            MakeTraceSourceAccessor(&SatGeoNetDevice::m_rxUserLinkJitterTrace),
+                            MakeTraceSourceAccessor(&SatOrbiterNetDevice::m_rxUserLinkJitterTrace),
                             "ns3::SatTypedefs::PacketJitterAddressCallback");
     return tid;
 }
 
-SatGeoNetDevice::SatGeoNetDevice()
+SatOrbiterNetDevice::SatOrbiterNetDevice()
     : m_node(0),
       m_mtu(0xffff),
       m_ifIndex(0)
@@ -141,7 +142,7 @@ SatGeoNetDevice::SatGeoNetDevice()
 }
 
 void
-SatGeoNetDevice::ReceivePacketUser(Ptr<Packet> packet, const Address& userAddress)
+SatOrbiterNetDevice::ReceivePacketUser(Ptr<Packet> packet, const Address& userAddress)
 {
     NS_LOG_FUNCTION(this << packet);
     NS_LOG_INFO("Receiving a packet: " << packet->GetUid());
@@ -216,7 +217,7 @@ SatGeoNetDevice::ReceivePacketUser(Ptr<Packet> packet, const Address& userAddres
 }
 
 void
-SatGeoNetDevice::ReceivePacketFeeder(Ptr<Packet> packet, const Address& feederAddress)
+SatOrbiterNetDevice::ReceivePacketFeeder(Ptr<Packet> packet, const Address& feederAddress)
 {
     NS_LOG_FUNCTION(this << packet);
     NS_LOG_INFO("Receiving a packet: " << packet->GetUid());
@@ -294,8 +295,8 @@ SatGeoNetDevice::ReceivePacketFeeder(Ptr<Packet> packet, const Address& feederAd
 }
 
 void
-SatGeoNetDevice::ReceiveUser(SatPhy::PacketContainer_t /*packets*/,
-                             Ptr<SatSignalParameters> rxParams)
+SatOrbiterNetDevice::ReceiveUser(SatPhy::PacketContainer_t /*packets*/,
+                                 Ptr<SatSignalParameters> rxParams)
 {
     NS_LOG_FUNCTION(this << rxParams->m_packetsInBurst.size() << rxParams);
     NS_LOG_INFO("Receiving a packet at the satellite from user link");
@@ -320,7 +321,7 @@ SatGeoNetDevice::ReceiveUser(SatPhy::PacketContainer_t /*packets*/,
     }
     case SatEnums::REGENERATION_NETWORK: {
         NS_FATAL_ERROR(
-            "SatGeoNetDevice::ReceiveUser should not be used in case of network regeneration");
+            "SatOrbiterNetDevice::ReceiveUser should not be used in case of network regeneration");
     }
     default: {
         NS_FATAL_ERROR("Not implemented yet");
@@ -329,8 +330,8 @@ SatGeoNetDevice::ReceiveUser(SatPhy::PacketContainer_t /*packets*/,
 }
 
 void
-SatGeoNetDevice::ReceiveFeeder(SatPhy::PacketContainer_t /*packets*/,
-                               Ptr<SatSignalParameters> rxParams)
+SatOrbiterNetDevice::ReceiveFeeder(SatPhy::PacketContainer_t /*packets*/,
+                                   Ptr<SatSignalParameters> rxParams)
 {
     NS_LOG_FUNCTION(this << rxParams->m_packetsInBurst.size() << rxParams);
     NS_LOG_INFO("Receiving a packet at the satellite from feeder link");
@@ -343,8 +344,8 @@ SatGeoNetDevice::ReceiveFeeder(SatPhy::PacketContainer_t /*packets*/,
         break;
     }
     case SatEnums::REGENERATION_NETWORK: {
-        NS_FATAL_ERROR(
-            "SatGeoNetDevice::ReceiveFeeder should not be used in case of network regeneration");
+        NS_FATAL_ERROR("SatOrbiterNetDevice::ReceiveFeeder should not be used in case of network "
+                       "regeneration");
     }
     default: {
         NS_FATAL_ERROR("Not implemented yet");
@@ -353,9 +354,9 @@ SatGeoNetDevice::ReceiveFeeder(SatPhy::PacketContainer_t /*packets*/,
 }
 
 bool
-SatGeoNetDevice::SendControlMsgToFeeder(Ptr<SatControlMessage> msg,
-                                        const Address& dest,
-                                        Ptr<SatSignalParameters> rxParams)
+SatOrbiterNetDevice::SendControlMsgToFeeder(Ptr<SatControlMessage> msg,
+                                            const Address& dest,
+                                            Ptr<SatSignalParameters> rxParams)
 {
     NS_LOG_FUNCTION(this << msg << dest);
 
@@ -425,55 +426,55 @@ SatGeoNetDevice::SendControlMsgToFeeder(Ptr<SatControlMessage> msg,
 }
 
 void
-SatGeoNetDevice::SetReceiveErrorModel(Ptr<ErrorModel> em)
+SatOrbiterNetDevice::SetReceiveErrorModel(Ptr<ErrorModel> em)
 {
     NS_LOG_FUNCTION(this << em);
     m_receiveErrorModel = em;
 }
 
 void
-SatGeoNetDevice::SetForwardLinkRegenerationMode(
+SatOrbiterNetDevice::SetForwardLinkRegenerationMode(
     SatEnums::RegenerationMode_t forwardLinkRegenerationMode)
 {
     m_forwardLinkRegenerationMode = forwardLinkRegenerationMode;
 }
 
 void
-SatGeoNetDevice::SetReturnLinkRegenerationMode(
+SatOrbiterNetDevice::SetReturnLinkRegenerationMode(
     SatEnums::RegenerationMode_t returnLinkRegenerationMode)
 {
     m_returnLinkRegenerationMode = returnLinkRegenerationMode;
 }
 
 void
-SatGeoNetDevice::SetNodeId(uint32_t nodeId)
+SatOrbiterNetDevice::SetNodeId(uint32_t nodeId)
 {
     m_nodeId = nodeId;
 }
 
 void
-SatGeoNetDevice::SetIfIndex(const uint32_t index)
+SatOrbiterNetDevice::SetIfIndex(const uint32_t index)
 {
     NS_LOG_FUNCTION(this << index);
     m_ifIndex = index;
 }
 
 uint32_t
-SatGeoNetDevice::GetIfIndex(void) const
+SatOrbiterNetDevice::GetIfIndex(void) const
 {
     NS_LOG_FUNCTION(this);
     return m_ifIndex;
 }
 
 void
-SatGeoNetDevice::SetAddress(Address address)
+SatOrbiterNetDevice::SetAddress(Address address)
 {
     NS_LOG_FUNCTION(this << address);
     m_address = Mac48Address::ConvertFrom(address);
 }
 
 Address
-SatGeoNetDevice::GetAddress(void) const
+SatOrbiterNetDevice::GetAddress(void) const
 {
     //
     // Implicit conversion from Mac48Address to Address
@@ -483,7 +484,7 @@ SatGeoNetDevice::GetAddress(void) const
 }
 
 bool
-SatGeoNetDevice::SetMtu(const uint16_t mtu)
+SatOrbiterNetDevice::SetMtu(const uint16_t mtu)
 {
     NS_LOG_FUNCTION(this << mtu);
     m_mtu = mtu;
@@ -491,76 +492,76 @@ SatGeoNetDevice::SetMtu(const uint16_t mtu)
 }
 
 uint16_t
-SatGeoNetDevice::GetMtu(void) const
+SatOrbiterNetDevice::GetMtu(void) const
 {
     NS_LOG_FUNCTION(this);
     return m_mtu;
 }
 
 bool
-SatGeoNetDevice::IsLinkUp(void) const
+SatOrbiterNetDevice::IsLinkUp(void) const
 {
     NS_LOG_FUNCTION(this);
     return true;
 }
 
 void
-SatGeoNetDevice::AddLinkChangeCallback(Callback<void> callback)
+SatOrbiterNetDevice::AddLinkChangeCallback(Callback<void> callback)
 {
     NS_LOG_FUNCTION(this << &callback);
 }
 
 bool
-SatGeoNetDevice::IsBroadcast(void) const
+SatOrbiterNetDevice::IsBroadcast(void) const
 {
     NS_LOG_FUNCTION(this);
     return true;
 }
 
 Address
-SatGeoNetDevice::GetBroadcast(void) const
+SatOrbiterNetDevice::GetBroadcast(void) const
 {
     NS_LOG_FUNCTION(this);
     return Mac48Address("ff:ff:ff:ff:ff:ff");
 }
 
 bool
-SatGeoNetDevice::IsMulticast(void) const
+SatOrbiterNetDevice::IsMulticast(void) const
 {
     NS_LOG_FUNCTION(this);
     return false;
 }
 
 Address
-SatGeoNetDevice::GetMulticast(Ipv4Address multicastGroup) const
+SatOrbiterNetDevice::GetMulticast(Ipv4Address multicastGroup) const
 {
     NS_LOG_FUNCTION(this << multicastGroup);
     return Mac48Address::GetMulticast(multicastGroup);
 }
 
 Address
-SatGeoNetDevice::GetMulticast(Ipv6Address addr) const
+SatOrbiterNetDevice::GetMulticast(Ipv6Address addr) const
 {
     NS_LOG_FUNCTION(this << addr);
     return Mac48Address::GetMulticast(addr);
 }
 
 bool
-SatGeoNetDevice::IsPointToPoint(void) const
+SatOrbiterNetDevice::IsPointToPoint(void) const
 {
     NS_LOG_FUNCTION(this);
     return false;
 }
 
 bool
-SatGeoNetDevice::IsBridge(void) const
+SatOrbiterNetDevice::IsBridge(void) const
 {
     NS_LOG_FUNCTION(this);
     return false;
 }
 
 bool
-SatGeoNetDevice::Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
+SatOrbiterNetDevice::Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
     NS_LOG_FUNCTION(this << packet << dest << protocolNumber);
 
@@ -573,10 +574,10 @@ SatGeoNetDevice::Send(Ptr<Packet> packet, const Address& dest, uint16_t protocol
 }
 
 bool
-SatGeoNetDevice::SendFrom(Ptr<Packet> packet,
-                          const Address& source,
-                          const Address& dest,
-                          uint16_t protocolNumber)
+SatOrbiterNetDevice::SendFrom(Ptr<Packet> packet,
+                              const Address& source,
+                              const Address& dest,
+                              uint16_t protocolNumber)
 {
     NS_LOG_FUNCTION(this << packet << source << dest << protocolNumber);
 
@@ -589,34 +590,34 @@ SatGeoNetDevice::SendFrom(Ptr<Packet> packet,
 }
 
 Ptr<Node>
-SatGeoNetDevice::GetNode(void) const
+SatOrbiterNetDevice::GetNode(void) const
 {
     NS_LOG_FUNCTION(this);
     return m_node;
 }
 
 void
-SatGeoNetDevice::SetNode(Ptr<Node> node)
+SatOrbiterNetDevice::SetNode(Ptr<Node> node)
 {
     NS_LOG_FUNCTION(this << node);
     m_node = node;
 }
 
 bool
-SatGeoNetDevice::NeedsArp(void) const
+SatOrbiterNetDevice::NeedsArp(void) const
 {
     NS_LOG_FUNCTION(this);
     return false;
 }
 
 void
-SatGeoNetDevice::SetReceiveCallback(NetDevice::ReceiveCallback cb)
+SatOrbiterNetDevice::SetReceiveCallback(NetDevice::ReceiveCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
 }
 
 void
-SatGeoNetDevice::DoDispose(void)
+SatOrbiterNetDevice::DoDispose(void)
 {
     NS_LOG_FUNCTION(this);
     m_node = 0;
@@ -631,42 +632,42 @@ SatGeoNetDevice::DoDispose(void)
 }
 
 void
-SatGeoNetDevice::SetPromiscReceiveCallback(PromiscReceiveCallback cb)
+SatOrbiterNetDevice::SetPromiscReceiveCallback(PromiscReceiveCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
     m_promiscCallback = cb;
 }
 
 bool
-SatGeoNetDevice::SupportsSendFrom(void) const
+SatOrbiterNetDevice::SupportsSendFrom(void) const
 {
     NS_LOG_FUNCTION(this);
     return false;
 }
 
 Ptr<Channel>
-SatGeoNetDevice::GetChannel(void) const
+SatOrbiterNetDevice::GetChannel(void) const
 {
     NS_LOG_FUNCTION(this);
     return nullptr;
 }
 
 void
-SatGeoNetDevice::AddUserPhy(Ptr<SatPhy> phy, uint32_t beamId)
+SatOrbiterNetDevice::AddUserPhy(Ptr<SatPhy> phy, uint32_t beamId)
 {
     NS_LOG_FUNCTION(this << phy << beamId);
     m_userPhy.insert(std::pair<uint32_t, Ptr<SatPhy>>(beamId, phy));
 }
 
 void
-SatGeoNetDevice::AddFeederPhy(Ptr<SatPhy> phy, uint32_t beamId)
+SatOrbiterNetDevice::AddFeederPhy(Ptr<SatPhy> phy, uint32_t beamId)
 {
     NS_LOG_FUNCTION(this << phy << beamId);
     m_feederPhy.insert(std::pair<uint32_t, Ptr<SatPhy>>(beamId, phy));
 }
 
 Ptr<SatPhy>
-SatGeoNetDevice::GetUserPhy(uint32_t beamId)
+SatOrbiterNetDevice::GetUserPhy(uint32_t beamId)
 {
     if (m_userPhy.count(beamId))
     {
@@ -676,7 +677,7 @@ SatGeoNetDevice::GetUserPhy(uint32_t beamId)
 }
 
 Ptr<SatPhy>
-SatGeoNetDevice::GetFeederPhy(uint32_t beamId)
+SatOrbiterNetDevice::GetFeederPhy(uint32_t beamId)
 {
     if (m_userPhy.count(beamId))
     {
@@ -686,26 +687,26 @@ SatGeoNetDevice::GetFeederPhy(uint32_t beamId)
 }
 
 std::map<uint32_t, Ptr<SatPhy>>
-SatGeoNetDevice::GetUserPhy()
+SatOrbiterNetDevice::GetUserPhy()
 {
     return m_userPhy;
 }
 
 std::map<uint32_t, Ptr<SatPhy>>
-SatGeoNetDevice::GetFeederPhy()
+SatOrbiterNetDevice::GetFeederPhy()
 {
     return m_feederPhy;
 }
 
 void
-SatGeoNetDevice::AddUserMac(Ptr<SatMac> mac, uint32_t beamId)
+SatOrbiterNetDevice::AddUserMac(Ptr<SatMac> mac, uint32_t beamId)
 {
     NS_LOG_FUNCTION(this << mac << beamId);
     m_userMac.insert(std::pair<uint32_t, Ptr<SatMac>>(beamId, mac));
 }
 
 void
-SatGeoNetDevice::AddFeederMac(Ptr<SatMac> mac, Ptr<SatMac> macUsed, uint32_t beamId)
+SatOrbiterNetDevice::AddFeederMac(Ptr<SatMac> mac, Ptr<SatMac> macUsed, uint32_t beamId)
 {
     NS_LOG_FUNCTION(this << mac << macUsed << beamId);
     m_feederMac.insert(std::pair<uint32_t, Ptr<SatMac>>(beamId, macUsed));
@@ -713,7 +714,7 @@ SatGeoNetDevice::AddFeederMac(Ptr<SatMac> mac, Ptr<SatMac> macUsed, uint32_t bea
 }
 
 Ptr<SatMac>
-SatGeoNetDevice::GetUserMac(uint32_t beamId)
+SatOrbiterNetDevice::GetUserMac(uint32_t beamId)
 {
     if (m_userMac.count(beamId))
     {
@@ -723,7 +724,7 @@ SatGeoNetDevice::GetUserMac(uint32_t beamId)
 }
 
 Ptr<SatMac>
-SatGeoNetDevice::GetFeederMac(uint32_t beamId)
+SatOrbiterNetDevice::GetFeederMac(uint32_t beamId)
 {
     if (m_feederMac.count(beamId))
     {
@@ -733,25 +734,25 @@ SatGeoNetDevice::GetFeederMac(uint32_t beamId)
 }
 
 std::map<uint32_t, Ptr<SatMac>>
-SatGeoNetDevice::GetUserMac()
+SatOrbiterNetDevice::GetUserMac()
 {
     return m_userMac;
 }
 
 std::map<uint32_t, Ptr<SatMac>>
-SatGeoNetDevice::GetFeederMac()
+SatOrbiterNetDevice::GetFeederMac()
 {
     return m_feederMac;
 }
 
 std::map<uint32_t, Ptr<SatMac>>
-SatGeoNetDevice::GetAllFeederMac()
+SatOrbiterNetDevice::GetAllFeederMac()
 {
     return m_allFeederMac;
 }
 
 void
-SatGeoNetDevice::AddFeederPair(uint32_t beamId, Mac48Address satelliteFeederAddress)
+SatOrbiterNetDevice::AddFeederPair(uint32_t beamId, Mac48Address satelliteFeederAddress)
 {
     NS_LOG_FUNCTION(this << beamId << satelliteFeederAddress);
 
@@ -759,7 +760,7 @@ SatGeoNetDevice::AddFeederPair(uint32_t beamId, Mac48Address satelliteFeederAddr
 }
 
 void
-SatGeoNetDevice::AddUserPair(uint32_t beamId, Mac48Address satelliteUserAddress)
+SatOrbiterNetDevice::AddUserPair(uint32_t beamId, Mac48Address satelliteUserAddress)
 {
     NS_LOG_FUNCTION(this << beamId << satelliteUserAddress);
 
@@ -767,7 +768,7 @@ SatGeoNetDevice::AddUserPair(uint32_t beamId, Mac48Address satelliteUserAddress)
 }
 
 Mac48Address
-SatGeoNetDevice::GetSatelliteFeederAddress(uint32_t beamId)
+SatOrbiterNetDevice::GetSatelliteFeederAddress(uint32_t beamId)
 {
     NS_LOG_FUNCTION(this << beamId);
 
@@ -779,7 +780,7 @@ SatGeoNetDevice::GetSatelliteFeederAddress(uint32_t beamId)
 }
 
 Mac48Address
-SatGeoNetDevice::GetSatelliteUserAddress(uint32_t beamId)
+SatOrbiterNetDevice::GetSatelliteUserAddress(uint32_t beamId)
 {
     NS_LOG_FUNCTION(this << beamId);
 
@@ -791,7 +792,7 @@ SatGeoNetDevice::GetSatelliteUserAddress(uint32_t beamId)
 }
 
 Address
-SatGeoNetDevice::GetRxUtAddress(Ptr<Packet> packet, SatEnums::SatLinkDir_t ld)
+SatOrbiterNetDevice::GetRxUtAddress(Ptr<Packet> packet, SatEnums::SatLinkDir_t ld)
 {
     NS_LOG_FUNCTION(this << packet);
 
@@ -815,7 +816,7 @@ SatGeoNetDevice::GetRxUtAddress(Ptr<Packet> packet, SatEnums::SatLinkDir_t ld)
 }
 
 void
-SatGeoNetDevice::ConnectGw(Mac48Address gwAddress, uint32_t beamId)
+SatOrbiterNetDevice::ConnectGw(Mac48Address gwAddress, uint32_t beamId)
 {
     NS_LOG_FUNCTION(this << gwAddress << beamId);
 
@@ -827,17 +828,17 @@ SatGeoNetDevice::ConnectGw(Mac48Address gwAddress, uint32_t beamId)
 
     if (m_feederMac.find(beamId) != m_feederMac.end())
     {
-        Ptr<SatOrbiterFeederMac> geoFeederMac =
+        Ptr<SatOrbiterFeederMac> orbiterFeederMac =
             DynamicCast<SatOrbiterFeederMac>(GetFeederMac(beamId));
-        NS_ASSERT(geoFeederMac != nullptr);
+        NS_ASSERT(orbiterFeederMac != nullptr);
         {
-            geoFeederMac->AddPeer(gwAddress);
+            orbiterFeederMac->AddPeer(gwAddress);
         }
     }
 }
 
 void
-SatGeoNetDevice::DisconnectGw(Mac48Address gwAddress, uint32_t beamId)
+SatOrbiterNetDevice::DisconnectGw(Mac48Address gwAddress, uint32_t beamId)
 {
     NS_LOG_FUNCTION(this << gwAddress << beamId);
 
@@ -848,17 +849,17 @@ SatGeoNetDevice::DisconnectGw(Mac48Address gwAddress, uint32_t beamId)
 
     if (m_feederMac.find(beamId) != m_feederMac.end())
     {
-        Ptr<SatOrbiterFeederMac> geoFeederMac =
+        Ptr<SatOrbiterFeederMac> orbiterFeederMac =
             DynamicCast<SatOrbiterFeederMac>(GetFeederMac(beamId));
-        NS_ASSERT(geoFeederMac != nullptr);
+        NS_ASSERT(orbiterFeederMac != nullptr);
         {
-            geoFeederMac->RemovePeer(gwAddress);
+            orbiterFeederMac->RemovePeer(gwAddress);
         }
     }
 }
 
 std::set<Mac48Address>
-SatGeoNetDevice::GetGwConnected()
+SatOrbiterNetDevice::GetGwConnected()
 {
     NS_LOG_FUNCTION(this);
 
@@ -873,7 +874,7 @@ SatGeoNetDevice::GetGwConnected()
 }
 
 void
-SatGeoNetDevice::ConnectUt(Mac48Address utAddress, uint32_t beamId)
+SatOrbiterNetDevice::ConnectUt(Mac48Address utAddress, uint32_t beamId)
 {
     NS_LOG_FUNCTION(this << utAddress << beamId);
 
@@ -885,16 +886,16 @@ SatGeoNetDevice::ConnectUt(Mac48Address utAddress, uint32_t beamId)
 
     if (m_userMac.find(beamId) != m_userMac.end())
     {
-        Ptr<SatOrbiterUserMac> geoUserMac = DynamicCast<SatOrbiterUserMac>(GetUserMac(beamId));
-        NS_ASSERT(geoUserMac != nullptr);
+        Ptr<SatOrbiterUserMac> orbiterUserMac = DynamicCast<SatOrbiterUserMac>(GetUserMac(beamId));
+        NS_ASSERT(orbiterUserMac != nullptr);
         {
-            geoUserMac->AddPeer(utAddress);
+            orbiterUserMac->AddPeer(utAddress);
         }
     }
 }
 
 void
-SatGeoNetDevice::DisconnectUt(Mac48Address utAddress, uint32_t beamId)
+SatOrbiterNetDevice::DisconnectUt(Mac48Address utAddress, uint32_t beamId)
 {
     NS_LOG_FUNCTION(this << utAddress << beamId);
 
@@ -905,16 +906,16 @@ SatGeoNetDevice::DisconnectUt(Mac48Address utAddress, uint32_t beamId)
 
     if (m_userMac.find(beamId) != m_userMac.end())
     {
-        Ptr<SatOrbiterUserMac> geoUserMac = DynamicCast<SatOrbiterUserMac>(GetUserMac(beamId));
-        NS_ASSERT(geoUserMac != nullptr);
+        Ptr<SatOrbiterUserMac> orbiterUserMac = DynamicCast<SatOrbiterUserMac>(GetUserMac(beamId));
+        NS_ASSERT(orbiterUserMac != nullptr);
         {
-            geoUserMac->RemovePeer(utAddress);
+            orbiterUserMac->RemovePeer(utAddress);
         }
     }
 }
 
 std::set<Mac48Address>
-SatGeoNetDevice::GetUtConnected()
+SatOrbiterNetDevice::GetUtConnected()
 {
     NS_LOG_FUNCTION(this);
 
@@ -929,7 +930,7 @@ SatGeoNetDevice::GetUtConnected()
 }
 
 void
-SatGeoNetDevice::AddIslsNetDevice(Ptr<PointToPointIslNetDevice> islNetDevices)
+SatOrbiterNetDevice::AddIslsNetDevice(Ptr<PointToPointIslNetDevice> islNetDevices)
 {
     NS_LOG_FUNCTION(this);
 
@@ -937,7 +938,7 @@ SatGeoNetDevice::AddIslsNetDevice(Ptr<PointToPointIslNetDevice> islNetDevices)
 }
 
 std::vector<Ptr<PointToPointIslNetDevice>>
-SatGeoNetDevice::GetIslsNetDevices()
+SatOrbiterNetDevice::GetIslsNetDevices()
 {
     NS_LOG_FUNCTION(this);
 
@@ -945,7 +946,7 @@ SatGeoNetDevice::GetIslsNetDevices()
 }
 
 void
-SatGeoNetDevice::SetArbiter(Ptr<SatIslArbiter> arbiter)
+SatOrbiterNetDevice::SetArbiter(Ptr<SatIslArbiter> arbiter)
 {
     NS_LOG_FUNCTION(this << arbiter);
 
@@ -953,7 +954,7 @@ SatGeoNetDevice::SetArbiter(Ptr<SatIslArbiter> arbiter)
 }
 
 Ptr<SatIslArbiter>
-SatGeoNetDevice::GetArbiter()
+SatOrbiterNetDevice::GetArbiter()
 {
     NS_LOG_FUNCTION(this);
 
@@ -961,7 +962,7 @@ SatGeoNetDevice::GetArbiter()
 }
 
 void
-SatGeoNetDevice::SendToIsl(Ptr<Packet> packet, Mac48Address destination)
+SatOrbiterNetDevice::SendToIsl(Ptr<Packet> packet, Mac48Address destination)
 {
     NS_LOG_FUNCTION(this << packet << destination);
 
@@ -996,7 +997,7 @@ SatGeoNetDevice::SendToIsl(Ptr<Packet> packet, Mac48Address destination)
 }
 
 void
-SatGeoNetDevice::ReceiveFromIsl(Ptr<Packet> packet, Mac48Address destination)
+SatOrbiterNetDevice::ReceiveFromIsl(Ptr<Packet> packet, Mac48Address destination)
 {
     NS_LOG_FUNCTION(this << packet << destination);
 

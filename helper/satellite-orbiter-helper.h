@@ -31,9 +31,9 @@
 #include "ns3/satellite-bbframe-conf.h"
 #include "ns3/satellite-channel.h"
 #include "ns3/satellite-fwd-link-scheduler.h"
-#include "ns3/satellite-geo-net-device.h"
 #include "ns3/satellite-ncc.h"
 #include "ns3/satellite-orbiter-feeder-mac.h"
+#include "ns3/satellite-orbiter-net-device.h"
 #include "ns3/satellite-phy.h"
 #include "ns3/satellite-scpc-scheduler.h"
 #include "ns3/satellite-superframe-sequence.h"
@@ -207,7 +207,7 @@ class SatOrbiterHelper : public Object
      * \param forwardLinkRegenerationMode Regeneration mode on forward
      * \param returnLinkRegenerationMode Regeneration mode on return
      */
-    void AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
+    void AttachChannelsFeeder(Ptr<SatOrbiterNetDevice> dev,
                               Ptr<SatChannel> ff,
                               Ptr<SatChannel> fr,
                               Ptr<SatAntennaGainPattern> feederAgp,
@@ -230,7 +230,7 @@ class SatOrbiterHelper : public Object
      * \param forwardLinkRegenerationMode Regeneration mode on forward
      * \param returnLinkRegenerationMode Regeneration mode on return
      */
-    void AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
+    void AttachChannelsUser(Ptr<SatOrbiterNetDevice> dev,
                             Ptr<SatChannel> uf,
                             Ptr<SatChannel> ur,
                             Ptr<SatAntennaGainPattern> userAgp,

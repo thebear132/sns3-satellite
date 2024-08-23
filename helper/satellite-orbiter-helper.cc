@@ -186,7 +186,7 @@ SatOrbiterHelper::SatOrbiterHelper(SatTypedefs::CarrierBandwidthConverter_t band
 {
     NS_LOG_FUNCTION(this << rtnLinkCarrierCount << fwdLinkCarrierCount);
 
-    m_deviceFactory.SetTypeId("ns3::SatGeoNetDevice");
+    m_deviceFactory.SetTypeId("ns3::SatOrbiterNetDevice");
 }
 
 void
@@ -272,7 +272,7 @@ SatOrbiterHelper::Install(Ptr<Node> n)
     NS_ASSERT(m_deviceCount[n->GetId()] == 0);
 
     // Create SatOrbiterNetDevice
-    Ptr<SatGeoNetDevice> satDev = m_deviceFactory.Create<SatGeoNetDevice>();
+    Ptr<SatOrbiterNetDevice> satDev = m_deviceFactory.Create<SatOrbiterNetDevice>();
 
     satDev->SetAddress(Mac48Address::Allocate());
     n->AddDevice(satDev);
@@ -313,7 +313,7 @@ SatOrbiterHelper::AttachChannels(Ptr<NetDevice> d,
     NS_LOG_FUNCTION(this << d << ff << fr << uf << ur << userAgp << feederAgp << satId << gwId
                          << userBeamId);
 
-    Ptr<SatGeoNetDevice> dev = DynamicCast<SatGeoNetDevice>(d);
+    Ptr<SatOrbiterNetDevice> dev = DynamicCast<SatOrbiterNetDevice>(d);
 
     dev->SetForwardLinkRegenerationMode(forwardLinkRegenerationMode);
     dev->SetReturnLinkRegenerationMode(returnLinkRegenerationMode);
@@ -341,7 +341,7 @@ SatOrbiterHelper::AttachChannels(Ptr<NetDevice> d,
 }
 
 void
-SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
+SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatOrbiterNetDevice> dev,
                                        Ptr<SatChannel> ff,
                                        Ptr<SatChannel> fr,
                                        Ptr<SatAntennaGainPattern> feederAgp,
@@ -506,7 +506,7 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
         SatPhy::ReceiveCallback fCb = MakeCallback(&SatOrbiterFeederMac::Receive, fMac);
         fPhy->SetAttribute("ReceiveCb", CallbackValue(fCb));
 
-        fMac->SetReceiveNetDeviceCallback(MakeCallback(&SatGeoNetDevice::ReceiveFeeder, dev));
+        fMac->SetReceiveNetDeviceCallback(MakeCallback(&SatOrbiterNetDevice::ReceiveFeeder, dev));
 
         break;
     }
@@ -516,7 +516,8 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
 
         fMac->SetReceiveCallback(MakeCallback(&SatOrbiterFeederLlc::Receive, fLlc));
 
-        fLlc->SetReceiveSatelliteCallback(MakeCallback(&SatGeoNetDevice::ReceivePacketFeeder, dev));
+        fLlc->SetReceiveSatelliteCallback(
+            MakeCallback(&SatOrbiterNetDevice::ReceivePacketFeeder, dev));
 
         break;
     }
@@ -562,7 +563,7 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatGeoNetDevice> dev,
 }
 
 void
-SatOrbiterHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
+SatOrbiterHelper::AttachChannelsUser(Ptr<SatOrbiterNetDevice> dev,
                                      Ptr<SatChannel> uf,
                                      Ptr<SatChannel> ur,
                                      Ptr<SatAntennaGainPattern> userAgp,
@@ -731,10 +732,10 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
     {
     case SatEnums::TRANSPARENT:
     case SatEnums::REGENERATION_PHY: {
-        SatPhy::ReceiveCallback uCb = MakeCallback(&SatGeoNetDevice::ReceiveUser, dev);
+        SatPhy::ReceiveCallback uCb = MakeCallback(&SatOrbiterNetDevice::ReceiveUser, dev);
         uPhy->SetAttribute("ReceiveCb", CallbackValue(uCb));
 
-        uMac->SetReceiveNetDeviceCallback(MakeCallback(&SatGeoNetDevice::ReceiveUser, dev));
+        uMac->SetReceiveNetDeviceCallback(MakeCallback(&SatOrbiterNetDevice::ReceiveUser, dev));
 
         break;
     }
@@ -742,7 +743,7 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
         SatPhy::ReceiveCallback uCb = MakeCallback(&SatOrbiterUserMac::Receive, uMac);
         uPhy->SetAttribute("ReceiveCb", CallbackValue(uCb));
 
-        uMac->SetReceiveNetDeviceCallback(MakeCallback(&SatGeoNetDevice::ReceiveUser, dev));
+        uMac->SetReceiveNetDeviceCallback(MakeCallback(&SatOrbiterNetDevice::ReceiveUser, dev));
 
         break;
     }
@@ -752,7 +753,8 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
 
         uMac->SetReceiveCallback(MakeCallback(&SatOrbiterUserLlc::Receive, uLlc));
 
-        uLlc->SetReceiveSatelliteCallback(MakeCallback(&SatGeoNetDevice::ReceivePacketUser, dev));
+        uLlc->SetReceiveSatelliteCallback(
+            MakeCallback(&SatOrbiterNetDevice::ReceivePacketUser, dev));
 
         break;
     }
@@ -764,7 +766,7 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatGeoNetDevice> dev,
     {
         uPhy->BeginEndScheduling();
         uPhy->SetSendControlMsgToFeederCallback(
-            MakeCallback(&SatGeoNetDevice::SendControlMsgToFeeder, dev));
+            MakeCallback(&SatOrbiterNetDevice::SendControlMsgToFeeder, dev));
     }
 }
 

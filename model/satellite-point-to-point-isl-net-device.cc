@@ -247,16 +247,17 @@ PointToPointIslNetDevice::Receive(Ptr<Packet> packet)
             NS_FATAL_ERROR("SatGroundStationAddressTag not found");
         }
 
-        m_geoNetDevice->ReceiveFromIsl(packet, groundStationAddressTag.GetGroundStationAddress());
+        m_orbiterNetDevice->ReceiveFromIsl(packet,
+                                           groundStationAddressTag.GetGroundStationAddress());
     }
 }
 
 void
-PointToPointIslNetDevice::SetGeoNetDevice(Ptr<SatGeoNetDevice> geoNetDevice)
+PointToPointIslNetDevice::SetOrbiterNetDevice(Ptr<SatOrbiterNetDevice> orbiterNetDevice)
 {
     NS_LOG_FUNCTION(this);
 
-    m_geoNetDevice = geoNetDevice;
+    m_orbiterNetDevice = orbiterNetDevice;
 }
 
 Ptr<DropTailQueue<Packet>>

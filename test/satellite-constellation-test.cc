@@ -33,13 +33,13 @@
 #include "ns3/packet-sink-helper.h"
 #include "ns3/packet-sink.h"
 #include "ns3/satellite-env-variables.h"
-#include "ns3/satellite-geo-net-device.h"
 #include "ns3/satellite-gw-mac.h"
 #include "ns3/satellite-helper.h"
 #include "ns3/satellite-id-mapper.h"
 #include "ns3/satellite-isl-arbiter-unicast.h"
 #include "ns3/satellite-isl-arbiter.h"
 #include "ns3/satellite-orbiter-feeder-phy.h"
+#include "ns3/satellite-orbiter-net-device.h"
 #include "ns3/satellite-orbiter-user-phy.h"
 #include "ns3/satellite-phy-rx-carrier.h"
 #include "ns3/satellite-ut-mac-state.h"
@@ -139,7 +139,7 @@ SatConstellationTest1::DoRun(void)
     {
         for (uint32_t j = 0; j < sats.Get(i)->GetNDevices(); j++)
         {
-            if (DynamicCast<SatGeoNetDevice>(sats.Get(i)->GetDevice(j)) != nullptr)
+            if (DynamicCast<SatOrbiterNetDevice>(sats.Get(i)->GetDevice(j)) != nullptr)
             {
                 countNetDevices += 1;
             }
@@ -147,7 +147,9 @@ SatConstellationTest1::DoRun(void)
     }
 
     NS_TEST_ASSERT_MSG_EQ(sats.GetN(), 2, "Topology must contain 2 satellites");
-    NS_TEST_ASSERT_MSG_EQ(countNetDevices, 2, "Topology must contain 2 satellite Geo Net Devices");
+    NS_TEST_ASSERT_MSG_EQ(countNetDevices,
+                          2,
+                          "Topology must contain 2 satellite Orbiter Net Devices");
     NS_TEST_ASSERT_MSG_EQ(gws.GetN(), 2, "Topology must contain 2 GWs");
     NS_TEST_ASSERT_MSG_EQ(uts.GetN(), 3, "Topology must contain 3 UTs");
     NS_TEST_ASSERT_MSG_EQ(gwUsers.GetN(), 3, "Topology must contain 3 GW users");
@@ -849,10 +851,10 @@ SatConstellationTest4::DoRun(void)
     {
         for (uint32_t j = 0; j < sats.Get(i)->GetNDevices(); j++)
         {
-            if (DynamicCast<SatGeoNetDevice>(sats.Get(i)->GetDevice(j)) != nullptr)
+            if (DynamicCast<SatOrbiterNetDevice>(sats.Get(i)->GetDevice(j)) != nullptr)
             {
                 countNetDevices += 1;
-                countIslNetDevice += DynamicCast<SatGeoNetDevice>(sats.Get(i)->GetDevice(j))
+                countIslNetDevice += DynamicCast<SatOrbiterNetDevice>(sats.Get(i)->GetDevice(j))
                                          ->GetIslsNetDevices()
                                          .size();
             }
@@ -862,7 +864,7 @@ SatConstellationTest4::DoRun(void)
     NS_TEST_ASSERT_MSG_EQ(sats.GetN(), 351, "Topology must contain 351 satellites");
     NS_TEST_ASSERT_MSG_EQ(countNetDevices,
                           351,
-                          "Topology must contain 351 satellite Geo Net Devices");
+                          "Topology must contain 351 satellite Orbiter Net Devices");
     NS_TEST_ASSERT_MSG_EQ(countIslNetDevice,
                           1404,
                           "Topology must contain 1404 (351*4) satellite ISL Net Devices");
@@ -874,7 +876,7 @@ SatConstellationTest4::DoRun(void)
     for (uint32_t i = 0; i < sats.GetN(); i++)
     {
         Ptr<SatIslArbiter> arbiter =
-            DynamicCast<SatGeoNetDevice>(sats.Get(i)->GetDevice(0))->GetArbiter();
+            DynamicCast<SatOrbiterNetDevice>(sats.Get(i)->GetDevice(0))->GetArbiter();
         Ptr<SatIslArbiterUnicast> arbiterUnicast = DynamicCast<SatIslArbiterUnicast>(arbiter);
         NS_TEST_ASSERT_MSG_NE(arbiterUnicast,
                               nullptr,

@@ -31,10 +31,10 @@
 #include <ns3/satellite-channel-estimation-error-container.h>
 #include <ns3/satellite-channel.h>
 #include <ns3/satellite-enums.h>
-#include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-link-results.h>
 #include <ns3/satellite-lower-layer-service.h>
 #include <ns3/satellite-net-device.h>
+#include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-typedefs.h>
 
 NS_LOG_COMPONENT_DEFINE("SatGwHelper");

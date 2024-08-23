@@ -31,8 +31,8 @@
 #include <ns3/node.h>
 #include <ns3/object-map.h>
 #include <ns3/object-vector.h>
-#include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-helper.h>
+#include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-phy-rx-carrier.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy.h>

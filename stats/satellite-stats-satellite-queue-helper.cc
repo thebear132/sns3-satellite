@@ -35,10 +35,10 @@
 #include <ns3/object-map.h>
 #include <ns3/object-vector.h>
 #include <ns3/probe.h>
-#include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-orbiter-feeder-phy.h>
+#include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-orbiter-user-phy.h>
 #include <ns3/satellite-phy.h>
 #include <ns3/scalar-collector.h>
@@ -633,11 +633,11 @@ SatStatsRtnFeederQueueBytesHelper::DoInstallProbes()
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
         Ptr<SatPhy> satPhy;
-        std::map<uint32_t, Ptr<SatPhy>> satOrbiterFeederPhys = satGeoDev->GetFeederPhy();
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterFeederPhys = satOrbiterDev->GetFeederPhy();
         for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterFeederPhys.begin();
              it2 != satOrbiterFeederPhys.end();
              ++it2)
@@ -650,13 +650,13 @@ SatStatsRtnFeederQueueBytesHelper::DoInstallProbes()
             if (satOrbiterFeederPhy->TraceConnectWithoutContext("QueueSizeBytes", callback))
             {
                 NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
-                                 << " device #" << satGeoDev->GetIfIndex());
+                                 << " device #" << satOrbiterDev->GetIfIndex());
             }
             else
             {
                 NS_FATAL_ERROR("Error connecting to QueueSizeBytes trace source"
                                << " at node ID " << (*it)->GetId() << " device #"
-                               << satGeoDev->GetIfIndex());
+                               << satOrbiterDev->GetIfIndex());
             }
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
@@ -706,11 +706,11 @@ SatStatsRtnFeederQueuePacketsHelper::DoInstallProbes()
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
         Ptr<SatPhy> satPhy;
-        std::map<uint32_t, Ptr<SatPhy>> satOrbiterFeederPhys = satGeoDev->GetFeederPhy();
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterFeederPhys = satOrbiterDev->GetFeederPhy();
         for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterFeederPhys.begin();
              it2 != satOrbiterFeederPhys.end();
              ++it2)
@@ -723,13 +723,13 @@ SatStatsRtnFeederQueuePacketsHelper::DoInstallProbes()
             if (satOrbiterFeederPhy->TraceConnectWithoutContext("QueueSizePackets", callback))
             {
                 NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
-                                 << " device #" << satGeoDev->GetIfIndex());
+                                 << " device #" << satOrbiterDev->GetIfIndex());
             }
             else
             {
                 NS_FATAL_ERROR("Error connecting to QueueSizePackets trace source"
                                << " at node ID " << (*it)->GetId() << " device #"
-                               << satGeoDev->GetIfIndex());
+                               << satOrbiterDev->GetIfIndex());
             }
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
@@ -778,11 +778,11 @@ SatStatsFwdUserQueueBytesHelper::DoInstallProbes()
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
         Ptr<SatPhy> satPhy;
-        std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhys = satGeoDev->GetUserPhy();
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhys = satOrbiterDev->GetUserPhy();
         for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterUserPhys.begin();
              it2 != satOrbiterUserPhys.end();
              ++it2)
@@ -795,13 +795,13 @@ SatStatsFwdUserQueueBytesHelper::DoInstallProbes()
             if (satOrbiterUserPhy->TraceConnectWithoutContext("QueueSizeBytes", callback))
             {
                 NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
-                                 << " device #" << satGeoDev->GetIfIndex());
+                                 << " device #" << satOrbiterDev->GetIfIndex());
             }
             else
             {
                 NS_FATAL_ERROR("Error connecting to QueueSizeBytes trace source"
                                << " at node ID " << (*it)->GetId() << " device #"
-                               << satGeoDev->GetIfIndex());
+                               << satOrbiterDev->GetIfIndex());
             }
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
@@ -850,11 +850,11 @@ SatStatsFwdUserQueuePacketsHelper::DoInstallProbes()
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
         Ptr<SatPhy> satPhy;
-        std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhys = satGeoDev->GetUserPhy();
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhys = satOrbiterDev->GetUserPhy();
         for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterUserPhys.begin();
              it2 != satOrbiterUserPhys.end();
              ++it2)
@@ -867,13 +867,13 @@ SatStatsFwdUserQueuePacketsHelper::DoInstallProbes()
             if (satOrbiterUserPhy->TraceConnectWithoutContext("QueueSizePackets", callback))
             {
                 NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
-                                 << " device #" << satGeoDev->GetIfIndex());
+                                 << " device #" << satOrbiterDev->GetIfIndex());
             }
             else
             {
                 NS_FATAL_ERROR("Error connecting to QueueSizePackets trace source"
                                << " at node ID " << (*it)->GetId() << " device #"
-                               << satGeoDev->GetIfIndex());
+                               << satOrbiterDev->GetIfIndex());
             }
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`

@@ -34,7 +34,7 @@ namespace ns3
 {
 
 /**
- * \brief Creates needed objects for LORA UT nodes like SatGeoNetDevice objects.
+ * \brief Creates needed objects for LORA UT nodes like SatOrbiterNetDevice objects.
  *        Handles needed configuration for the UT nodes.
  *
  */

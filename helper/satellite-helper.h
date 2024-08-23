@@ -350,7 +350,7 @@ class SatHelper : public Object
     std::string m_rtnConfFileName;
     std::string m_fwdConfFileName;
     std::string m_gwPosFileName;
-    std::string m_geoPosFileName;
+    std::string m_satPosFileName;
     std::string m_utPosFileName;
     std::string m_waveformConfDirectoryName;
 
@@ -593,9 +593,9 @@ class SatHelper : public Object
     void SetGwMobility(NodeContainer gwNodes);
 
     /**
-     * Sets mobility to created Sat Geo node.
+     * Sets mobility to created Sat node.
      *
-     * \param node node pointer of Geo Satellite to set mobility
+     * \param node node pointer of Satellite to set mobility
      */
     void SetSatMobility(Ptr<Node> node);
 

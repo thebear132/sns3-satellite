@@ -25,7 +25,7 @@
 #ifndef SATELLITE_POINT_TO_POINT_ISL_NET_DEVICE_H
 #define SATELLITE_POINT_TO_POINT_ISL_NET_DEVICE_H
 
-#include "satellite-geo-net-device.h"
+#include "satellite-orbiter-net-device.h"
 
 #include "ns3/address.h"
 #include "ns3/callback.h"
@@ -47,7 +47,7 @@ template <typename Item>
 class DropTailQueue;
 class PointToPointIslChannel;
 class ErrorModel;
-class SatGeoNetDevice;
+class SatOrbiterNetDevice;
 
 /**
  * \ingroup point-to-point
@@ -151,10 +151,10 @@ class PointToPointIslNetDevice : public NetDevice
     void Receive(Ptr<Packet> p);
 
     /**
-     * Set the associated GeoNetDevice
-     * \param geoNetDevice The device to attach to this instance
+     * Set the associated OrbiterNetDevice
+     * \param orbiterNetDevice The device to attach to this instance
      */
-    void SetGeoNetDevice(Ptr<SatGeoNetDevice> geoNetDevice);
+    void SetOrbiterNetDevice(Ptr<SatOrbiterNetDevice> orbiterNetDevice);
 
     // The remaining methods are documented in ns3::NetDevice*
 
@@ -318,7 +318,8 @@ class PointToPointIslNetDevice : public NetDevice
     uint32_t m_mtu;                                      //!< The Maximum Transmission Unit
     Ptr<Packet> m_currentPkt;                            //!< Current packet processed
 
-    Ptr<SatGeoNetDevice> m_geoNetDevice; //!< Satellite GEO Net Device associated to this instance
+    Ptr<SatOrbiterNetDevice>
+        m_orbiterNetDevice; //!< Satellite Orbiter Net Device associated to this instance
 
     /**
      * \brief PPP to Ethernet protocol number mapping

@@ -38,11 +38,11 @@
 #include <ns3/node-container.h>
 #include <ns3/nstime.h>
 #include <ns3/probe.h>
-#include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-mac.h>
 #include <ns3/satellite-net-device.h>
+#include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-time-tag.h>
 #include <ns3/scalar-collector.h>
@@ -1070,22 +1070,22 @@ SatStatsFwdPhyDelayHelper::DoInstallProbes()
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
-        std::map<uint32_t, Ptr<SatPhy>> satGeoFeederPhys = satGeoDev->GetFeederPhy();
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterFeederPhys = satOrbiterDev->GetFeederPhy();
         Ptr<SatPhy> satPhy;
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin();
-             it2 != satGeoFeederPhys.end();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterFeederPhys.begin();
+             it2 != satOrbiterFeederPhys.end();
              ++it2)
         {
             satPhy = it2->second;
             NS_ASSERT(satPhy != nullptr);
             satPhy->SetAttribute("EnableStatisticsTags", BooleanValue(true));
         }
-        std::map<uint32_t, Ptr<SatPhy>> satGeoUserPhys = satGeoDev->GetUserPhy();
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin();
-             it2 != satGeoUserPhys.end();
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhys = satOrbiterDev->GetUserPhy();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterUserPhys.begin();
+             it2 != satOrbiterUserPhys.end();
              ++it2)
         {
             satPhy = it2->second;
@@ -1584,21 +1584,21 @@ SatStatsRtnPhyDelayHelper::DoInstallProbes()
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
         Ptr<SatPhy> satPhy;
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
-        std::map<uint32_t, Ptr<SatPhy>> satGeoFeederPhys = satGeoDev->GetFeederPhy();
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin();
-             it2 != satGeoFeederPhys.end();
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterFeederPhys = satOrbiterDev->GetFeederPhy();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterFeederPhys.begin();
+             it2 != satOrbiterFeederPhys.end();
              ++it2)
         {
             satPhy = it2->second;
             NS_ASSERT(satPhy != nullptr);
             satPhy->SetAttribute("EnableStatisticsTags", BooleanValue(true));
         }
-        std::map<uint32_t, Ptr<SatPhy>> satGeoUserPhys = satGeoDev->GetUserPhy();
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin();
-             it2 != satGeoUserPhys.end();
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhys = satOrbiterDev->GetUserPhy();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterUserPhys.begin();
+             it2 != satOrbiterUserPhys.end();
              ++it2)
         {
             satPhy = it2->second;

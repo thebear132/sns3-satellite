@@ -101,7 +101,7 @@ class SatBeamHelper : public Object
      * Constructor for SatBeamHelper.
      *
      * \param standard                    The standard to use (DVB or LORA)
-     * \param satNodes                    Container of Geo Satellite node
+     * \param satNodes                    Container of Satellite node
      * \param isls                        List of all ISLs
      * \param bandwidthConverterCb        Callback to convert bandwidth
      * \param fwdLinkCarrierCount         Number of carriers used in forward link
@@ -136,7 +136,7 @@ class SatBeamHelper : public Object
 
     /**
      * Set the antenna gain patterns to be used when configuring the beams
-     * to the GEO satellite. Note, that currently we have only one set of
+     * to the satellite. Note, that currently we have only one set of
      * antenna patterns, which are utilized in both user return (Rx gain)
      * and user forward (Tx gain) links. Antenna gain patterns are not utilized
      * in feeder link at all.
@@ -206,7 +206,7 @@ class SatBeamHelper : public Object
         SatMac::RoutingUpdateCallback routingCallback);
 
     /**
-     * \param geoNetDevice Net device of satellite
+     * \param orbiterNetDevice Net device of satellite
      * \param gwNode pointer of GW node
      * \param gwId id of the GW
      * \param satId ID of the satellite linked to the UT
@@ -223,7 +223,7 @@ class SatBeamHelper : public Object
      * and associate the resulting ns3::NetDevices with the ns3::Nodes.
      * \return the new SatNetDevice of the gateway
      */
-    Ptr<NetDevice> InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
+    Ptr<NetDevice> InstallFeeder(Ptr<SatOrbiterNetDevice> orbiterNetDevice,
                                  Ptr<Node> gwNode,
                                  uint32_t gwId,
                                  uint32_t satId,
@@ -236,7 +236,7 @@ class SatBeamHelper : public Object
                                  SatMac::RoutingUpdateCallback routingCallback);
 
     /**
-     * \param geoNetDevice Net device of satellite
+     * \param orbiterNetDevice Net device of satellite
      * \param ut a set of UT nodes
      * \param gwNd Net Device of GW
      * \param satId ID of the satellite
@@ -251,7 +251,7 @@ class SatBeamHelper : public Object
      * and associate the resulting ns3::NetDevices with the ns3::Nodes.
      * \return a NetDeviceContainer of all SatNetDevice for the UTs
      */
-    NetDeviceContainer InstallUser(Ptr<SatGeoNetDevice> geoNetDevice,
+    NetDeviceContainer InstallUser(Ptr<SatOrbiterNetDevice> orbiterNetDevice,
                                    NodeContainer ut,
                                    Ptr<NetDevice> gwNd,
                                    uint32_t satId,
@@ -353,7 +353,7 @@ class SatBeamHelper : public Object
     Ptr<SatGwHelper> GetGwHelper() const;
 
     /**
-     * \return pointer to Geo helper.
+     * \return pointer to Orbiter helper.
      */
     Ptr<SatOrbiterHelper> GetOrbiterHelper() const;
 

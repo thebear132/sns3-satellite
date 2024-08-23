@@ -71,7 +71,6 @@ set(source_files
     model/satellite-fwd-link-scheduler-time-slicing.cc
     model/satellite-generic-stream-encapsulator-arq.cc
     model/satellite-generic-stream-encapsulator.cc
-    model/satellite-geo-net-device.cc
     model/satellite-ground-station-address-tag.cc
     model/satellite-gse-header.cc
     model/satellite-gw-llc.cc
@@ -112,6 +111,7 @@ set(source_files
     model/satellite-orbiter-feeder-phy.cc
     model/satellite-orbiter-llc.cc
     model/satellite-orbiter-mac.cc
+    model/satellite-orbiter-net-device.cc
     model/satellite-orbiter-user-llc.cc
     model/satellite-orbiter-user-mac.cc
     model/satellite-orbiter-user-phy.cc
@@ -316,7 +316,6 @@ set(header_files
     model/satellite-fwd-link-scheduler-time-slicing.h
     model/satellite-generic-stream-encapsulator-arq.h
     model/satellite-generic-stream-encapsulator.h
-    model/satellite-geo-net-device.h
     model/satellite-ground-station-address-tag.h
     model/satellite-gse-header.h
     model/satellite-gw-llc.h
@@ -357,6 +356,7 @@ set(header_files
     model/satellite-orbiter-feeder-phy.h
     model/satellite-orbiter-llc.h
     model/satellite-orbiter-mac.h
+    model/satellite-orbiter-net-device.h
     model/satellite-orbiter-user-llc.h
     model/satellite-orbiter-user-mac.h
     model/satellite-orbiter-user-phy.h

@@ -34,10 +34,10 @@
 #include <ns3/multi-file-aggregator.h>
 #include <ns3/node-container.h>
 #include <ns3/object-vector.h>
-#include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-net-device.h>
+#include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-phy-rx-carrier.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy.h>
@@ -575,16 +575,16 @@ SatStatsPacketErrorHelper::InstallProbeOnSatFeeder(Ptr<Node> satNode)
 {
     NS_LOG_FUNCTION(this << satNode->GetId());
 
-    Ptr<NetDevice> dev = GetSatSatGeoNetDevice(satNode);
+    Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(satNode);
     Callback<void, uint32_t, const Address&, bool> callback =
         MakeCallback(&SatStatsPacketErrorHelper::ErrorRxCallback, this);
 
     Ptr<SatPhy> satPhy;
-    Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-    NS_ASSERT(satGeoDev != nullptr);
-    std::map<uint32_t, Ptr<SatPhy>> satGeoFeederPhys = satGeoDev->GetFeederPhy();
-    for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satGeoFeederPhys.begin();
-         itPhy != satGeoFeederPhys.end();
+    Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+    NS_ASSERT(satOrbiterDev != nullptr);
+    std::map<uint32_t, Ptr<SatPhy>> satOrbiterFeederPhys = satOrbiterDev->GetFeederPhy();
+    for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satOrbiterFeederPhys.begin();
+         itPhy != satOrbiterFeederPhys.end();
          ++itPhy)
     {
         satPhy = itPhy->second;
@@ -624,7 +624,7 @@ SatStatsPacketErrorHelper::InstallProbeOnSatFeeder(Ptr<Node> satNode)
 
         } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`
 
-    } // end of `for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satGeoFeederPhys)`
+    } // end of `for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satOrbiterFeederPhys)`
 
 } // end of `void InstallProbeOnSatFeeder (Ptr<Node>)`
 
@@ -633,16 +633,16 @@ SatStatsPacketErrorHelper::InstallProbeOnSatUser(Ptr<Node> satNode)
 {
     NS_LOG_FUNCTION(this << satNode->GetId());
 
-    Ptr<NetDevice> dev = GetSatSatGeoNetDevice(satNode);
+    Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(satNode);
     Callback<void, uint32_t, const Address&, bool> callback =
         MakeCallback(&SatStatsPacketErrorHelper::ErrorRxCallback, this);
 
     Ptr<SatPhy> satPhy;
-    Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-    NS_ASSERT(satGeoDev != nullptr);
-    std::map<uint32_t, Ptr<SatPhy>> satGeoUserPhys = satGeoDev->GetUserPhy();
-    for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satGeoUserPhys.begin();
-         itPhy != satGeoUserPhys.end();
+    Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+    NS_ASSERT(satOrbiterDev != nullptr);
+    std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhys = satOrbiterDev->GetUserPhy();
+    for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satOrbiterUserPhys.begin();
+         itPhy != satOrbiterUserPhys.end();
          ++itPhy)
     {
         satPhy = itPhy->second;
@@ -682,7 +682,7 @@ SatStatsPacketErrorHelper::InstallProbeOnSatUser(Ptr<Node> satNode)
 
         } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`
 
-    } // end of `for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satGeoUserPhys)`
+    } // end of `for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satOrbiterUserPhys)`
 
 } // end of `void InstallProbeOnSatUser (Ptr<Node>)`
 

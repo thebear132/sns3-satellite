@@ -32,9 +32,9 @@
 #include <ns3/satellite-beam-helper.h>
 #include <ns3/satellite-const-variables.h>
 #include <ns3/satellite-env-variables.h>
-#include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-user-helper.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
@@ -439,11 +439,11 @@ SatStatsHelper::CreateCollectorPerIdentifier(CollectorMap& collectorMap) const
 
         for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
         {
-            Ptr<SatGeoNetDevice> satGeoNetDevice =
-                DynamicCast<SatGeoNetDevice>(GetSatSatGeoNetDevice(*it));
+            Ptr<SatOrbiterNetDevice> satOrbiterNetDevice =
+                DynamicCast<SatOrbiterNetDevice>(GetSatSatOrbiterNetDevice(*it));
             const uint32_t satSrcId = GetSatId(*it);
             std::vector<Ptr<PointToPointIslNetDevice>> islNetDevices =
-                satGeoNetDevice->GetIslsNetDevices();
+                satOrbiterNetDevice->GetIslsNetDevices();
             for (std::vector<Ptr<PointToPointIslNetDevice>>::iterator itIsl = islNetDevices.begin();
                  itIsl != islNetDevices.end();
                  itIsl++)
@@ -1059,12 +1059,12 @@ SatStatsHelper::GetUtSatNetDevice(Ptr<Node> utNode)
 }
 
 Ptr<NetDevice> // static
-SatStatsHelper::GetSatSatGeoNetDevice(Ptr<Node> satNode)
+SatStatsHelper::GetSatSatOrbiterNetDevice(Ptr<Node> satNode)
 {
     NS_ASSERT(satNode->GetNDevices() > 0);
     Ptr<NetDevice> dev = satNode->GetDevice(0);
 
-    if (dev->GetObject<SatGeoNetDevice>() == nullptr)
+    if (dev->GetObject<SatOrbiterNetDevice>() == nullptr)
     {
         NS_FATAL_ERROR("Node " << satNode->GetId() << " is not a valid SAT");
     }

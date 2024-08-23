@@ -30,7 +30,6 @@
 #include <ns3/satellite-fwd-link-scheduler-default.h>
 #include <ns3/satellite-fwd-link-scheduler-time-slicing.h>
 #include <ns3/satellite-fwd-link-scheduler.h>
-#include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-gw-llc.h>
 #include <ns3/satellite-gw-mac.h>
 #include <ns3/satellite-gw-phy.h>
@@ -39,6 +38,7 @@
 #include <ns3/satellite-lower-layer-service.h>
 #include <ns3/satellite-net-device.h>
 #include <ns3/satellite-node-info.h>
+#include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-packet-classifier.h>
 #include <ns3/satellite-phy-rx-carrier-conf.h>
 #include <ns3/satellite-typedefs.h>

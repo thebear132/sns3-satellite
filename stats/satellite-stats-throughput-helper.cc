@@ -39,11 +39,11 @@
 #include <ns3/node-container.h>
 #include <ns3/packet.h>
 #include <ns3/probe.h>
-#include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-mac.h>
 #include <ns3/satellite-net-device.h>
+#include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-phy.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
@@ -576,24 +576,24 @@ SatStatsFwdFeederDevThroughputHelper::DoInstallProbes()
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
-        satGeoDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
+        satOrbiterDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
 
-        if (satGeoDev->TraceConnectWithoutContext("RxFeeder", callback))
+        if (satOrbiterDev->TraceConnectWithoutContext("RxFeeder", callback))
         {
             NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
-                             << " device #" << satGeoDev->GetIfIndex());
+                             << " device #" << satOrbiterDev->GetIfIndex());
 
             // Enable statistics-related tags and trace sources on the device.
-            satGeoDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
+            satOrbiterDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
         }
         else
         {
             NS_FATAL_ERROR("Error connecting to Rx trace source of SatNetDevice"
                            << " at node ID " << (*it)->GetId() << " device #"
-                           << satGeoDev->GetIfIndex());
+                           << satOrbiterDev->GetIfIndex());
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
@@ -783,14 +783,14 @@ SatStatsFwdFeederMacThroughputHelper::DoInstallProbes()
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
-        satGeoDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
-        std::map<uint32_t, Ptr<SatMac>> satGeoFeederMacs = satGeoDev->GetAllFeederMac();
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
+        satOrbiterDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
+        std::map<uint32_t, Ptr<SatMac>> satOrbiterFeederMacs = satOrbiterDev->GetAllFeederMac();
         Ptr<SatMac> satMac;
-        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoFeederMacs.begin();
-             it2 != satGeoFeederMacs.end();
+        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satOrbiterFeederMacs.begin();
+             it2 != satOrbiterFeederMacs.end();
              ++it2)
         {
             satMac = it2->second;
@@ -801,18 +801,18 @@ SatStatsFwdFeederMacThroughputHelper::DoInstallProbes()
             if (satMac->TraceConnectWithoutContext("Rx", callback))
             {
                 NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
-                                 << " device #" << satGeoDev->GetIfIndex());
+                                 << " device #" << satOrbiterDev->GetIfIndex());
             }
             else
             {
                 NS_FATAL_ERROR("Error connecting to Rx trace source of SatMac"
                                << " at node ID " << (*it)->GetId() << " device #"
-                               << satGeoDev->GetIfIndex());
+                               << satOrbiterDev->GetIfIndex());
             }
         }
-        std::map<uint32_t, Ptr<SatMac>> satGeoUserMacs = satGeoDev->GetUserMac();
-        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoUserMacs.begin();
-             it2 != satGeoUserMacs.end();
+        std::map<uint32_t, Ptr<SatMac>> satOrbiterUserMacs = satOrbiterDev->GetUserMac();
+        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satOrbiterUserMacs.begin();
+             it2 != satOrbiterUserMacs.end();
              ++it2)
         {
             satMac = it2->second;
@@ -892,23 +892,23 @@ SatStatsFwdUserMacThroughputHelper::DoInstallProbes()
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
-        satGeoDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
-        std::map<uint32_t, Ptr<SatMac>> satGeoFeederMacs = satGeoDev->GetAllFeederMac();
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
+        satOrbiterDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
+        std::map<uint32_t, Ptr<SatMac>> satOrbiterFeederMacs = satOrbiterDev->GetAllFeederMac();
         Ptr<SatMac> satMac;
-        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoFeederMacs.begin();
-             it2 != satGeoFeederMacs.end();
+        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satOrbiterFeederMacs.begin();
+             it2 != satOrbiterFeederMacs.end();
              ++it2)
         {
             satMac = it2->second;
             NS_ASSERT(satMac != nullptr);
             satMac->SetAttribute("EnableStatisticsTags", BooleanValue(true));
         }
-        std::map<uint32_t, Ptr<SatMac>> satGeoUserMacs = satGeoDev->GetUserMac();
-        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoUserMacs.begin();
-             it2 != satGeoUserMacs.end();
+        std::map<uint32_t, Ptr<SatMac>> satOrbiterUserMacs = satOrbiterDev->GetUserMac();
+        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satOrbiterUserMacs.begin();
+             it2 != satOrbiterUserMacs.end();
              ++it2)
         {
             satMac = it2->second;
@@ -1050,14 +1050,14 @@ SatStatsFwdFeederPhyThroughputHelper::DoInstallProbes()
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
-        satGeoDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
-        std::map<uint32_t, Ptr<SatPhy>> satGeoFeederPhys = satGeoDev->GetFeederPhy();
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
+        satOrbiterDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterFeederPhys = satOrbiterDev->GetFeederPhy();
         Ptr<SatPhy> satPhy;
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin();
-             it2 != satGeoFeederPhys.end();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterFeederPhys.begin();
+             it2 != satOrbiterFeederPhys.end();
              ++it2)
         {
             satPhy = it2->second;
@@ -1068,7 +1068,7 @@ SatStatsFwdFeederPhyThroughputHelper::DoInstallProbes()
             if (satPhy->TraceConnectWithoutContext("Rx", callback))
             {
                 NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
-                                 << " device #" << satGeoDev->GetIfIndex());
+                                 << " device #" << satOrbiterDev->GetIfIndex());
 
                 // Enable statistics-related tags and trace sources on the device.
                 satPhy->SetAttribute("EnableStatisticsTags", BooleanValue(true));
@@ -1077,12 +1077,12 @@ SatStatsFwdFeederPhyThroughputHelper::DoInstallProbes()
             {
                 NS_FATAL_ERROR("Error connecting to Rx trace source of SatPhy"
                                << " at node ID " << (*it)->GetId() << " device #"
-                               << satGeoDev->GetIfIndex());
+                               << satOrbiterDev->GetIfIndex());
             }
         }
-        std::map<uint32_t, Ptr<SatPhy>> satGeoUserPhys = satGeoDev->GetUserPhy();
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin();
-             it2 != satGeoUserPhys.end();
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhys = satOrbiterDev->GetUserPhy();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterUserPhys.begin();
+             it2 != satOrbiterUserPhys.end();
              ++it2)
         {
             satPhy = it2->second;
@@ -1162,23 +1162,23 @@ SatStatsFwdUserPhyThroughputHelper::DoInstallProbes()
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
-        satGeoDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
-        std::map<uint32_t, Ptr<SatPhy>> satGeoFeederPhys = satGeoDev->GetFeederPhy();
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
+        satOrbiterDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterFeederPhys = satOrbiterDev->GetFeederPhy();
         Ptr<SatPhy> satPhy;
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin();
-             it2 != satGeoFeederPhys.end();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterFeederPhys.begin();
+             it2 != satOrbiterFeederPhys.end();
              ++it2)
         {
             satPhy = it2->second;
             NS_ASSERT(satPhy != nullptr);
             satPhy->SetAttribute("EnableStatisticsTags", BooleanValue(true));
         }
-        std::map<uint32_t, Ptr<SatPhy>> satGeoUserPhys = satGeoDev->GetUserPhy();
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin();
-             it2 != satGeoUserPhys.end();
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhys = satOrbiterDev->GetUserPhy();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterUserPhys.begin();
+             it2 != satOrbiterUserPhys.end();
              ++it2)
         {
             satPhy = it2->second;
@@ -1535,22 +1535,22 @@ SatStatsRtnUserDevThroughputHelper::DoInstallProbes()
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
-        satGeoDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
+        satOrbiterDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
 
         // Connect the object to the probe.
-        if (satGeoDev->TraceConnectWithoutContext("RxUser", callback))
+        if (satOrbiterDev->TraceConnectWithoutContext("RxUser", callback))
         {
             NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
-                             << " device #" << satGeoDev->GetIfIndex());
+                             << " device #" << satOrbiterDev->GetIfIndex());
         }
         else
         {
             NS_FATAL_ERROR("Error connecting to Rx trace source of SatMac"
                            << " at node ID " << (*it)->GetId() << " device #"
-                           << satGeoDev->GetIfIndex());
+                           << satOrbiterDev->GetIfIndex());
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
@@ -1621,22 +1621,22 @@ SatStatsRtnFeederMacThroughputHelper::DoInstallProbes()
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
         Ptr<SatMac> satMac;
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
-        satGeoDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
-        std::map<uint32_t, Ptr<SatMac>> satGeoFeederMacs = satGeoDev->GetAllFeederMac();
-        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoFeederMacs.begin();
-             it2 != satGeoFeederMacs.end();
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
+        satOrbiterDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
+        std::map<uint32_t, Ptr<SatMac>> satOrbiterFeederMacs = satOrbiterDev->GetAllFeederMac();
+        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satOrbiterFeederMacs.begin();
+             it2 != satOrbiterFeederMacs.end();
              ++it2)
         {
             satMac = it2->second;
             NS_ASSERT(satMac != nullptr);
             satMac->SetAttribute("EnableStatisticsTags", BooleanValue(true));
         }
-        std::map<uint32_t, Ptr<SatMac>> satGeoUserMacs = satGeoDev->GetUserMac();
-        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoUserMacs.begin();
-             it2 != satGeoUserMacs.end();
+        std::map<uint32_t, Ptr<SatMac>> satOrbiterUserMacs = satOrbiterDev->GetUserMac();
+        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satOrbiterUserMacs.begin();
+             it2 != satOrbiterUserMacs.end();
              ++it2)
         {
             satMac = it2->second;
@@ -1736,23 +1736,23 @@ SatStatsRtnUserMacThroughputHelper::DoInstallProbes()
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
-        satGeoDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
-        std::map<uint32_t, Ptr<SatMac>> satGeoFeederMacs = satGeoDev->GetAllFeederMac();
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
+        satOrbiterDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
+        std::map<uint32_t, Ptr<SatMac>> satOrbiterFeederMacs = satOrbiterDev->GetAllFeederMac();
         Ptr<SatMac> satMac;
-        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoFeederMacs.begin();
-             it2 != satGeoFeederMacs.end();
+        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satOrbiterFeederMacs.begin();
+             it2 != satOrbiterFeederMacs.end();
              ++it2)
         {
             satMac = it2->second;
             NS_ASSERT(satMac != nullptr);
             satMac->SetAttribute("EnableStatisticsTags", BooleanValue(true));
         }
-        std::map<uint32_t, Ptr<SatMac>> satGeoUserMacs = satGeoDev->GetUserMac();
-        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satGeoUserMacs.begin();
-             it2 != satGeoUserMacs.end();
+        std::map<uint32_t, Ptr<SatMac>> satOrbiterUserMacs = satOrbiterDev->GetUserMac();
+        for (std::map<uint32_t, Ptr<SatMac>>::iterator it2 = satOrbiterUserMacs.begin();
+             it2 != satOrbiterUserMacs.end();
              ++it2)
         {
             satMac = it2->second;
@@ -1763,13 +1763,13 @@ SatStatsRtnUserMacThroughputHelper::DoInstallProbes()
             if (satMac->TraceConnectWithoutContext("Rx", callback))
             {
                 NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
-                                 << " device #" << satGeoDev->GetIfIndex());
+                                 << " device #" << satOrbiterDev->GetIfIndex());
             }
             else
             {
                 NS_FATAL_ERROR("Error connecting to Rx trace source of SatMac"
                                << " at node ID " << (*it)->GetId() << " device #"
-                               << satGeoDev->GetIfIndex());
+                               << satOrbiterDev->GetIfIndex());
             }
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
@@ -1847,22 +1847,22 @@ SatStatsRtnFeederPhyThroughputHelper::DoInstallProbes()
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
         Ptr<SatPhy> satPhy;
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
-        satGeoDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
-        std::map<uint32_t, Ptr<SatPhy>> satGeoFeederPhys = satGeoDev->GetFeederPhy();
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin();
-             it2 != satGeoFeederPhys.end();
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
+        satOrbiterDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterFeederPhys = satOrbiterDev->GetFeederPhy();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterFeederPhys.begin();
+             it2 != satOrbiterFeederPhys.end();
              ++it2)
         {
             satPhy = it2->second;
             NS_ASSERT(satPhy != nullptr);
             satPhy->SetAttribute("EnableStatisticsTags", BooleanValue(true));
         }
-        std::map<uint32_t, Ptr<SatPhy>> satGeoUserPhys = satGeoDev->GetUserPhy();
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin();
-             it2 != satGeoUserPhys.end();
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhys = satOrbiterDev->GetUserPhy();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterUserPhys.begin();
+             it2 != satOrbiterUserPhys.end();
              ++it2)
         {
             satPhy = it2->second;
@@ -1962,23 +1962,23 @@ SatStatsRtnUserPhyThroughputHelper::DoInstallProbes()
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
-        satGeoDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
-        std::map<uint32_t, Ptr<SatPhy>> satGeoFeederPhys = satGeoDev->GetFeederPhy();
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
+        satOrbiterDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterFeederPhys = satOrbiterDev->GetFeederPhy();
         Ptr<SatPhy> satPhy;
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoFeederPhys.begin();
-             it2 != satGeoFeederPhys.end();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterFeederPhys.begin();
+             it2 != satOrbiterFeederPhys.end();
              ++it2)
         {
             satPhy = it2->second;
             NS_ASSERT(satPhy != nullptr);
             satPhy->SetAttribute("EnableStatisticsTags", BooleanValue(true));
         }
-        std::map<uint32_t, Ptr<SatPhy>> satGeoUserPhys = satGeoDev->GetUserPhy();
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satGeoUserPhys.begin();
-             it2 != satGeoUserPhys.end();
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhys = satOrbiterDev->GetUserPhy();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator it2 = satOrbiterUserPhys.begin();
+             it2 != satOrbiterUserPhys.end();
              ++it2)
         {
             satPhy = it2->second;
@@ -1989,13 +1989,13 @@ SatStatsRtnUserPhyThroughputHelper::DoInstallProbes()
             if (satPhy->TraceConnectWithoutContext("Rx", callback))
             {
                 NS_LOG_INFO(this << " successfully connected with node ID " << (*it)->GetId()
-                                 << " device #" << satGeoDev->GetIfIndex());
+                                 << " device #" << satOrbiterDev->GetIfIndex());
             }
             else
             {
                 NS_FATAL_ERROR("Error connecting to Rx trace source of SatPhy"
                                << " at node ID " << (*it)->GetId() << " device #"
-                               << satGeoDev->GetIfIndex());
+                               << satOrbiterDev->GetIfIndex());
             }
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`

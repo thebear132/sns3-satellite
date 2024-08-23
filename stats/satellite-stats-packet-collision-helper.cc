@@ -32,10 +32,10 @@
 #include <ns3/multi-file-aggregator.h>
 #include <ns3/node-container.h>
 #include <ns3/object-vector.h>
-#include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-net-device.h>
+#include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-phy-rx-carrier.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy.h>
@@ -526,14 +526,14 @@ SatStatsUserPacketCollisionHelper::DoInstall()
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-        Ptr<NetDevice> dev = GetSatSatGeoNetDevice(*it);
+        Ptr<NetDevice> dev = GetSatSatOrbiterNetDevice(*it);
 
         Ptr<SatPhy> satPhy;
-        Ptr<SatGeoNetDevice> satGeoDev = dev->GetObject<SatGeoNetDevice>();
-        NS_ASSERT(satGeoDev != nullptr);
-        std::map<uint32_t, Ptr<SatPhy>> satGeoUserPhys = satGeoDev->GetUserPhy();
-        for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satGeoUserPhys.begin();
-             itPhy != satGeoUserPhys.end();
+        Ptr<SatOrbiterNetDevice> satOrbiterDev = dev->GetObject<SatOrbiterNetDevice>();
+        NS_ASSERT(satOrbiterDev != nullptr);
+        std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhys = satOrbiterDev->GetUserPhy();
+        for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satOrbiterUserPhys.begin();
+             itPhy != satOrbiterUserPhys.end();
              ++itPhy)
         {
             satPhy = itPhy->second;
@@ -576,7 +576,7 @@ SatStatsUserPacketCollisionHelper::DoInstall()
 
             } // end of `for (ObjectVectorValue::Iterator itCarrier = carriers)`
 
-        } // end of `for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satGeoUserPhys)`
+        } // end of `for (std::map<uint32_t, Ptr<SatPhy>>::iterator itPhy = satOrbiterUserPhys)`
 
     } // end of `for (NodeContainer::Iterator it = sats)`
 

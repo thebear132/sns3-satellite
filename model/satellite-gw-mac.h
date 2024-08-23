@@ -212,14 +212,14 @@ class SatGwMac : public SatMac
     void SetOrbiterNodesCallback(SatGwMac::OrbiterNodesCallback cb);
 
     /**
-     * Callback to set geo satellite feeder address on LLC
+     * Callback to set satellite feeder address on LLC
      * \param The new satellite feeder address
      */
     typedef Callback<void, Mac48Address> GwLlcSetSatelliteAddress;
 
     /**
-     * Method to set callback to set geo satellite feeder address
-     * \param cb callback to invoke to set geo satellite feeder address
+     * Method to set callback to set satellite feeder address
+     * \param cb callback to invoke to set satellite feeder address
      */
     void SetGwLlcSetSatelliteAddress(SatGwMac::GwLlcSetSatelliteAddress cb);
 

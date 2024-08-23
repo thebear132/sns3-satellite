@@ -406,7 +406,7 @@ class SatStatsHelper : public Object
     /**
      * \return
      */
-    static Ptr<NetDevice> GetSatSatGeoNetDevice(Ptr<Node> satNode);
+    static Ptr<NetDevice> GetSatSatOrbiterNetDevice(Ptr<Node> satNode);
 
     /**
      * \brief Save the address and the proper identifier from the given UT node.

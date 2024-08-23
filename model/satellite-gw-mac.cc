@@ -408,9 +408,9 @@ SatGwMac::StartTransmission(uint32_t carrierId)
 
             m_updateIslCallback();
 
-            Ptr<SatGeoNetDevice> geoNetDevice = DynamicCast<SatGeoNetDevice>(
+            Ptr<SatOrbiterNetDevice> orbiterNetDevice = DynamicCast<SatOrbiterNetDevice>(
                 m_orbiterNodesCallback().Get(m_feederSatId)->GetDevice(0));
-            Mac48Address satFeederAddress = geoNetDevice->GetSatelliteFeederAddress(m_beamId);
+            Mac48Address satFeederAddress = orbiterNetDevice->GetSatelliteFeederAddress(m_beamId);
             SetSatelliteAddress(satFeederAddress);
             if (m_gwLlcSetSatelliteAddress.IsNull() == false)
             {

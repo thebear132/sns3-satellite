@@ -34,6 +34,7 @@
 #include <ns3/probe.h>
 #include <ns3/satellite-handover-module.h>
 #include <ns3/satellite-helper.h>
+#include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
@@ -245,10 +246,10 @@ SatStatsPacketDropRateHelper::InstallProbes()
     NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
-        Ptr<SatGeoNetDevice> satGeoNetDevice =
-            DynamicCast<SatGeoNetDevice>(GetSatSatGeoNetDevice(*it));
+        Ptr<SatOrbiterNetDevice> satOrbiterNetDevice =
+            DynamicCast<SatOrbiterNetDevice>(GetSatSatOrbiterNetDevice(*it));
         std::vector<Ptr<PointToPointIslNetDevice>> islNetDevices =
-            satGeoNetDevice->GetIslsNetDevices();
+            satOrbiterNetDevice->GetIslsNetDevices();
         for (std::vector<Ptr<PointToPointIslNetDevice>>::iterator itIsl = islNetDevices.begin();
              itIsl != islNetDevices.end();
              itIsl++)
