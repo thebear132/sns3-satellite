@@ -164,6 +164,7 @@ set(source_files
     model/satellite-superframe-sequence.cc
     model/satellite-tbtp-container.cc
     model/satellite-time-tag.cc
+    model/satellite-topology.cc
     model/satellite-traced-interference.cc
     model/satellite-traced-mobility-model.cc
     model/satellite-uplink-info-tag.cc
@@ -409,6 +410,7 @@ set(header_files
     model/satellite-superframe-sequence.h
     model/satellite-tbtp-container.h
     model/satellite-time-tag.h
+    model/satellite-topology.h
     model/satellite-traced-interference.h
     model/satellite-traced-mobility-model.h
     model/satellite-typedefs.h
