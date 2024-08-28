@@ -89,21 +89,21 @@ SatFreeSpaceLossTestCase::DoRun(void)
 
     NodeContainer gw = helper->GwNodes();
     NodeContainer ut = helper->UtNodes();
-    Ptr<Node> geo = helper->SatNodes().Get(0);
+    Ptr<Node> sat = helper->SatNodes().Get(0);
 
     // get mobilities
     Ptr<SatMobilityModel> gwMob = gw.Get(0)->GetObject<SatMobilityModel>();
     Ptr<SatMobilityModel> utMob = ut.Get(0)->GetObject<SatMobilityModel>();
-    Ptr<SatMobilityModel> geoMob = geo->GetObject<SatMobilityModel>();
+    Ptr<SatMobilityModel> satMob = sat->GetObject<SatMobilityModel>();
 
     // set reference positions for test
     gwMob->SetGeoPosition(GeoCoordinate(25.28, 54.689444, 0.0));
     utMob->SetGeoPosition(GeoCoordinate(25.00, -26.20, 230.0));
-    geoMob->SetGeoPosition(GeoCoordinate(0.0, 33.0, 35786000.0));
+    satMob->SetGeoPosition(GeoCoordinate(0.0, 33.0, 35786000.0));
 
     // test fsl calculation in path UT - Geo Satellite
-    //  double fsl_ratio = fsl.GetFsl(utMob, geoMob, frequency);
-    double fsl_dB = fsl.GetFsldB(utMob, geoMob, frequency);
+    //  double fsl_ratio = fsl.GetFsl(utMob, satMob, frequency);
+    double fsl_dB = fsl.GetFsldB(utMob, satMob, frequency);
 
     // Calculations with big double numbers there will produce results
     // with different precisions when compiled with optimized and debug flags.
@@ -113,8 +113,8 @@ SatFreeSpaceLossTestCase::DoRun(void)
     NS_TEST_ASSERT_MSG_EQ_TOL(fsl_dB, 209.460211515483, 0.1, "FSL (UT-GEO) in dBs incorrect");
 
     // test fsl calculation in path GW - Geo Satellite
-    //  fsl_ratio = fsl.GetFsl(gwMob, geoMob, frequency);
-    fsl_dB = fsl.GetFsldB(gwMob, geoMob, frequency);
+    //  fsl_ratio = fsl.GetFsl(gwMob, satMob, frequency);
+    fsl_dB = fsl.GetFsldB(gwMob, satMob, frequency);
 
     // Calculations with big double numbers there will produce results
     // with different precisions when compiled with optimized and debug flags.

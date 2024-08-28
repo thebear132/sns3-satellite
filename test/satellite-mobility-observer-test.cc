@@ -280,7 +280,7 @@ static const double g_refElAngles[g_latitudeCount][g_longitudeCount] = {
  *  6.  Set position of own mobility.
  *  7.  Get elevation angle from observer.
  *  8.  Repeat steps 6 and 7 several times.
- *  9.  Set Geo satellite using reference satellite and repeat steps 6 and 7 several times.
+ *  9.  Set satellite using reference satellite and repeat steps 6 and 7 several times.
  *
  *  Expected result:
  *      Timing advance and elevation angle values got are correct.
@@ -321,7 +321,7 @@ SatMobilityObserverTestCase::DoRun(void)
     // create mobilities
     Ptr<SatConstantPositionMobilityModel> gwMob = CreateObject<SatConstantPositionMobilityModel>();
     Ptr<SatConstantPositionMobilityModel> utMob = CreateObject<SatConstantPositionMobilityModel>();
-    Ptr<SatConstantPositionMobilityModel> geoMob = CreateObject<SatConstantPositionMobilityModel>();
+    Ptr<SatConstantPositionMobilityModel> satMob = CreateObject<SatConstantPositionMobilityModel>();
 
     // create propagation delays
     Ptr<SatConstantPropagationDelayModel> gwProgDelay =
@@ -337,15 +337,15 @@ SatMobilityObserverTestCase::DoRun(void)
     double earthRadius =
         CalculateDistance(GeoCoordinate(0.00, 0.00, 0.00).ToVector(), Vector(0, 0, 0));
     GeoCoordinate satellitePosition = GeoCoordinate(0.00, 0.00, earthRadius);
-    geoMob->SetGeoPosition(satellitePosition);
+    satMob->SetGeoPosition(satellitePosition);
 
     // set some positions to UT and GW
     gwMob->SetGeoPosition(GeoCoordinate(0.00, 0.00, 0.00));
     utMob->SetGeoPosition(GeoCoordinate(0.00, 0.00, 0.00));
 
     // create mobility observers
-    Ptr<SatMobilityObserver> utObserver = CreateObject<SatMobilityObserver>(utMob, geoMob);
-    Ptr<SatMobilityObserver> gwObserver = CreateObject<SatMobilityObserver>(gwMob, geoMob);
+    Ptr<SatMobilityObserver> utObserver = CreateObject<SatMobilityObserver>(utMob, satMob);
+    Ptr<SatMobilityObserver> gwObserver = CreateObject<SatMobilityObserver>(gwMob, satMob);
 
     utObserver->ObserveTimingAdvance(utProgDelay, gwProgDelay, gwMob);
     double timingAdvance = utObserver->GetTimingAdvance().GetSeconds();
@@ -438,7 +438,7 @@ SatMobilityObserverTestCase::DoRun(void)
     satellitePosition.SetLatitude(0.00);
     satellitePosition.SetLongitude(33.00);
     satellitePosition.SetAltitude(35786000.00);
-    geoMob->SetGeoPosition(satellitePosition);
+    satMob->SetGeoPosition(satellitePosition);
 
     Ptr<UniformRandomVariable> randAlt = CreateObject<UniformRandomVariable>();
     randAlt->SetAttribute("Min", DoubleValue(-200.00));

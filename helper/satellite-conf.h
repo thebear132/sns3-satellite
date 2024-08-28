@@ -36,7 +36,7 @@ namespace ns3
 {
 
 /**
- * \brief A configuration class for the GEO satellite reference system
+ * \brief A configuration class for the satellite reference system
  *
  */
 class SatConf : public Object
@@ -160,9 +160,9 @@ class SatConf : public Object
     GeoCoordinate GetUtPosition(uint32_t utId) const;
 
     /**
-     * Get the position of the Geo Satellite
+     * Get the position of the Satellite
      *
-     * \return Geo satellite position.
+     * \return satellite position.
      */
     GeoCoordinate GetSatPosition() const;
 
@@ -285,7 +285,7 @@ class SatConf : public Object
     PositionContainer_t m_utPositions;
 
     /**
-     * Geodetic positions of the Geo Satellite
+     * Geodetic positions of the Satellite
      */
     PositionContainer_t m_satPosition;
 
