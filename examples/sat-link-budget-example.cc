@@ -151,7 +151,7 @@ main(int argc, char* argv[])
     NodeContainer gw = helper->GwNodes();
     Ptr<SatMobilityModel> gwMob = gw.Get(0)->GetObject<SatMobilityModel>();
 
-    Ptr<Node> sat = helper->SatNodes().Get(0);
+    Ptr<Node> sat = Singleton<SatTopology>::Get()->GetOrbiterNode(0);
     Ptr<SatMobilityModel> satMob = sat->GetObject<SatMobilityModel>();
 
     // print used parameters using log info

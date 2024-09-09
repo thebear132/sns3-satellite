@@ -43,6 +43,7 @@
 #include <ns3/satellite-net-device.h>
 #include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-phy.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
@@ -593,7 +594,7 @@ SatStatsFwdFeederLinkModcodHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, uint32_t, const Address&> callback =
         MakeCallback(&SatStatsFwdFeederLinkModcodHelper::RxLinkModcodCallback, this);
 
@@ -703,7 +704,7 @@ SatStatsFwdUserLinkModcodHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, uint32_t, const Address&> callback =
         MakeCallback(&SatStatsFwdUserLinkModcodHelper::RxLinkModcodCallback, this);
 
@@ -813,7 +814,7 @@ SatStatsRtnFeederLinkModcodHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -923,7 +924,7 @@ SatStatsRtnUserLinkModcodHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, uint32_t, const Address&> callback =
         MakeCallback(&SatStatsRtnUserLinkModcodHelper::RxLinkModcodCallback, this);
 

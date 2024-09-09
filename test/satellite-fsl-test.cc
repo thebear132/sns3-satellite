@@ -24,15 +24,15 @@
  * \brief Test cases to unit test Satellite Free Space Loss model.
  */
 
-#include "../helper/satellite-helper.h"
-#include "../model/satellite-free-space-loss.h"
-#include "../model/satellite-mobility-model.h"
-#include "../utils/satellite-env-variables.h"
-
-#include "ns3/log.h"
-#include "ns3/simulator.h"
-#include "ns3/singleton.h"
-#include "ns3/test.h"
+#include <ns3/log.h>
+#include <ns3/satellite-env-variables.h>
+#include <ns3/satellite-free-space-loss.h>
+#include <ns3/satellite-helper.h>
+#include <ns3/satellite-mobility-model.h>
+#include <ns3/satellite-topology.h>
+#include <ns3/simulator.h>
+#include <ns3/singleton.h>
+#include <ns3/test.h>
 
 using namespace ns3;
 
@@ -89,7 +89,7 @@ SatFreeSpaceLossTestCase::DoRun(void)
 
     NodeContainer gw = helper->GwNodes();
     NodeContainer ut = helper->UtNodes();
-    Ptr<Node> sat = helper->SatNodes().Get(0);
+    Ptr<Node> sat = Singleton<SatTopology>::Get()->GetOrbiterNode(0);
 
     // get mobilities
     Ptr<SatMobilityModel> gwMob = gw.Get(0)->GetObject<SatMobilityModel>();

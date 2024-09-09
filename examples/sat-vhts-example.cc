@@ -292,7 +292,7 @@ main(int argc, char* argv[])
     if (utMobility)
     {
         Ptr<SatMobilityModel> satMobility =
-            satHelper->GetBeamHelper()->GetSatNodes().Get(0)->GetObject<SatMobilityModel>();
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetObject<SatMobilityModel>();
         Ptr<Node> node = satHelper->LoadMobileUtFromFile(0, mobilityPath);
         node->GetObject<SatMobilityModel>()->TraceConnect("SatCourseChange",
                                                           "BeamTracer",

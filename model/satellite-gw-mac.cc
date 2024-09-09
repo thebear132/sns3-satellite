@@ -29,6 +29,7 @@
 #include "satellite-rtn-link-time.h"
 #include "satellite-signal-parameters.h"
 #include "satellite-time-tag.h"
+#include "satellite-topology.h"
 #include "satellite-uplink-info-tag.h"
 #include "satellite-utils.h"
 
@@ -409,7 +410,7 @@ SatGwMac::StartTransmission(uint32_t carrierId)
             m_updateIslCallback();
 
             Ptr<SatOrbiterNetDevice> orbiterNetDevice = DynamicCast<SatOrbiterNetDevice>(
-                m_orbiterNodesCallback().Get(m_feederSatId)->GetDevice(0));
+                Singleton<SatTopology>::Get()->GetOrbiterNode(m_feederSatId)->GetDevice(0));
             Mac48Address satFeederAddress = orbiterNetDevice->GetSatelliteFeederAddress(m_beamId);
             SetSatelliteAddress(satFeederAddress);
             if (m_gwLlcSetSatelliteAddress.IsNull() == false)
@@ -894,13 +895,6 @@ SatGwMac::SetBeamCallback(SatGwMac::PhyBeamCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
     m_beamCallback = cb;
-}
-
-void
-SatGwMac::SetOrbiterNodesCallback(SatGwMac::OrbiterNodesCallback cb)
-{
-    NS_LOG_FUNCTION(this << &cb);
-    m_orbiterNodesCallback = cb;
 }
 
 void

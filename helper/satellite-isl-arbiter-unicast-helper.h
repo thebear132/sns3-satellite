@@ -43,11 +43,9 @@ class SatIslArbiterUnicastHelper : public Object
     /**
      * Constructor
      *
-     * \param satNodes List of all satellite nodes
      * \param isls List of all ISLs
      */
-    SatIslArbiterUnicastHelper(NodeContainer satNodes,
-                               std::vector<std::pair<uint32_t, uint32_t>> isls);
+    SatIslArbiterUnicastHelper(std::vector<std::pair<uint32_t, uint32_t>> isls);
 
     /**
      * Install arbiter on all satellite nodes
@@ -65,7 +63,6 @@ class SatIslArbiterUnicastHelper : public Object
      */
     std::vector<std::map<uint32_t, uint32_t>> CalculateGlobalState();
 
-    NodeContainer m_satNodes;                          // List of all satellite nodes
     std::vector<std::pair<uint32_t, uint32_t>> m_isls; // List of all ISLs
 };
 

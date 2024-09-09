@@ -136,14 +136,13 @@ class SatOrbiterHelper : public Object
     void SetFeederPhyAttribute(std::string name, const AttributeValue& value);
 
     /**
-     * \param c a set of nodes
-     *
      * This method creates a ns3::SatOrbiterNetDevices with the requested attributes
-     * and associate the resulting ns3::NetDevices with the ns3::Nodes.
+     * and associate the resulting ns3::NetDevices with the ns3::Nodes corresponding to the
+     * orbiters.
      *
      * \return container to the created devices
      */
-    NetDeviceContainer Install(NodeContainer c);
+    NetDeviceContainer InstallAllOrbiters();
 
     /**
      * \param n a node
@@ -250,10 +249,9 @@ class SatOrbiterHelper : public Object
     /**
      * Set ISL routes
      *
-     * \param satNodes List of all satellite nodes
      * \param isls List of all ISLs
      */
-    void SetIslRoutes(NodeContainer satNodes, std::vector<std::pair<uint32_t, uint32_t>> isls);
+    void SetIslRoutes(std::vector<std::pair<uint32_t, uint32_t>> isls);
 
   private:
     /**

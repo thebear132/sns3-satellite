@@ -45,6 +45,7 @@
 #include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-time-tag.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
@@ -1060,7 +1061,7 @@ SatStatsFwdPhyJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -1551,7 +1552,7 @@ SatStatsRtnPhyJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {

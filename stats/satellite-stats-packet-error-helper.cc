@@ -41,6 +41,7 @@
 #include <ns3/satellite-phy-rx-carrier.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
@@ -249,7 +250,7 @@ SatStatsPacketErrorHelper::DoInstall()
         }
 
         // Connect to trace sources at SAT nodes.
-        NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+        NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
         for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
         {
             InstallProbeOnSatFeeder(*it);
@@ -285,7 +286,7 @@ SatStatsPacketErrorHelper::DoInstall()
         }
 
         // Connect to trace sources at SAT nodes.
-        NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+        NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
         for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
         {
             InstallProbeOnSatUser(*it);

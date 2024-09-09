@@ -101,7 +101,6 @@ class SatBeamHelper : public Object
      * Constructor for SatBeamHelper.
      *
      * \param standard                    The standard to use (DVB or LORA)
-     * \param satNodes                    Container of Satellite node
      * \param isls                        List of all ISLs
      * \param bandwidthConverterCb        Callback to convert bandwidth
      * \param fwdLinkCarrierCount         Number of carriers used in forward link
@@ -112,7 +111,6 @@ class SatBeamHelper : public Object
      * mode used in satellites for return link
      */
     SatBeamHelper(SatEnums::Standard_t standard,
-                  NodeContainer satNodes,
                   std::vector<std::pair<uint32_t, uint32_t>> isls,
                   SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                   uint32_t fwdLinkCarrierCount,
@@ -336,13 +334,6 @@ class SatBeamHelper : public Object
     Ptr<Node> GetGwNode(uint32_t gwId) const;
 
     /**
-     * Gets Satellite nodes.
-     *
-     * \return pointer to Satellite nodes.
-     */
-    NodeContainer GetSatNodes() const;
-
-    /**
      * \return pointer to UT helper.
      */
     Ptr<SatUtHelper> GetUtHelper() const;
@@ -423,7 +414,6 @@ class SatBeamHelper : public Object
     Ptr<SatOrbiterHelper> m_orbiterHelper;
     Ptr<SatGwHelper> m_gwHelper;
     Ptr<SatUtHelper> m_utHelper;
-    NodeContainer m_satNodes;
     Ptr<SatNcc> m_ncc;
 
     Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;

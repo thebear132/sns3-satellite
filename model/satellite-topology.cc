@@ -65,9 +65,9 @@ SatTopology::Reset()
 {
     NS_LOG_FUNCTION(this);
 
-    m_gws.clear();
-    m_uts.clear();
-    m_orbiters.clear();
+    m_gws = NodeContainer();
+    m_uts = NodeContainer();
+    m_orbiters = NodeContainer();
     m_utToGwMap.clear();
 
     m_enableMapPrint = false;
@@ -78,7 +78,7 @@ SatTopology::AddGwNode(Ptr<Node> gw)
 {
     NS_LOG_FUNCTION(this << gw);
 
-    m_gws.push_back(gw);
+    m_gws.Add(gw);
 }
 
 void
@@ -86,7 +86,7 @@ SatTopology::AddUtNode(Ptr<Node> ut)
 {
     NS_LOG_FUNCTION(this << ut);
 
-    m_uts.push_back(ut);
+    m_uts.Add(ut);
 }
 
 void
@@ -94,7 +94,7 @@ SatTopology::AddOrbiterNode(Ptr<Node> orbiter)
 {
     NS_LOG_FUNCTION(this << orbiter);
 
-    m_orbiters.push_back(orbiter);
+    m_orbiters.Add(orbiter);
 }
 
 void
@@ -104,7 +104,8 @@ SatTopology::ConnectGwToUt(Ptr<Node> ut, Ptr<Node> gw)
 
     if (m_utToGwMap.count(ut) > 0)
     {
-        NS_FATAL_ERROR("UT " << ut << " already in GW to UT map. Connected to GW " << m_utToGwMap[ut]);
+        NS_FATAL_ERROR("UT " << ut << " already in GW to UT map. Connected to GW "
+                             << m_utToGwMap[ut]);
     }
 
     m_utToGwMap[ut] = gw;
@@ -139,7 +140,7 @@ SatTopology::DisconnectGwFromUt(Ptr<Node> ut)
     }
 }
 
-std::vector<Ptr<Node>>
+NodeContainer
 SatTopology::GetGwNodes() const
 {
     NS_LOG_FUNCTION(this);
@@ -147,7 +148,7 @@ SatTopology::GetGwNodes() const
     return m_gws;
 }
 
-std::vector<Ptr<Node>>
+NodeContainer
 SatTopology::GetUtNodes() const
 {
     NS_LOG_FUNCTION(this);
@@ -155,12 +156,36 @@ SatTopology::GetUtNodes() const
     return m_uts;
 }
 
-std::vector<Ptr<Node>>
+NodeContainer
 SatTopology::GetOrbiterNodes() const
 {
     NS_LOG_FUNCTION(this);
 
     return m_orbiters;
+}
+
+Ptr<Node>
+SatTopology::GetGwNode(uint32_t nodeId) const
+{
+    NS_LOG_FUNCTION(this << nodeId);
+
+    return m_gws.Get(nodeId);
+}
+
+Ptr<Node>
+SatTopology::GetUtNode(uint32_t nodeId) const
+{
+    NS_LOG_FUNCTION(this << nodeId);
+
+    return m_uts.Get(nodeId);
+}
+
+Ptr<Node>
+SatTopology::GetOrbiterNode(uint32_t nodeId) const
+{
+    NS_LOG_FUNCTION(this << nodeId);
+
+    return m_orbiters.Get(nodeId);
 }
 
 } // namespace ns3

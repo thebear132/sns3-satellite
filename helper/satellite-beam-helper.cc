@@ -56,6 +56,7 @@
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-propagation-delay-model.h>
 #include <ns3/satellite-sgp4-mobility-model.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/satellite-typedefs.h>
 #include <ns3/satellite-ut-llc.h>
 #include <ns3/satellite-ut-mac.h>
@@ -245,7 +246,6 @@ SatBeamHelper::SatBeamHelper()
 }
 
 SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
-                             NodeContainer satNodes,
                              std::vector<std::pair<uint32_t, uint32_t>> isls,
                              SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                              uint32_t rtnLinkCarrierCount,
@@ -444,8 +444,7 @@ SatBeamHelper::SatBeamHelper(SatEnums::Standard_t standard,
     // DVB-RCS2 link results for RTN link waveform configurations
     m_superframeSeq->GetWaveformConf()->InitializeEbNoRequirements(linkResultsReturnLink);
 
-    m_satNodes = satNodes;
-    m_orbiterHelper->Install(m_satNodes);
+    m_orbiterHelper->InstallAllOrbiters();
 
     m_ncc = CreateObject<SatNcc>();
 
@@ -592,7 +591,7 @@ SatBeamHelper::Install(NodeContainer ut,
     SatChannelPair::ChannelPair_t userLink =
         GetChannelPair(satId, beamId, fwdUlFreqId, rtnUlFreqId, true);
 
-    Ptr<Node> satNode = m_satNodes.Get(satId);
+    Ptr<Node> satNode = Singleton<SatTopology>::Get()->GetOrbiterNode(satId);
 
     NS_ASSERT(satNode != nullptr);
 
@@ -812,7 +811,6 @@ SatBeamHelper::InstallFeeder(Ptr<SatOrbiterNetDevice> orbiterNetDevice,
     {
         Ptr<SatGwMac> gwMac = DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNd)->GetMac());
         Mac48Address satFeederAddress = orbiterNetDevice->GetSatelliteFeederAddress(beamId);
-        gwMac->SetOrbiterNodesCallback(MakeCallback(&SatBeamHelper::GetSatNodes, this));
         gwMac->SetSatelliteAddress(satFeederAddress);
     }
 
@@ -907,8 +905,8 @@ SatBeamHelper::InstallIsls()
          it != m_isls.end();
          it++)
     {
-        Ptr<Node> sat1 = m_satNodes.Get(it->first);
-        Ptr<Node> sat2 = m_satNodes.Get(it->second);
+        Ptr<Node> sat1 = Singleton<SatTopology>::Get()->GetOrbiterNode(it->first);
+        Ptr<Node> sat2 = Singleton<SatTopology>::Get()->GetOrbiterNode(it->second);
 
         // Install a p2p ISL link between these two satellites
         NetDeviceContainer netDevices = p2pIslHelper->Install(sat1, sat2);
@@ -933,7 +931,7 @@ SatBeamHelper::SetIslRoutes()
 {
     NS_LOG_FUNCTION(this);
 
-    m_orbiterHelper->SetIslRoutes(m_satNodes, m_isls);
+    m_orbiterHelper->SetIslRoutes(m_isls);
 }
 
 uint32_t
@@ -966,13 +964,6 @@ SatBeamHelper::GetGwNode(uint32_t gwId) const
     }
 
     return node;
-}
-
-NodeContainer
-SatBeamHelper::GetSatNodes() const
-{
-    NS_LOG_FUNCTION(this);
-    return m_satNodes;
 }
 
 Ptr<SatUtHelper>
@@ -1271,9 +1262,12 @@ SatBeamHelper::GetClosestSat(GeoCoordinate position)
     double distanceMin = std::numeric_limits<double>::max();
     uint32_t indexDistanceMin = 0;
 
-    for (uint32_t i = 0; i < m_satNodes.GetN(); i++)
+    for (uint32_t i = 0; i < Singleton<SatTopology>::Get()->GetOrbiterNodes().GetN(); i++)
     {
-        GeoCoordinate satPos = m_satNodes.Get(i)->GetObject<SatMobilityModel>()->GetGeoPosition();
+        GeoCoordinate satPos = Singleton<SatTopology>::Get()
+                                   ->GetOrbiterNode(i)
+                                   ->GetObject<SatMobilityModel>()
+                                   ->GetGeoPosition();
         double distance = CalculateDistance(position.ToVector(), satPos.ToVector());
         if (distance < distanceMin)
         {
@@ -1500,9 +1494,10 @@ SatBeamHelper::CreateBeamInfo() const
         }
     }
 
-    oss << std::endl << " -- Geo Satellite position --" << std::endl;
+    oss << std::endl << " -- Satellite positions --" << std::endl;
 
-    Ptr<SatMobilityModel> model = m_satNodes.Get(0)->GetObject<SatMobilityModel>();
+    Ptr<SatMobilityModel> model =
+        Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetObject<SatMobilityModel>();
     GeoCoordinate pos = model->GetGeoPosition();
     oss << "latitude=" << pos.GetLatitude() << ", longitude=" << pos.GetLongitude()
         << ", altitude=" << pos.GetAltitude() << std::endl;

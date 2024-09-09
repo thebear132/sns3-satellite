@@ -45,6 +45,7 @@
 #include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-time-tag.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
@@ -666,7 +667,7 @@ SatStatsFwdFeederDevLinkDelayHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, const Time&, const Address&> callback =
         MakeCallback(&SatStatsFwdFeederDevLinkDelayHelper::RxLinkDelayCallback, this);
 
@@ -751,7 +752,7 @@ SatStatsFwdUserDevLinkDelayHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -871,7 +872,7 @@ SatStatsFwdFeederMacLinkDelayHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, const Time&, const Address&> callback =
         MakeCallback(&SatStatsFwdFeederMacLinkDelayHelper::RxLinkDelayCallback, this);
 
@@ -984,7 +985,7 @@ SatStatsFwdUserMacLinkDelayHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -1130,7 +1131,7 @@ SatStatsFwdFeederPhyLinkDelayHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, const Time&, const Address&> callback =
         MakeCallback(&SatStatsFwdFeederPhyLinkDelayHelper::RxLinkDelayCallback, this);
 
@@ -1243,7 +1244,7 @@ SatStatsFwdUserPhyLinkDelayHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -1389,7 +1390,7 @@ SatStatsRtnFeederDevLinkDelayHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -1478,7 +1479,7 @@ SatStatsRtnUserDevLinkDelayHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, const Time&, const Address&> callback =
         MakeCallback(&SatStatsRtnUserDevLinkDelayHelper::RxLinkDelayCallback, this);
 
@@ -1565,7 +1566,7 @@ SatStatsRtnFeederMacLinkDelayHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -1678,7 +1679,7 @@ SatStatsRtnUserMacLinkDelayHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, const Time&, const Address&> callback =
         MakeCallback(&SatStatsRtnUserMacLinkDelayHelper::RxLinkDelayCallback, this);
 
@@ -1790,7 +1791,7 @@ SatStatsRtnFeederPhyLinkDelayHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -1903,7 +1904,7 @@ SatStatsRtnUserPhyLinkDelayHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, const Time&, const Address&> callback =
         MakeCallback(&SatStatsRtnUserPhyLinkDelayHelper::RxLinkDelayCallback, this);
 

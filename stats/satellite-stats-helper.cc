@@ -35,6 +35,7 @@
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-id-mapper.h>
 #include <ns3/satellite-orbiter-net-device.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/satellite-user-helper.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
@@ -420,7 +421,7 @@ SatStatsHelper::CreateCollectorPerIdentifier(CollectorMap& collectorMap) const
     }
 
     case SatStatsHelper::IDENTIFIER_SAT: {
-        NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+        NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
         for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
         {
@@ -435,7 +436,7 @@ SatStatsHelper::CreateCollectorPerIdentifier(CollectorMap& collectorMap) const
     }
 
     case SatStatsHelper::IDENTIFIER_ISL: {
-        NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+        NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
         for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
         {

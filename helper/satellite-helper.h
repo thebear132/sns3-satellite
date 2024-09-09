@@ -303,11 +303,6 @@ class SatHelper : public Object
         return m_beamHelper->GetUtNodes();
     }
 
-    inline NodeContainer SatNodes()
-    {
-        return m_beamHelper->GetSatNodes();
-    }
-
     /**
      * Dispose of this class instance
      */

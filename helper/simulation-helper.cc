@@ -39,6 +39,7 @@
 #include <ns3/pointer.h>
 #include <ns3/random-variable-stream.h>
 #include <ns3/satellite-env-variables.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
 #include <ns3/three-gpp-http-satellite-helper.h>
@@ -1350,7 +1351,9 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
         switch (scenario)
         {
         case SatHelper::NONE: {
-            for (uint32_t satId = 0; satId < m_satHelper->SatNodes().GetN(); satId++)
+            for (uint32_t satId = 0;
+                 satId < Singleton<SatTopology>::Get()->GetOrbiterNodes().GetN();
+                 satId++)
             {
                 // Set beamInfo to indicate enabled beams
                 for (uint32_t i = 1; i <= m_satHelper->GetBeamCount(); i++)
@@ -1365,7 +1368,9 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
             break;
         }
         case SatHelper::FULL: {
-            for (uint32_t satId = 0; satId < m_satHelper->SatNodes().GetN(); satId++)
+            for (uint32_t satId = 0;
+                 satId < Singleton<SatTopology>::Get()->GetOrbiterNodes().GetN();
+                 satId++)
             {
                 // Set beamInfo to indicate enabled beams
                 for (uint32_t i = 1; i <= m_satHelper->GetBeamCount(); i++)

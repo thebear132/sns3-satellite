@@ -39,6 +39,7 @@
 #include <ns3/satellite-phy-rx-carrier.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
@@ -520,7 +521,7 @@ SatStatsUserPacketCollisionHelper::DoInstall()
 
     // Connect to trace sources at SAT nodes.
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, uint32_t, const Address&, bool> callback =
         MakeCallback(&SatStatsUserPacketCollisionHelper::CollisionRxCallback, this);
 

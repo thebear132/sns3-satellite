@@ -35,6 +35,7 @@
 #include <ns3/satellite-handover-module.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-orbiter-net-device.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
@@ -243,7 +244,7 @@ SatStatsPacketDropRateHelper::InstallProbes()
     Callback<void, uint32_t, Ptr<Node>, Ptr<Node>, bool> callback =
         MakeCallback(&SatStatsPacketDropRateHelper::PacketDropRateCallback, this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
         Ptr<SatOrbiterNetDevice> satOrbiterNetDevice =

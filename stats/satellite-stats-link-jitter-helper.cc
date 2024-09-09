@@ -45,6 +45,7 @@
 #include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-time-tag.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
@@ -672,7 +673,7 @@ SatStatsFwdFeederDevLinkJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, const Time&, const Address&> callback =
         MakeCallback(&SatStatsFwdFeederDevLinkJitterHelper::RxLinkJitterCallback, this);
 
@@ -756,7 +757,7 @@ SatStatsFwdUserDevLinkJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -877,7 +878,7 @@ SatStatsFwdFeederMacLinkJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, const Time&, const Address&> callback =
         MakeCallback(&SatStatsFwdFeederMacLinkJitterHelper::RxLinkJitterCallback, this);
 
@@ -991,7 +992,7 @@ SatStatsFwdUserMacLinkJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -1139,7 +1140,7 @@ SatStatsFwdFeederPhyLinkJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, const Time&, const Address&> callback =
         MakeCallback(&SatStatsFwdFeederPhyLinkJitterHelper::RxLinkJitterCallback, this);
 
@@ -1255,7 +1256,7 @@ SatStatsFwdUserPhyLinkJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -1401,7 +1402,7 @@ SatStatsRtnFeederDevLinkJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -1491,7 +1492,7 @@ SatStatsRtnUserDevLinkJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, const Time&, const Address&> callback =
         MakeCallback(&SatStatsRtnUserDevLinkJitterHelper::RxLinkJitterCallback, this);
 
@@ -1578,7 +1579,7 @@ SatStatsRtnFeederMacLinkJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -1692,7 +1693,7 @@ SatStatsRtnUserMacLinkJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, const Time&, const Address&> callback =
         MakeCallback(&SatStatsRtnUserMacLinkJitterHelper::RxLinkJitterCallback, this);
 
@@ -1806,7 +1807,7 @@ SatStatsRtnFeederPhyLinkJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
     for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
     {
@@ -1922,7 +1923,7 @@ SatStatsRtnUserPhyLinkJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, const Time&, const Address&> callback =
         MakeCallback(&SatStatsRtnUserPhyLinkJitterHelper::RxLinkJitterCallback, this);
 

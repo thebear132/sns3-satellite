@@ -20,8 +20,9 @@
 #ifndef SATELLITE_TOPOLOGY_H
 #define SATELLITE_TOPOLOGY_H
 
-#include <ns3/object.h>
+#include <ns3/node-container.h>
 #include <ns3/node.h>
+#include <ns3/object.h>
 
 namespace ns3
 {
@@ -29,7 +30,8 @@ namespace ns3
 /**
  * \ingroup satellite
  *
- * \brief Class to store topology of the whole system. It has the information of all the nodes of the scenario, and all the links between them.
+ * \brief Class to store topology of the whole system. It has the information of all the nodes of
+ * the scenario, and all the links between them.
  */
 class SatTopology : public Object
 {
@@ -109,21 +111,48 @@ class SatTopology : public Object
      *
      * \return The list of GW nodes
      */
-    std::vector<Ptr<Node>> GetGwNodes() const;
+    NodeContainer GetGwNodes() const;
 
     /**
      * Get the list of UT nodes
      *
      * \return The list of UT nodes
      */
-    std::vector<Ptr<Node>> GetUtNodes() const;
+    NodeContainer GetUtNodes() const;
 
     /**
      * Get the list of orbiter nodes
      *
      * \return The list of orbiter nodes
      */
-    std::vector<Ptr<Node>> GetOrbiterNodes() const;
+    NodeContainer GetOrbiterNodes() const;
+
+    /**
+     * Get the wanted GW node
+     *
+     * \param nodeId ID of the node needed
+     *
+     * \return The GW node
+     */
+    Ptr<Node> GetGwNode(uint32_t nodeId) const;
+
+    /**
+     * Get the wanted UT node
+     *
+     * \param nodeId ID of the node needed
+     *
+     * \return The UT node
+     */
+    Ptr<Node> GetUtNode(uint32_t nodeId) const;
+
+    /**
+     * Get the wanted orbiter node
+     *
+     * \param nodeId ID of the node needed
+     *
+     * \return The orbiter node
+     */
+    Ptr<Node> GetOrbiterNode(uint32_t nodeId) const;
 
     /**
      * \brief Function for printing out the topology
@@ -139,14 +168,13 @@ class SatTopology : public Object
     }
 
   private:
+    NodeContainer m_gws;      // List of GW nodes
+    NodeContainer m_uts;      // List of UT nodes
+    NodeContainer m_orbiters; // List of orbiter nodes
 
-    std::vector<Ptr<Node>>          m_gws;                    // List of GW nodes
-    std::vector<Ptr<Node>>          m_uts;                    // List of UT nodes
-    std::vector<Ptr<Node>>          m_orbiters;               // List of orbiter nodes
+    std::map<Ptr<Node>, Ptr<Node>> m_utToGwMap; // Map of GW connected for each UT
 
-    std::map<Ptr<Node>, Ptr<Node>>  m_utToGwMap;              // Map of GW connected for each UT
-
-    bool                            m_enableMapPrint;         // Is map printing enabled or not
+    bool m_enableMapPrint; // Is map printing enabled or not
 };
 
 } // namespace ns3

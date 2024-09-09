@@ -41,6 +41,7 @@
 #include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-orbiter-user-phy.h>
 #include <ns3/satellite-phy.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
@@ -627,7 +628,7 @@ SatStatsRtnFeederQueueBytesHelper::DoInstallProbes()
         SaveAddressAndIdentifier(*it);
     }
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, uint32_t, const Address&> callback =
         MakeCallback(&SatStatsRtnFeederQueueBytesHelper::QueueSizeCallback, this);
 
@@ -700,7 +701,7 @@ SatStatsRtnFeederQueuePacketsHelper::DoInstallProbes()
         SaveAddressAndIdentifier(*it);
     }
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, uint32_t, const Address&> callback =
         MakeCallback(&SatStatsRtnFeederQueuePacketsHelper::QueueSizeCallback, this);
 
@@ -772,7 +773,7 @@ SatStatsFwdUserQueueBytesHelper::DoInstallProbes()
         SaveAddressAndIdentifier(*it);
     }
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, uint32_t, const Address&> callback =
         MakeCallback(&SatStatsFwdUserQueueBytesHelper::QueueSizeCallback, this);
 
@@ -844,7 +845,7 @@ SatStatsFwdUserQueuePacketsHelper::DoInstallProbes()
         SaveAddressAndIdentifier(*it);
     }
 
-    NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetSatNodes();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     Callback<void, uint32_t, const Address&> callback =
         MakeCallback(&SatStatsFwdUserQueuePacketsHelper::QueueSizeCallback, this);
 

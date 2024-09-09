@@ -200,18 +200,6 @@ class SatGwMac : public SatMac
     void SetBeamCallback(SatGwMac::PhyBeamCallback cb);
 
     /**
-     * Callback to get all satellite nodes
-     * \return All satellites of the simulation
-     */
-    typedef Callback<NodeContainer> OrbiterNodesCallback;
-
-    /**
-     * Method to set callback to get all satellite nodes
-     * \param cb callback to invoke to get all satellite nodes
-     */
-    void SetOrbiterNodesCallback(SatGwMac::OrbiterNodesCallback cb);
-
-    /**
      * Callback to set satellite feeder address on LLC
      * \param The new satellite feeder address
      */
@@ -444,11 +432,6 @@ class SatGwMac : public SatMac
      * Callback to change phy-layer beam ID
      */
     SatGwMac::PhyBeamCallback m_beamCallback;
-
-    /**
-     * Callback to get all satellite nodes
-     */
-    SatGwMac::OrbiterNodesCallback m_orbiterNodesCallback;
 
     /**
      * Callback to set satellite address on LLC

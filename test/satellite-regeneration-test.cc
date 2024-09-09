@@ -26,26 +26,27 @@
  * In this module implements the Regeneration Test Cases.
  */
 
-#include "ns3/cbr-application.h"
-#include "ns3/cbr-helper.h"
-#include "ns3/config.h"
-#include "ns3/log.h"
-#include "ns3/packet-sink-helper.h"
-#include "ns3/packet-sink.h"
-#include "ns3/satellite-env-variables.h"
-#include "ns3/satellite-gw-mac.h"
-#include "ns3/satellite-helper.h"
-#include "ns3/satellite-orbiter-feeder-phy.h"
-#include "ns3/satellite-orbiter-net-device.h"
-#include "ns3/satellite-orbiter-user-phy.h"
-#include "ns3/satellite-phy-rx-carrier.h"
-#include "ns3/satellite-phy-tx.h"
-#include "ns3/satellite-ut-mac-state.h"
-#include "ns3/simulation-helper.h"
-#include "ns3/simulator.h"
-#include "ns3/singleton.h"
-#include "ns3/string.h"
-#include "ns3/test.h"
+#include <ns3/cbr-application.h>
+#include <ns3/cbr-helper.h>
+#include <ns3/config.h>
+#include <ns3/log.h>
+#include <ns3/packet-sink-helper.h>
+#include <ns3/packet-sink.h>
+#include <ns3/satellite-env-variables.h>
+#include <ns3/satellite-gw-mac.h>
+#include <ns3/satellite-helper.h>
+#include <ns3/satellite-orbiter-feeder-phy.h>
+#include <ns3/satellite-orbiter-net-device.h>
+#include <ns3/satellite-orbiter-user-phy.h>
+#include <ns3/satellite-phy-rx-carrier.h>
+#include <ns3/satellite-phy-tx.h>
+#include <ns3/satellite-topology.h>
+#include <ns3/satellite-ut-mac-state.h>
+#include <ns3/simulation-helper.h>
+#include <ns3/simulator.h>
+#include <ns3/singleton.h>
+#include <ns3/string.h>
+#include <ns3/test.h>
 
 using namespace ns3;
 
@@ -191,10 +192,13 @@ SatRegenerationTest1::DoRun(void)
     m_stAddress = m_helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
 
     Ptr<SatOrbiterFeederPhy> satOrbiterFeederPhy = DynamicCast<SatOrbiterFeederPhy>(
-        DynamicCast<SatOrbiterNetDevice>(m_helper->SatNodes().Get(0)->GetDevice(0))
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
             ->GetFeederPhy(8));
     Ptr<SatOrbiterUserPhy> satOrbiterUserPhy = DynamicCast<SatOrbiterUserPhy>(
-        DynamicCast<SatOrbiterNetDevice>(m_helper->SatNodes().Get(0)->GetDevice(0))->GetUserPhy(8));
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
+            ->GetUserPhy(8));
 
     satOrbiterFeederPhy->TraceConnectWithoutContext(
         "RxLinkDelay",
@@ -490,10 +494,13 @@ SatRegenerationTest2::DoRun(void)
     gwAppsReturn.Stop(Seconds(60.0));
 
     Ptr<SatOrbiterFeederPhy> satOrbiterFeederPhy = DynamicCast<SatOrbiterFeederPhy>(
-        DynamicCast<SatOrbiterNetDevice>(m_helper->SatNodes().Get(0)->GetDevice(0))
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
             ->GetFeederPhy(8));
     Ptr<SatOrbiterUserPhy> satOrbiterUserPhy = DynamicCast<SatOrbiterUserPhy>(
-        DynamicCast<SatOrbiterNetDevice>(m_helper->SatNodes().Get(0)->GetDevice(0))->GetUserPhy(8));
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
+            ->GetUserPhy(8));
 
     satOrbiterFeederPhy->TraceConnectWithoutContext(
         "PacketTrace",
@@ -815,10 +822,13 @@ SatRegenerationTest3::DoRun(void)
     m_helper = simulationHelper->GetSatelliteHelper();
 
     Ptr<SatOrbiterFeederPhy> satOrbiterFeederPhy = DynamicCast<SatOrbiterFeederPhy>(
-        DynamicCast<SatOrbiterNetDevice>(m_helper->SatNodes().Get(0)->GetDevice(0))
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
             ->GetFeederPhy(1));
     Ptr<SatOrbiterUserPhy> satOrbiterUserPhy = DynamicCast<SatOrbiterUserPhy>(
-        DynamicCast<SatOrbiterNetDevice>(m_helper->SatNodes().Get(0)->GetDevice(0))->GetUserPhy(1));
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
+            ->GetUserPhy(1));
 
     m_gwAddress = m_helper->GwNodes().Get(0)->GetDevice(1)->GetAddress();
 
@@ -1210,7 +1220,7 @@ SatRegenerationTest5::DoRun(void)
 
     Ptr<Node> gwNode = m_helper->GwNodes().Get(0);
     Ptr<Node> utNode = m_helper->UtNodes().Get(0);
-    Ptr<Node> satNode = m_helper->SatNodes().Get(0);
+    Ptr<Node> satNode = Singleton<SatTopology>::Get()->GetOrbiterNode(0);
     Ptr<SatOrbiterFeederPhy> satOrbiterFeederPhy = DynamicCast<SatOrbiterFeederPhy>(
         DynamicCast<SatOrbiterNetDevice>(satNode->GetDevice(0))->GetFeederPhy(8));
     Ptr<SatOrbiterUserPhy> satOrbiterUserPhy = DynamicCast<SatOrbiterUserPhy>(
@@ -1643,7 +1653,7 @@ SatRegenerationTest7::DoRun(void)
 
     Ptr<Node> gwNode = m_helper->GwNodes().Get(0);
     Ptr<Node> utNode = m_helper->UtNodes().Get(0);
-    Ptr<Node> satNode = m_helper->SatNodes().Get(0);
+    Ptr<Node> satNode = Singleton<SatTopology>::Get()->GetOrbiterNode(0);
     Ptr<SatOrbiterFeederPhy> satOrbiterFeederPhy = DynamicCast<SatOrbiterFeederPhy>(
         DynamicCast<SatOrbiterNetDevice>(satNode->GetDevice(0))->GetFeederPhy(8));
     Ptr<SatOrbiterUserPhy> satOrbiterUserPhy = DynamicCast<SatOrbiterUserPhy>(
@@ -1901,13 +1911,21 @@ SatRegenerationTest8::DoRun(void)
     m_helper = simulationHelper->GetSatelliteHelper();
 
     std::map<uint32_t, Ptr<SatPhy>> satOrbiterFeederPhy =
-        DynamicCast<SatOrbiterNetDevice>(m_helper->SatNodes().Get(0)->GetDevice(0))->GetFeederPhy();
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
+            ->GetFeederPhy();
     std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhy =
-        DynamicCast<SatOrbiterNetDevice>(m_helper->SatNodes().Get(0)->GetDevice(0))->GetUserPhy();
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
+            ->GetUserPhy();
     std::map<uint32_t, Ptr<SatMac>> satOrbiterFeederMac =
-        DynamicCast<SatOrbiterNetDevice>(m_helper->SatNodes().Get(0)->GetDevice(0))->GetFeederMac();
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
+            ->GetFeederMac();
     std::map<uint32_t, Ptr<SatMac>> satOrbiterUserMac =
-        DynamicCast<SatOrbiterNetDevice>(m_helper->SatNodes().Get(0)->GetDevice(0))->GetUserMac();
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
+            ->GetUserMac();
 
     Config::ConnectWithoutContext("/NodeList/0/DeviceList/0/UserPhy/*/PacketTrace",
                                   MakeCallback(&SatRegenerationTest8::AddTraceEntry, this));

@@ -25,6 +25,8 @@
 
 #include <ns3/node-container.h>
 #include <ns3/node.h>
+#include <ns3/satellite-topology.h>
+#include <ns3/singleton.h>
 
 NS_LOG_COMPONENT_DEFINE("SatIslArbiterUnicastHelper");
 
@@ -48,10 +50,8 @@ SatIslArbiterUnicastHelper::SatIslArbiterUnicastHelper()
 }
 
 SatIslArbiterUnicastHelper::SatIslArbiterUnicastHelper(
-    NodeContainer satNodes,
     std::vector<std::pair<uint32_t, uint32_t>> isls)
-    : m_satNodes(satNodes),
-      m_isls(isls)
+    : m_isls(isls)
 {
     NS_LOG_FUNCTION(this);
 }
@@ -65,7 +65,7 @@ SatIslArbiterUnicastHelper::InstallArbiters()
 
     for (uint32_t satIndex = 0; satIndex < globalState.size(); satIndex++)
     {
-        Ptr<Node> satelliteNode = m_satNodes.Get(satIndex);
+        Ptr<Node> satelliteNode = Singleton<SatTopology>::Get()->GetOrbiterNode(satIndex);
         Ptr<SatOrbiterNetDevice> satelliteOrbiterNetDevice;
         for (uint32_t ndIndex = 0; ndIndex < satelliteNode->GetNDevices(); ndIndex++)
         {
@@ -125,7 +125,7 @@ SatIslArbiterUnicastHelper::CalculateGlobalState()
     ///////////////////////////
     // Floyd-Warshall
 
-    int64_t n = m_satNodes.GetN();
+    int64_t n = Singleton<SatTopology>::Get()->GetOrbiterNodes().GetN();
 
     // Enforce that more than 40000 nodes is not permitted (sqrt(2^31) ~= 46340, so let's call it an
     // even 40000)

@@ -44,6 +44,7 @@
 #include "ns3/satellite-phy-rx-carrier-conf.h"
 #include "ns3/satellite-phy-rx.h"
 #include "ns3/satellite-phy-tx.h"
+#include "ns3/satellite-topology.h"
 #include "ns3/satellite-typedefs.h"
 #include "ns3/satellite-utils.h"
 #include "ns3/singleton.h"
@@ -250,10 +251,11 @@ SatOrbiterHelper::SetFeederPhyAttribute(std::string n1, const AttributeValue& v1
 }
 
 NetDeviceContainer
-SatOrbiterHelper::Install(NodeContainer c)
+SatOrbiterHelper::InstallAllOrbiters()
 {
     NS_LOG_FUNCTION(this);
 
+    NodeContainer c = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     NetDeviceContainer devs;
 
     for (NodeContainer::Iterator i = c.Begin(); i != c.End(); i++)
@@ -779,8 +781,7 @@ SatOrbiterHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, Callback
 }
 
 void
-SatOrbiterHelper::SetIslRoutes(NodeContainer satNodes,
-                               std::vector<std::pair<uint32_t, uint32_t>> isls)
+SatOrbiterHelper::SetIslRoutes(std::vector<std::pair<uint32_t, uint32_t>> isls)
 {
     NS_LOG_FUNCTION(this);
 
@@ -788,7 +789,7 @@ SatOrbiterHelper::SetIslRoutes(NodeContainer satNodes,
     {
     case SatEnums::UNICAST: {
         Ptr<SatIslArbiterUnicastHelper> satIslArbiterHelper =
-            CreateObject<SatIslArbiterUnicastHelper>(satNodes, isls);
+            CreateObject<SatIslArbiterUnicastHelper>(isls);
         satIslArbiterHelper->InstallArbiters();
         break;
     }
