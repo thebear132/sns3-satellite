@@ -278,12 +278,12 @@ main(int argc, char* argv[])
     /*
     Ptr<SatCnoHelper> satCnoHelper = simulationHelper->GetCnoHelper ();
     satCnoHelper->UseTracesForDefault (false);
-    for (uint32_t i = 0; i < satHelper->GetBeamHelper ()->GetUtNodes ().GetN (); i++)
+    for (uint32_t i = 0; i < Singleton<SatTopology>::Get()->GetUtNodes().GetN (); i++)
       {
-        satCnoHelper->SetUtNodeCnoFile (satHelper->GetBeamHelper ()->GetUtNodes ().Get (i),
+        satCnoHelper->SetUtNodeCnoFile (Singleton<SatTopology>::Get()->GetUtNode(i),
     SatEnums::FORWARD_USER_CH, "path_to_cno_file"); // For input trace file
         // or
-        satCnoHelper->SetGwNodeCno (satHelper->GetBeamHelper ()->GetUtNodes ().Get (i),
+        satCnoHelper->SetGwNodeCno (Singleton<SatTopology>::Get()->GetUtNode(i),
     SatEnums::FORWARD_USER_CH, 1e10); // For constant value
       }
     */

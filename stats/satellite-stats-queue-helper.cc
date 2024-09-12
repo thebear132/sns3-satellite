@@ -587,7 +587,7 @@ SatStatsRtnQueueHelper::DoEnlistSource()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
         const uint32_t identifier = GetIdentifierForUt(*it);

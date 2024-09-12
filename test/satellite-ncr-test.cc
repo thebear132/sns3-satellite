@@ -214,7 +214,8 @@ SatNcrTest1::GetData(Ptr<CbrApplication> sender, Ptr<PacketSink> receiver)
     m_totalReceived.push_back(receiver->GetTotalRx());
     m_states.push_back(
         DynamicCast<SatUtMac>(
-            DynamicCast<SatNetDevice>(m_helper->UtNodes().Get(0)->GetDevice(2))->GetMac())
+            DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetUtNode(0)->GetDevice(2))
+                ->GetMac())
             ->GetRcstState());
 
     Simulator::Schedule(Seconds(1), &SatNcrTest1::GetData, this, sender, receiver);
@@ -420,7 +421,8 @@ SatNcrTest2::GetData(Ptr<CbrApplication> sender, Ptr<PacketSink> receiver)
     m_totalReceived.push_back(receiver->GetTotalRx());
     m_states.push_back(
         DynamicCast<SatUtMac>(
-            DynamicCast<SatNetDevice>(m_helper->UtNodes().Get(0)->GetDevice(2))->GetMac())
+            DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetUtNode(0)->GetDevice(2))
+                ->GetMac())
             ->GetRcstState());
 
     Simulator::Schedule(Seconds(1), &SatNcrTest2::GetData, this, sender, receiver);
@@ -680,7 +682,8 @@ SatNcrTest3::GetData(Ptr<CbrApplication> sender, Ptr<PacketSink> receiver)
     m_totalReceived.push_back(receiver->GetTotalRx());
     m_states.push_back(
         DynamicCast<SatUtMac>(
-            DynamicCast<SatNetDevice>(m_helper->UtNodes().Get(0)->GetDevice(2))->GetMac())
+            DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetUtNode(0)->GetDevice(2))
+                ->GetMac())
             ->GetRcstState());
 
     Simulator::Schedule(Seconds(1), &SatNcrTest3::GetData, this, sender, receiver);

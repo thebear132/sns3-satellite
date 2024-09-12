@@ -29,7 +29,9 @@
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-net-device.h>
 #include <ns3/satellite-request-manager.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/satellite-ut-llc.h>
+#include <ns3/singleton.h>
 #include <ns3/string.h>
 
 NS_LOG_COMPONENT_DEFINE("SatStatsCapacityRequestHelper");
@@ -87,7 +89,7 @@ SatStatsCapacityRequestHelper::DoInstall()
         MakeCallback(&MultiFileAggregator::WriteString, multiFileAggregator);
 
     // Setup probes.
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
         std::ostringstream context;

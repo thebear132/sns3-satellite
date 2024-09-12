@@ -232,7 +232,7 @@ SatStatsPacketErrorHelper::DoInstall()
     {
     case SatEnums::FORWARD_USER_CH: {
         // Connect to trace sources at UT nodes.
-        NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+        NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
         for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
         {
             InstallProbeOnUt(*it);
@@ -243,7 +243,7 @@ SatStatsPacketErrorHelper::DoInstall()
 
     case SatEnums::FORWARD_FEEDER_CH: {
         // Create a map of UT addresses and identifiers.
-        NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+        NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
         for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
         {
             SaveAddressAndIdentifier(*it);
@@ -261,7 +261,7 @@ SatStatsPacketErrorHelper::DoInstall()
 
     case SatEnums::RETURN_FEEDER_CH: {
         // Create a map of UT addresses and identifiers.
-        NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+        NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
         for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
         {
             SaveAddressAndIdentifier(*it);
@@ -279,7 +279,7 @@ SatStatsPacketErrorHelper::DoInstall()
 
     case SatEnums::RETURN_USER_CH: {
         // Create a map of UT addresses and identifiers.
-        NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+        NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
         for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
         {
             SaveAddressAndIdentifier(*it);

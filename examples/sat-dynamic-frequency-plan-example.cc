@@ -145,10 +145,11 @@ main(int argc, char* argv[])
     if (varyingCno)
     {
         std::vector<Ptr<SatUtPhy>> utsPhysicalLayers;
-        NodeContainer utNodes = simulationHelper->GetSatelliteHelper()->UtNodes();
-        for (uint32_t i = 0; i < utNodes.GetN(); ++i)
+        NodeContainer utNodes = Singleton<SatTopology>::Get()->GetUtNodes();
+        Ptr<Node> node;
+        for (NodeContainer::Iterator it = utNodes.Begin(); it != utNodes.End(); it++)
         {
-            Ptr<Node> node = utNodes.Get(i);
+            node = *it;
             for (uint32_t j = 0; j < node->GetNDevices(); ++j)
             {
                 Ptr<SatNetDevice> dev = DynamicCast<SatNetDevice>(node->GetDevice(j));

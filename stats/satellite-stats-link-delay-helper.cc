@@ -692,7 +692,7 @@ SatStatsFwdFeederDevLinkDelayHelper::DoInstallProbes()
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
 
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
@@ -761,7 +761,7 @@ SatStatsFwdUserDevLinkDelayHelper::DoInstallProbes()
         satOrbiterDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
 
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
@@ -919,7 +919,7 @@ SatStatsFwdFeederMacLinkDelayHelper::DoInstallProbes()
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
 
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
@@ -1014,7 +1014,7 @@ SatStatsFwdUserMacLinkDelayHelper::DoInstallProbes()
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
 
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
@@ -1178,7 +1178,7 @@ SatStatsFwdFeederPhyLinkDelayHelper::DoInstallProbes()
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
 
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
@@ -1273,7 +1273,7 @@ SatStatsFwdUserPhyLinkDelayHelper::DoInstallProbes()
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
 
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
@@ -1401,7 +1401,7 @@ SatStatsRtnFeederDevLinkDelayHelper::DoInstallProbes()
         satOrbiterDev->SetAttribute("EnableStatisticsTags", BooleanValue(true));
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
         // Create a map of UT addresses and identifiers.
@@ -1504,7 +1504,7 @@ SatStatsRtnUserDevLinkDelayHelper::DoInstallProbes()
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
         // Create a map of UT addresses and identifiers.
@@ -1595,7 +1595,7 @@ SatStatsRtnFeederMacLinkDelayHelper::DoInstallProbes()
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
         // Create a map of UT addresses and identifiers.
@@ -1723,7 +1723,7 @@ SatStatsRtnUserMacLinkDelayHelper::DoInstallProbes()
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
         // Create a map of UT addresses and identifiers.
@@ -1820,7 +1820,7 @@ SatStatsRtnFeederPhyLinkDelayHelper::DoInstallProbes()
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
         // Create a map of UT addresses and identifiers.
@@ -1948,7 +1948,7 @@ SatStatsRtnUserPhyLinkDelayHelper::DoInstallProbes()
         }
     } // end of `for (it = sats.Begin(); it != sats.End (); ++it)`
 
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
         // Create a map of UT addresses and identifiers.

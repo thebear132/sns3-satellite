@@ -988,24 +988,6 @@ SatBeamHelper::GetOrbiterHelper() const
 }
 
 NodeContainer
-SatBeamHelper::GetUtNodes() const
-{
-    NS_LOG_FUNCTION(this);
-
-    NodeContainer utNodes;
-
-    for (std::multimap<std::pair<uint32_t, uint32_t>, Ptr<Node>>::const_iterator i =
-             m_utNode.begin();
-         i != m_utNode.end();
-         ++i)
-    {
-        utNodes.Add(i->second);
-    }
-
-    return utNodes;
-}
-
-NodeContainer
 SatBeamHelper::GetUtNodes(uint32_t satId, uint32_t beamId) const
 {
     NS_LOG_FUNCTION(this << beamId);

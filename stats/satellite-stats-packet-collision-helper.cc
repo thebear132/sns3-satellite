@@ -298,7 +298,7 @@ SatStatsFeederPacketCollisionHelper::DoInstall()
     }
 
     // Create a map of UT addresses and identifiers.
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
         SaveAddressAndIdentifier(*it);
@@ -513,7 +513,7 @@ SatStatsUserPacketCollisionHelper::DoInstall()
     }
 
     // Create a map of UT addresses and identifiers.
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
         SaveAddressAndIdentifier(*it);

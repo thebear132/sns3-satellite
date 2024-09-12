@@ -765,6 +765,11 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
                 m_mobileUtsByBeam.erase(mobileUts);
             }
 
+            for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
+            {
+                Singleton<SatTopology>::Get()->AddUtNode(*it);
+            }
+
             // install the whole fleet to Internet
             internet.Install(uts);
 
@@ -900,9 +905,11 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
             SetGwAddressInUts();
 
-            for (uint32_t i = 0; i < UtNodes().GetN(); i++)
+            NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
+            Ptr<Node> ut;
+            for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
             {
-                Ptr<Node> ut = UtNodes().Get(i);
+                ut = *it;
 
                 for (uint32_t j = 0; j < ut->GetNDevices(); j++)
                 {
@@ -941,22 +948,19 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
             Ptr<LoraDeviceAddressGenerator> addrGen =
                 CreateObject<LoraDeviceAddressGenerator>(nwkId, nwkAddr);
 
-            Ptr<Node> utNode;
-            for (uint32_t indexUt = 0; indexUt < UtNodes().GetN(); indexUt++)
+            NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
+            Ptr<Node> ut;
+            for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
             {
-                utNode = UtNodes().Get(indexUt);
-                Ptr<SatLorawanNetDevice> dev =
-                    utNode->GetDevice(2)->GetObject<SatLorawanNetDevice>();
+                ut = *it;
+                Ptr<SatLorawanNetDevice> dev = ut->GetDevice(2)->GetObject<SatLorawanNetDevice>();
                 dev->GetMac()->GetObject<LorawanMacEndDeviceClassA>()->SetDeviceAddress(
                     addrGen->NextAddress());
-                ;
             }
 
             Ptr<LoraNetworkServerHelper> loraNetworkServerHelper =
                 CreateObject<LoraNetworkServerHelper>();
             Ptr<LoraForwarderHelper> forHelper = CreateObject<LoraForwarderHelper>();
-
-            loraNetworkServerHelper->SetEndDevices(UtNodes()); // TODO remove this method
 
             NodeContainer networkServer;
             networkServer.Create(1);
@@ -983,9 +987,11 @@ SatHelper::SetGwAddressInUts()
     NS_LOG_FUNCTION(this);
 
     // Loop on each UT
-    for (uint32_t i = 0; i < m_beamHelper->GetUtNodes().GetN(); i++)
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
+    Ptr<Node> ut;
+    for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
     {
-        Ptr<Node> ut = m_beamHelper->GetUtNodes().Get(i);
+        ut = *it;
         Mac48Address gwAddress = GetGwAddressInSingleUt(ut->GetId());
 
         Ptr<SatUtMac> satUtMac;
@@ -1013,11 +1019,12 @@ SatHelper::GetGwAddressInSingleUt(uint32_t utId)
     // Get UT, GW attached to this UT, satellite linked to this GW and beam ID used by the
     // satellite connected to the UT
     Ptr<Node> ut;
-    for (uint32_t i = 0; i < m_beamHelper->GetUtNodes().GetN(); i++)
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
+    for (uint32_t i = 0; i < uts.GetN(); i++)
     {
-        if (m_beamHelper->GetUtNodes().Get(i)->GetId() == utId)
+        if (uts.Get(i)->GetId() == utId)
         {
-            ut = m_beamHelper->GetUtNodes().Get(i);
+            ut = Singleton<SatTopology>::Get()->GetUtNode(i);
             break;
         }
     }
@@ -1681,17 +1688,18 @@ SatHelper::PrintTopology(std::ostream& os) const
     }
 
     os << "UTs" << std::endl;
-    NodeContainer utNodes = m_beamHelper->GetUtNodes();
-    for (uint32_t i = 0; i < utNodes.GetN(); i++)
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
+    Ptr<Node> ut;
+    for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
     {
-        Ptr<Node> node = utNodes.Get(i);
-        os << "  UT: ID = " << utNodes.Get(i)->GetId();
-        os << ", at " << GeoCoordinate(node->GetObject<SatMobilityModel>()->GetPosition())
+        ut = *it;
+        os << "  UT: ID = " << (*it)->GetId();
+        os << ", at " << GeoCoordinate(ut->GetObject<SatMobilityModel>()->GetPosition())
            << std::endl;
         os << "  Devices " << std::endl;
-        for (uint32_t j = 0; j < node->GetNDevices(); j++)
+        for (uint32_t j = 0; j < ut->GetNDevices(); j++)
         {
-            Ptr<SatNetDevice> netDevice = DynamicCast<SatNetDevice>(node->GetDevice(j));
+            Ptr<SatNetDevice> netDevice = DynamicCast<SatNetDevice>(ut->GetDevice(j));
             if (netDevice)
             {
                 Ptr<SatUtMac> mac = DynamicCast<SatUtMac>(netDevice->GetMac());

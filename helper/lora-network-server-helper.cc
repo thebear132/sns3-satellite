@@ -66,12 +66,6 @@ LoraNetworkServerHelper::SetAttribute(std::string name, const AttributeValue& va
     m_factory.Set(name, value);
 }
 
-void
-LoraNetworkServerHelper::SetEndDevices(NodeContainer endDevices)
-{
-    m_endDevices = endDevices;
-}
-
 ApplicationContainer
 LoraNetworkServerHelper::Install(Ptr<Node> node)
 {
@@ -120,7 +114,7 @@ LoraNetworkServerHelper::InstallPriv(Ptr<Node> node)
     }
 
     // Add the end devices
-    app->AddNodes(m_endDevices);
+    app->AddNodes(Singleton<SatTopology>::Get()->GetUtNodes());
 
     // Add components to the NetworkServer
     InstallComponents(app);

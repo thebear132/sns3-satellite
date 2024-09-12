@@ -130,7 +130,7 @@ main(int argc, char* argv[])
     Time startDelay = Seconds(0.0);
 
     NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
-    NodeContainer uts = helper->UtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     NodeContainer gwUsers = helper->GetGwUsers();
     NodeContainer utUsers = helper->GetUtUsers(uts);
 

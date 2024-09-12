@@ -381,7 +381,7 @@ SatStatsHelper::CreateCollectorPerIdentifier(CollectorMap& collectorMap) const
     }
 
     case SatStatsHelper::IDENTIFIER_UT: {
-        NodeContainer uts = m_satHelper->GetBeamHelper()->GetUtNodes();
+        NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
         for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
         {
             const uint32_t utId = GetUtId(*it);

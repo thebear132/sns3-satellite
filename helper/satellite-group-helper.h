@@ -73,9 +73,8 @@ class SatGroupHelper : public Object
 
     /**
      * \brief Initialize the helper. Should be call only by SatHelper internally
-     * \param uts The list of all UTs in the simulation
      */
-    void Init(NodeContainer uts);
+    void Init();
 
     /**
      * \brief Add a node to a group
@@ -181,11 +180,6 @@ class SatGroupHelper : public Object
      * \return The list of nodes not created from position by group helper
      */
     NodeContainer GetNodesNotAddedFromPosition(NodeContainer nodes);
-
-    /**
-     * The list of all the UTs in the simulation
-     */
-    NodeContainer m_uts;
 
     /**
      * Container to associate nodes to the groups

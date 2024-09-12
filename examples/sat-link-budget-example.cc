@@ -130,8 +130,8 @@ main(int argc, char* argv[])
     Config::Connect("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
                     MakeCallback(&LinkBudgetTraceCb));
     // Set UT position
-    NodeContainer ut = helper->UtNodes();
-    Ptr<SatMobilityModel> utMob = ut.Get(0)->GetObject<SatMobilityModel>();
+    Ptr<SatMobilityModel> utMob =
+        Singleton<SatTopology>::Get()->GetUtNode(0)->GetObject<SatMobilityModel>();
 
     // Install CBR traffic model
     Config::SetDefault("ns3::CbrApplication::Interval", StringValue("0.1s"));

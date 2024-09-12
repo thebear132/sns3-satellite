@@ -55,7 +55,9 @@
 #include <ns3/enum.h>
 #include <ns3/log.h>
 #include <ns3/satellite-helper.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/satellite-ut-mac.h>
+#include <ns3/singleton.h>
 #include <ns3/string.h>
 
 NS_LOG_COMPONENT_DEFINE("SatStatsHelperContainer");
@@ -70,7 +72,7 @@ SatStatsHelperContainer::SatStatsHelperContainer(Ptr<SatHelper> satHelper)
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer uts = m_satHelper->UtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
     {
         Ptr<Node> ut = *it;

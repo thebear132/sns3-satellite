@@ -189,6 +189,8 @@ SatUserHelper::InstallUt(Ptr<Node> ut, uint32_t userCount)
         NS_FATAL_ERROR("User count is zero!!!");
     }
 
+    std::cout << "SatUserHelper::InstallUt " << ut << " " << userCount << std::endl;
+
     InternetStackHelper internet;
 
     NodeContainer users;

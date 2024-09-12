@@ -127,7 +127,7 @@ SatCnoHelper::SetGwNodeCno(uint32_t nodeId, SatEnums::ChannelType_t channel, dou
 void
 SatCnoHelper::SetUtNodeCno(uint32_t nodeId, SatEnums::ChannelType_t channel, double cno)
 {
-    SetUtNodeCno(m_satHelper->GetBeamHelper()->GetUtNodes().Get(nodeId), channel, cno);
+    SetUtNodeCno(Singleton<SatTopology>::Get()->GetUtNode(nodeId), channel, cno);
 }
 
 void
@@ -201,7 +201,7 @@ SatCnoHelper::SetGwNodeCnoFile(uint32_t nodeId, SatEnums::ChannelType_t channel,
 void
 SatCnoHelper::SetUtNodeCnoFile(uint32_t nodeId, SatEnums::ChannelType_t channel, std::string path)
 {
-    SetUtNodeCnoFile(m_satHelper->GetBeamHelper()->GetUtNodes().Get(nodeId), channel, path);
+    SetUtNodeCnoFile(Singleton<SatTopology>::Get()->GetUtNode(nodeId), channel, path);
 }
 
 void
@@ -210,14 +210,16 @@ SatCnoHelper::ApplyConfiguration()
     Singleton<SatRxCnoInputTraceContainer>::Get()->Reset();
 
     std::pair<Address, SatEnums::ChannelType_t> key;
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     // set default value for all nodes
     if (!m_useTraces)
     {
         // use power calculation from satellite-channel
         Ptr<Node> gwNode;
-        for (uint32_t i = 0; i < Singleton<SatTopology>::Get()->GetGwNodes().GetN(); i++)
+        for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); it++)
         {
-            gwNode = Singleton<SatTopology>::Get()->GetGwNode(i);
+            gwNode = *it;
             key = std::make_pair(Singleton<SatIdMapper>::Get()->GetGwMacWithNode(gwNode),
                                  SatEnums::FORWARD_FEEDER_CH);
             Singleton<SatRxCnoInputTraceContainer>::Get()->SetRxCno(key, 0);
@@ -226,9 +228,9 @@ SatCnoHelper::ApplyConfiguration()
             Singleton<SatRxCnoInputTraceContainer>::Get()->SetRxCno(key, 0);
         }
         Ptr<Node> utNode;
-        for (uint32_t i = 0; i < m_satHelper->GetBeamHelper()->GetUtNodes().GetN(); i++)
+        for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
         {
-            utNode = m_satHelper->GetBeamHelper()->GetUtNodes().Get(i);
+            utNode = *it;
             key = std::make_pair(Singleton<SatIdMapper>::Get()->GetUtMacWithNode(utNode),
                                  SatEnums::FORWARD_USER_CH);
             Singleton<SatRxCnoInputTraceContainer>::Get()->SetRxCno(key, 0);
@@ -241,9 +243,9 @@ SatCnoHelper::ApplyConfiguration()
     {
         // use input files from data/rxcnotraces/input folder
         Ptr<Node> gwNode;
-        for (uint32_t i = 0; i < Singleton<SatTopology>::Get()->GetGwNodes().GetN(); i++)
+        for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); it++)
         {
-            gwNode = Singleton<SatTopology>::Get()->GetGwNode(i);
+            gwNode = *it;
             key = std::make_pair(Singleton<SatIdMapper>::Get()->GetGwMacWithNode(gwNode),
                                  SatEnums::FORWARD_FEEDER_CH);
             Singleton<SatRxCnoInputTraceContainer>::Get()->AddNode(key);
@@ -252,9 +254,9 @@ SatCnoHelper::ApplyConfiguration()
             Singleton<SatRxCnoInputTraceContainer>::Get()->AddNode(key);
         }
         Ptr<Node> utNode;
-        for (uint32_t i = 0; i < m_satHelper->GetBeamHelper()->GetUtNodes().GetN(); i++)
+        for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
         {
-            utNode = m_satHelper->GetBeamHelper()->GetUtNodes().Get(i);
+            utNode = *it;
             key = std::make_pair(Singleton<SatIdMapper>::Get()->GetUtMacWithNode(utNode),
                                  SatEnums::FORWARD_USER_CH);
             Singleton<SatRxCnoInputTraceContainer>::Get()->AddNode(key);

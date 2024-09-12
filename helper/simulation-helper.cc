@@ -1542,7 +1542,7 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
 
     NS_LOG_INFO(ss.str());
 
-    m_groupHelper->Init(m_satHelper->UtNodes());
+    m_groupHelper->Init();
 
     return m_satHelper;
 }
@@ -1786,18 +1786,18 @@ SimulationHelper::InstallLoraTrafficModel(LoraTrafficModel_t trafficModel,
 {
     NS_LOG_FUNCTION(this << trafficModel << interval << packetSize << startTime << stopTime);
 
-    NodeContainer nodes = GetSatelliteHelper()->UtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     NodeContainer utUsers = m_satHelper->GetUtUsers();
     Ptr<Node> node;
 
-    std::cout << "Installing Lora traffic model on " << nodes.GetN() << " UTs" << std::endl;
+    std::cout << "Installing Lora traffic model on " << uts.GetN() << " UTs" << std::endl;
 
     switch (trafficModel)
     {
     case SimulationHelper::PERIODIC: {
-        for (uint32_t i = 0; i < nodes.GetN(); i++)
+        for (uint32_t i = 0; i < uts.GetN(); i++)
         {
-            node = nodes.Get(i);
+            node = uts.Get(i);
             Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
 
             app->SetInterval(interval);

@@ -129,6 +129,27 @@ class SatTopology : public Object
     NodeContainer GetOrbiterNodes() const;
 
     /**
+     * Get the number of GW nodes
+     *
+     * \return The number of GW nodes
+     */
+    uint32_t GetNGwNodes() const;
+
+    /**
+     * Get the number of UT nodes
+     *
+     * \return The number of UT nodes
+     */
+    uint32_t GetNUtNodes() const;
+
+    /**
+     * Get the number of orbiter nodes
+     *
+     * \return The number of orbiter nodes
+     */
+    uint32_t GetNOrbiterNodes() const;
+
+    /**
      * Get the wanted GW node
      *
      * \param nodeId ID of the node needed (index in vector)

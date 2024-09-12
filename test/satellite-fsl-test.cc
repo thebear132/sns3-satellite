@@ -88,7 +88,7 @@ SatFreeSpaceLossTestCase::DoRun(void)
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     NodeContainer gw = Singleton<SatTopology>::Get()->GetGwNodes();
-    NodeContainer ut = helper->UtNodes();
+    NodeContainer ut = Singleton<SatTopology>::Get()->GetUtNodes();
     Ptr<Node> sat = Singleton<SatTopology>::Get()->GetOrbiterNode(0);
 
     // get mobilities

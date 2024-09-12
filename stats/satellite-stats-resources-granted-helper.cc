@@ -34,9 +34,11 @@
 #include <ns3/probe.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-net-device.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/satellite-ut-mac.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/simulator.h>
+#include <ns3/singleton.h>
 #include <ns3/string.h>
 #include <ns3/unit-conversion-collector.h>
 
@@ -102,7 +104,7 @@ SatStatsResourcesGrantedHelper::DoInstall()
                                                  &MultiFileAggregator::Write1d);
 
         // Setup a probe in each UT MAC.
-        NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+        NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
         for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
         {
             InstallProbe(*it, &ScalarCollector::TraceSinkUinteger32);
@@ -129,7 +131,7 @@ SatStatsResourcesGrantedHelper::DoInstall()
                                                  &MultiFileAggregator::Write2d);
 
         // Setup a probe in each UT MAC.
-        NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+        NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
         for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
         {
             InstallProbe(*it, &UnitConversionCollector::TraceSinkUinteger32);
@@ -173,7 +175,7 @@ SatStatsResourcesGrantedHelper::DoInstall()
                                                  &MultiFileAggregator::EnableContextWarning);
 
         // Setup a probe in each UT MAC.
-        NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+        NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
         for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
         {
             InstallProbe(*it, &DistributionCollector::TraceSinkUinteger32);
@@ -219,7 +221,7 @@ SatStatsResourcesGrantedHelper::DoInstall()
                                                  &MagisterGnuplotAggregator::Write2d);
 
         // Setup a probe in each UT MAC.
-        NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+        NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
         for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
         {
             InstallProbe(*it, &UnitConversionCollector::TraceSinkUinteger32);
@@ -270,7 +272,7 @@ SatStatsResourcesGrantedHelper::DoInstall()
                                                  &MagisterGnuplotAggregator::Write2d);
 
         // Setup a probe in each UT MAC.
-        NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+        NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
         for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
         {
             InstallProbe(*it, &DistributionCollector::TraceSinkUinteger32);

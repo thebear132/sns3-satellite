@@ -33,6 +33,7 @@
 #include <ns3/probe.h>
 #include <ns3/satellite-handover-module.h>
 #include <ns3/satellite-helper.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
@@ -460,7 +461,7 @@ SatStatsAntennaGainHelper::InstallProbes()
     Callback<void, std::string, double> callback =
         MakeCallback(&SatStatsAntennaGainHelper::AntennaGainCallback, this);
 
-    NodeContainer utUsers = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtNodes();
     for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End(); ++it)
     {
         Ptr<SatHandoverModule> hoModule = (*it)->GetObject<SatHandoverModule>();

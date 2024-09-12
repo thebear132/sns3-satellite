@@ -171,6 +171,30 @@ SatTopology::GetOrbiterNodes() const
     return m_orbiters;
 }
 
+uint32_t
+SatTopology::GetNGwNodes() const
+{
+    NS_LOG_FUNCTION(this);
+
+    return m_gws.GetN();
+}
+
+uint32_t
+SatTopology::GetNUtNodes() const
+{
+    NS_LOG_FUNCTION(this);
+
+    return m_uts.GetN();
+}
+
+uint32_t
+SatTopology::GetNOrbiterNodes() const
+{
+    NS_LOG_FUNCTION(this);
+
+    return m_orbiters.GetN();
+}
+
 Ptr<Node>
 SatTopology::GetGwNode(uint32_t nodeId) const
 {

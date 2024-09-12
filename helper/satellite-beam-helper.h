@@ -278,11 +278,6 @@ class SatBeamHelper : public Object
     uint32_t GetGwId(uint32_t satId, uint32_t beamId) const;
 
     /**
-     * \return container having all UT nodes in satellite network.
-     */
-    NodeContainer GetUtNodes() const;
-
-    /**
      * \param satId satellite ID
      * \param beamId beam ID
      * \return container having all UT nodes of a specific beam.

@@ -169,7 +169,7 @@ SatLoraFirstWindowTestCase::DoRun(void)
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
-    Ptr<Node> utNode = helper->UtNodes().Get(0);
+    Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(0);
     Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
 
     app->SetInterval(Seconds(10));
@@ -182,7 +182,7 @@ SatLoraFirstWindowTestCase::DoRun(void)
     utNode->AddApplication(app);
 
     m_gwAddress = Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1)->GetAddress();
-    m_edAddress = helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
+    m_edAddress = Singleton<SatTopology>::Get()->GetUtNode(0)->GetDevice(2)->GetAddress();
 
     Config::Connect("/NodeList/*/DeviceList/*/SatMac/Rx",
                     MakeCallback(&SatLoraFirstWindowTestCase::MacTraceCb, this));
@@ -325,7 +325,7 @@ SatLoraSecondWindowTestCase::DoRun(void)
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
-    Ptr<Node> utNode = helper->UtNodes().Get(0);
+    Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(0);
     Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
 
     app->SetInterval(Seconds(10));
@@ -338,7 +338,7 @@ SatLoraSecondWindowTestCase::DoRun(void)
     utNode->AddApplication(app);
 
     m_gwAddress = Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1)->GetAddress();
-    m_edAddress = helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
+    m_edAddress = Singleton<SatTopology>::Get()->GetUtNode(0)->GetDevice(2)->GetAddress();
 
     Config::Connect("/NodeList/*/DeviceList/*/SatMac/Rx",
                     MakeCallback(&SatLoraSecondWindowTestCase::MacTraceCb, this));
@@ -500,7 +500,7 @@ SatLoraOutOfWindowWindowTestCase::DoRun(void)
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
-    Ptr<Node> utNode = helper->UtNodes().Get(0);
+    Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(0);
     Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
 
     app->SetInterval(Seconds(10));
@@ -513,7 +513,7 @@ SatLoraOutOfWindowWindowTestCase::DoRun(void)
     utNode->AddApplication(app);
 
     m_gwAddress = Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1)->GetAddress();
-    m_edAddress = helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
+    m_edAddress = utNode->GetDevice(2)->GetAddress();
 
     Config::Connect("/NodeList/*/DeviceList/*/SatMac/Rx",
                     MakeCallback(&SatLoraOutOfWindowWindowTestCase::MacTraceCb, this));
@@ -660,7 +660,7 @@ SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun(void)
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
-    Ptr<Node> utNode = helper->UtNodes().Get(0);
+    Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(0);
     Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
 
     app->SetInterval(Seconds(10));
@@ -673,7 +673,7 @@ SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun(void)
     utNode->AddApplication(app);
 
     m_gwAddress = Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1)->GetAddress();
-    m_edAddress = helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
+    m_edAddress = utNode->GetDevice(2)->GetAddress();
 
     Config::Connect(
         "/NodeList/*/DeviceList/*/SatMac/Rx",
@@ -829,7 +829,7 @@ SatLoraCbrTestCase::DoRun(void)
     sinkContainer.Stop(Seconds(20));
 
     m_gwAddress = Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1)->GetAddress();
-    m_edAddress = helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
+    m_edAddress = Singleton<SatTopology>::Get()->GetUtNode(0)->GetDevice(2)->GetAddress();
 
     Ptr<PacketSink> receiver = DynamicCast<PacketSink>(sinkContainer.Get(0));
 
