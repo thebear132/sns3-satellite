@@ -219,4 +219,93 @@ SatTopology::GetOrbiterNode(uint32_t nodeId) const
     return m_orbiters.Get(nodeId);
 }
 
+void
+SatTopology::AddGwLayers(Ptr<Node> gw, uint32_t satId, uint32_t beamId, Ptr<SatNetDevice> netDevice, Ptr<SatGwLlc> llc, Ptr<SatGwMac> mac, Ptr<SatGwPhy> phy)
+{
+    NS_LOG_FUNCTION(this << gw << satId << beamId << netDevice << llc << mac << phy);
+
+    NS_ASSERT_MSG(m_gwLayers.find(gw) == m_gwLayers.end(), "Layers already added to this GW node");
+
+    GwLayers_s layers;
+    layers.m_satId = satId;
+    layers.m_beamId = beamId;
+    layers.m_netDevice = netDevice;
+    layers.m_llc = llc;
+    layers.m_mac = mac;
+    layers.m_phy = phy;
+
+    m_gwLayers.insert(std::make_pair(gw, layers));
+}
+
+void
+SatTopology::UpdateGwSatAndBeam(Ptr<Node> gw, uint32_t satId, uint32_t beamId)
+{
+    NS_LOG_FUNCTION(this << gw << satId << beamId);
+
+    NS_ASSERT_MSG(m_gwLayers.find(gw) != m_gwLayers.end(), "Layers do not exist for this GW");
+
+    m_gwLayers[gw].m_satId = satId;
+    m_gwLayers[gw].m_beamId = beamId;
+}
+
+uint32_t
+SatTopology::GetGwSatId(Ptr<Node> gw) const
+{
+    NS_LOG_FUNCTION(this << gw);
+
+    NS_ASSERT_MSG(m_gwLayers.find(gw) != m_gwLayers.end(), "Layers do not exist for this GW");
+
+    return m_gwLayers.at(gw).m_satId;
+}
+
+uint32_t
+SatTopology::GetGwBeamId(Ptr<Node> gw) const
+{
+    NS_LOG_FUNCTION(this << gw);
+
+    NS_ASSERT_MSG(m_gwLayers.find(gw) != m_gwLayers.end(), "Layers do not exist for this GW");
+
+    return m_gwLayers.at(gw).m_beamId;
+}
+
+Ptr<SatNetDevice>
+SatTopology::GetGwNetDevice(Ptr<Node> gw) const
+{
+    NS_LOG_FUNCTION(this << gw);
+
+    NS_ASSERT_MSG(m_gwLayers.find(gw) != m_gwLayers.end(), "Layers do not exist for this GW");
+
+    return m_gwLayers.at(gw).m_netDevice;
+}
+
+Ptr<SatGwLlc>
+SatTopology::GetGwLlc(Ptr<Node> gw) const
+{
+    NS_LOG_FUNCTION(this << gw);
+
+    NS_ASSERT_MSG(m_gwLayers.find(gw) != m_gwLayers.end(), "Layers do not exist for this GW");
+
+    return m_gwLayers.at(gw).m_llc;
+}
+
+Ptr<SatGwMac>
+SatTopology::GetGwMac(Ptr<Node> gw) const
+{
+    NS_LOG_FUNCTION(this << gw);
+
+    NS_ASSERT_MSG(m_gwLayers.find(gw) != m_gwLayers.end(), "Layers do not exist for this GW");
+
+    return m_gwLayers.at(gw).m_mac;
+}
+
+Ptr<SatGwPhy>
+SatTopology::GetGwPhy(Ptr<Node> gw) const
+{
+    NS_LOG_FUNCTION(this << gw);
+
+    NS_ASSERT_MSG(m_gwLayers.find(gw) != m_gwLayers.end(), "Layers do not exist for this GW");
+
+    return m_gwLayers.at(gw).m_phy;
+}
+
 } // namespace ns3

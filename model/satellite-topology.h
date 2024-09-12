@@ -24,6 +24,15 @@
 #include <ns3/node.h>
 #include <ns3/object.h>
 
+#include <ns3/satellite-gw-phy.h>
+#include <ns3/satellite-ut-phy.h>
+#include <ns3/satellite-gw-mac.h>
+#include <ns3/satellite-ut-mac.h>
+#include <ns3/satellite-gw-llc.h>
+#include <ns3/satellite-ut-llc.h>
+#include <ns3/satellite-net-device.h>
+#include <ns3/satellite-orbiter-net-device.h>
+
 namespace ns3
 {
 
@@ -36,6 +45,35 @@ namespace ns3
 class SatTopology : public Object
 {
   public:
+    typedef struct
+    {
+        uint32_t                                                  m_satId;
+        uint32_t                                                  m_beamId;
+        Ptr<SatNetDevice>                                         m_netDevice;
+        Ptr<SatGwLlc>                                             m_llc;
+        Ptr<SatGwMac>                                             m_mac;
+        Ptr<SatGwPhy>                                             m_phy;
+    } GwLayers_s;
+
+    typedef struct
+    {
+        uint32_t                                                  m_satId;
+        uint32_t                                                  m_beamId;
+        Ptr<SatNetDevice>                                         m_netDevice;
+        Ptr<SatUtLlc>                                             m_llc;
+        Ptr<SatUtMac>                                             m_mac;
+        Ptr<SatUtPhy>                                             m_phy;
+    } UtLayers_s;
+
+    typedef struct
+    {
+        Ptr<SatOrbiterNetDevice>                                  m_netDevice;
+        std::map<std::pair<uint32_t, uint32_t>, Ptr<SatUtMac>>    m_feederMac;
+        std::map<std::pair<uint32_t, uint32_t>, Ptr<SatUtMac>>    m_userMac;
+        std::map<std::pair<uint32_t, uint32_t>, Ptr<SatUtPhy>>    m_feederPhy;
+        std::map<std::pair<uint32_t, uint32_t>, Ptr<SatUtPhy>>    m_userPhy;
+    } OrbiterLayers_s;
+
     /**
      * \brief Constructor
      */
@@ -177,6 +215,82 @@ class SatTopology : public Object
     Ptr<Node> GetOrbiterNode(uint32_t nodeId) const;
 
     /**
+     * Add GW layers for given node, associated to chosen satellite and beam
+     *
+     * \param gw GW node to consider
+     * \param satId ID of satellite linked to this stack
+     * \param beamId ID of beam linked to this stack
+     * \param netDevice SatNetDevice of this node
+     * \param llc LLC layer of this node
+     * \param mac MAC layer of this node
+     * \param phy PHY layer of this node
+     */
+    void AddGwLayers(Ptr<Node> gw, uint32_t satId, uint32_t beamId, Ptr<SatNetDevice> netDevice, Ptr<SatGwLlc> llc, Ptr<SatGwMac> mac, Ptr<SatGwPhy> phy);
+
+    /**
+     * Update satellite and beam associated to a GW
+     *
+     * \param gw GW node to consider
+     * \param satId ID of satellite linked to this stack
+     * \param beamId ID of beam linked to this stack
+     */
+    void UpdateGwSatAndBeam(Ptr<Node> gw, uint32_t satId, uint32_t beamId);
+
+    /**
+     * Get ID of satellite linked to a GW
+     *
+     * \param gw GW node to consider
+     *
+     * \return ID of satellite linked to this node
+     */
+    uint32_t GetGwSatId(Ptr<Node> gw) const;
+
+    /**
+     * Get ID of beam linked to a GW
+     *
+     * \param gw GW node to consider
+     *
+     * \return ID of beam linked to this node
+     */
+    uint32_t GetGwBeamId(Ptr<Node> gw) const;
+
+    /**
+     * Get SatNetDevice instance of a GW
+     *
+     * \param gw GW node to consider
+     *
+     * \return SatNetDevice instance of a GW
+     */
+    Ptr<SatNetDevice> GetGwNetDevice(Ptr<Node> gw) const;
+
+    /**
+     * Get SatGwLlc instance of a GW
+     *
+     * \param gw GW node to consider
+     *
+     * \return SatGwLlc instance of a GW
+     */
+    Ptr<SatGwLlc> GetGwLlc(Ptr<Node> gw) const;
+
+    /**
+     * Get SatGwMac instance of a GW
+     *
+     * \param gw GW node to consider
+     *
+     * \return SatGwMac instance of a GW
+     */
+    Ptr<SatGwMac> GetGwMac(Ptr<Node> gw) const;
+
+    /**
+     * Get SatGwPhy instance of a GW
+     *
+     * \param gw GW node to consider
+     *
+     * \return SatGwPhy instance of a GW
+     */
+    Ptr<SatGwPhy> GetGwPhy(Ptr<Node> gw) const;
+
+    /**
      * \brief Function for printing out the topology
      */
     void PrintTopology() const;
@@ -190,12 +304,16 @@ class SatTopology : public Object
     }
 
   private:
-    std::map<uint32_t, Ptr<Node>> m_gwIds; // List of GW nodes
-    NodeContainer m_gws;                   // List of GW nodes
-    NodeContainer m_uts;                   // List of UT nodes
-    NodeContainer m_orbiters;              // List of orbiter nodes
+    std::map<uint32_t, Ptr<Node>>           m_gwIds;            // List of GW nodes
+    NodeContainer                           m_gws;              // List of GW nodes
+    NodeContainer                           m_uts;              // List of UT nodes
+    NodeContainer                           m_orbiters;         // List of orbiter nodes
 
-    std::map<Ptr<Node>, Ptr<Node>> m_utToGwMap; // Map of GW connected for each UT
+    std::map<Ptr<Node>, GwLayers_s>         m_gwLayers;         // Map giving protocol layers for all GWs
+    std::map<Ptr<Node>, UtLayers_s>         m_utLayers;         // Map giving protocol layers for all UTs
+    std::map<Ptr<Node>, OrbiterLayers_s>    m_orbiterLayers;    // Map giving protocol layers for all orbiters
+
+    std::map<Ptr<Node>, Ptr<Node>>          m_utToGwMap;        // Map of GW connected for each UT
 
     bool m_enableMapPrint; // Is map printing enabled or not
 };
