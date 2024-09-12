@@ -193,7 +193,7 @@ main(int argc, char* argv[])
     /*
     Ptr<SatCnoHelper> satCnoHelper = simulationHelper->GetCnoHelper ();
     satCnoHelper->UseTracesForDefault (false);
-    for (uint32_t i = 0; i < Singleton<SatTopology>::Get()->GetUtNodes().GetN (); i++)
+    for (uint32_t i = 0; i < Singleton<SatTopology>::Get()->GetNUtNodes(); i++)
       {
         satCnoHelper->SetUtNodeCnoFile (Singleton<SatTopology>::Get()->GetUtNode(i),
     SatEnums::FORWARD_USER_CH, "path_to_cno_file"); // For input trace file

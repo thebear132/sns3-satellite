@@ -301,7 +301,7 @@ main(int argc, char* argv[])
     NS_LOG_INFO("  Packet size in bytes: " << packetSize);
     NS_LOG_INFO("  Packet sending interval: " << interval.GetSeconds());
     NS_LOG_INFO("  Simulation length: " << simLength.GetSeconds());
-    NS_LOG_INFO("  Number total of UTs: " << Singleton<SatTopology>::Get()->GetUtNodes().GetN());
+    NS_LOG_INFO("  Number total of UTs: " << Singleton<SatTopology>::Get()->GetNUtNodes());
     NS_LOG_INFO("  Number of end users per UT: " << endUsersPerUt);
     NS_LOG_INFO("  Number of groups: " << groupHelper->GetN());
     NS_LOG_INFO("  Nodes in default group: " << groupHelper->GetUtNodes(0).GetN());

@@ -125,7 +125,7 @@ SatIslArbiterUnicastHelper::CalculateGlobalState()
     ///////////////////////////
     // Floyd-Warshall
 
-    int64_t n = Singleton<SatTopology>::Get()->GetOrbiterNodes().GetN();
+    int64_t n = Singleton<SatTopology>::Get()->GetNOrbiterNodes();
 
     // Enforce that more than 40000 nodes is not permitted (sqrt(2^31) ~= 46340, so let's call it an
     // even 40000)

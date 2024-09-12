@@ -1351,8 +1351,7 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
         switch (scenario)
         {
         case SatHelper::NONE: {
-            for (uint32_t satId = 0;
-                 satId < Singleton<SatTopology>::Get()->GetOrbiterNodes().GetN();
+            for (uint32_t satId = 0; satId < Singleton<SatTopology>::Get()->GetNOrbiterNodes();
                  satId++)
             {
                 // Set beamInfo to indicate enabled beams
@@ -1368,8 +1367,7 @@ SimulationHelper::CreateSatScenario(SatHelper::PreDefinedScenario_t scenario,
             break;
         }
         case SatHelper::FULL: {
-            for (uint32_t satId = 0;
-                 satId < Singleton<SatTopology>::Get()->GetOrbiterNodes().GetN();
+            for (uint32_t satId = 0; satId < Singleton<SatTopology>::Get()->GetNOrbiterNodes();
                  satId++)
             {
                 // Set beamInfo to indicate enabled beams

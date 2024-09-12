@@ -1228,7 +1228,7 @@ SatBeamHelper::GetClosestSat(GeoCoordinate position)
     double distanceMin = std::numeric_limits<double>::max();
     uint32_t indexDistanceMin = 0;
 
-    for (uint32_t i = 0; i < Singleton<SatTopology>::Get()->GetOrbiterNodes().GetN(); i++)
+    for (uint32_t i = 0; i < Singleton<SatTopology>::Get()->GetNOrbiterNodes(); i++)
     {
         GeoCoordinate satPos = Singleton<SatTopology>::Get()
                                    ->GetOrbiterNode(i)

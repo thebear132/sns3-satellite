@@ -98,7 +98,7 @@ main(int argc, char* argv[])
         satMobility =
             Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetObject<SatMobilityModel>();
 
-        uint32_t satNb = Singleton<SatTopology>::Get()->GetOrbiterNodes().GetN();
+        uint32_t satNb = Singleton<SatTopology>::Get()->GetNOrbiterNodes();
         for (uint32_t i = 0; i < satNb; i++)
         {
             Ptr<Node> node = satHelper->LoadMobileUtFromFile(mobileUtTraceFile);
