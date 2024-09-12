@@ -27,6 +27,7 @@
 #include "ns3/lora-adr-component.h"
 #include "ns3/lora-network-controller-components.h"
 #include "ns3/satellite-lorawan-net-device.h"
+#include "ns3/satellite-topology.h"
 #include "ns3/simulator.h"
 #include "ns3/string.h"
 #include "ns3/trace-source-accessor.h"
@@ -66,12 +67,6 @@ LoraNetworkServerHelper::SetAttribute(std::string name, const AttributeValue& va
 }
 
 void
-LoraNetworkServerHelper::SetGateways(NodeContainer gateways)
-{
-    m_gateways = gateways;
-}
-
-void
 LoraNetworkServerHelper::SetEndDevices(NodeContainer endDevices)
 {
     m_endDevices = endDevices;
@@ -106,7 +101,8 @@ LoraNetworkServerHelper::InstallPriv(Ptr<Node> node)
     node->AddApplication(app);
 
     // Cycle on each gateway
-    for (NodeContainer::Iterator it = m_gateways.Begin(); it != m_gateways.End(); it++)
+    NodeContainer gwNodes = Singleton<SatTopology>::Get()->GetGwNodes();
+    for (NodeContainer::Iterator it = gwNodes.Begin(); it != gwNodes.End(); it++)
     {
         // Add the connections with the gateway
         // Create a PointToPoint link between gateway and NS

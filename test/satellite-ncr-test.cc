@@ -35,6 +35,7 @@
 #include "ns3/satellite-env-variables.h"
 #include "ns3/satellite-gw-mac.h"
 #include "ns3/satellite-helper.h"
+#include "ns3/satellite-topology.h"
 #include "ns3/satellite-ut-mac-state.h"
 #include "ns3/satellite-ut-mac.h"
 #include "ns3/simulator.h"
@@ -431,13 +432,15 @@ SatNcrTest2::ChangeTxStatus(bool enable)
     if (enable)
     {
         DynamicCast<SatGwMac>(
-            DynamicCast<SatNetDevice>(m_helper->GwNodes().Get(0)->GetDevice(1))->GetMac())
+            DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1))
+                ->GetMac())
             ->SetAttribute("NcrBroadcastPeriod", TimeValue(MilliSeconds(100)));
     }
     else
     {
         DynamicCast<SatGwMac>(
-            DynamicCast<SatNetDevice>(m_helper->GwNodes().Get(0)->GetDevice(1))->GetMac())
+            DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1))
+                ->GetMac())
             ->SetAttribute("NcrBroadcastPeriod", TimeValue(Seconds(9)));
     }
 }
@@ -689,13 +692,15 @@ SatNcrTest3::ChangeTxStatus(bool enable)
     if (enable)
     {
         DynamicCast<SatGwMac>(
-            DynamicCast<SatNetDevice>(m_helper->GwNodes().Get(0)->GetDevice(1))->GetMac())
+            DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1))
+                ->GetMac())
             ->SetAttribute("NcrBroadcastPeriod", TimeValue(MilliSeconds(100)));
     }
     else
     {
         DynamicCast<SatGwMac>(
-            DynamicCast<SatNetDevice>(m_helper->GwNodes().Get(0)->GetDevice(1))->GetMac())
+            DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1))
+                ->GetMac())
             ->SetAttribute("NcrBroadcastPeriod", TimeValue(Seconds(30)));
     }
 }

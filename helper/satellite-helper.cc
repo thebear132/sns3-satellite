@@ -891,7 +891,7 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
             SetBeamRoutingConstellations();
         }
 
-        m_userHelper->InstallGw(m_beamHelper->GetGwNodes(), gwUsers);
+        m_userHelper->InstallGw(gwUsers);
 
         if (m_satConstellationEnabled)
         {
@@ -916,9 +916,9 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
                 }
             }
 
-            for (uint32_t i = 0; i < GwNodes().GetN(); i++)
+            for (NodeContainer::Iterator it = gwNodes.Begin(); it != gwNodes.End(); it++)
             {
-                Ptr<Node> gw = GwNodes().Get(i);
+                Ptr<Node> gw = *it;
 
                 for (uint32_t j = 0; j < gw->GetNDevices(); j++)
                 {
@@ -956,15 +956,14 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
                 CreateObject<LoraNetworkServerHelper>();
             Ptr<LoraForwarderHelper> forHelper = CreateObject<LoraForwarderHelper>();
 
-            loraNetworkServerHelper->SetGateways(GwNodes());
-            loraNetworkServerHelper->SetEndDevices(UtNodes());
+            loraNetworkServerHelper->SetEndDevices(UtNodes()); // TODO remove this method
 
             NodeContainer networkServer;
             networkServer.Create(1);
 
             loraNetworkServerHelper->Install(networkServer);
 
-            forHelper->Install(GwNodes());
+            forHelper->Install(Singleton<SatTopology>::Get()->GetGwNodes());
         }
 
         if (m_packetTraces)
@@ -1089,9 +1088,10 @@ SatHelper::SetBeamRoutingConstellations()
 {
     NS_LOG_FUNCTION(this);
 
-    for (uint32_t gwId = 0; gwId < GwNodes().GetN(); gwId++)
+    NodeContainer gwNodes = Singleton<SatTopology>::Get()->GetGwNodes();
+    for (NodeContainer::Iterator it = gwNodes.Begin(); it != gwNodes.End(); it++)
     {
-        Ptr<Node> gw = GwNodes().Get(gwId);
+        Ptr<Node> gw = *it;
         for (uint32_t ndId = 0; ndId < gw->GetNDevices(); ndId++)
         {
             if (DynamicCast<SatNetDevice>(gw->GetDevice(ndId)))
@@ -1238,9 +1238,9 @@ SatHelper::SetGwMobility(NodeContainer gwNodes)
     mobility.SetMobilityModel("ns3::SatConstantPositionMobilityModel");
     mobility.Install(gwNodes);
 
-    for (uint32_t i = 0; i < gwNodes.GetN(); ++i)
+    for (NodeContainer::Iterator it = gwNodes.Begin(); it != gwNodes.End(); it++)
     {
-        Ptr<Node> gwNode = gwNodes.Get(i);
+        Ptr<Node> gwNode = *it;
 
         if (m_satConstellationEnabled)
         {
@@ -1660,11 +1660,11 @@ SatHelper::PrintTopology(std::ostream& os) const
     }
 
     os << "GWs" << std::endl;
-    NodeContainer gwNodes = m_beamHelper->GetGwNodes();
-    for (uint32_t i = 0; i < gwNodes.GetN(); i++)
+    NodeContainer gwNodes = Singleton<SatTopology>::Get()->GetGwNodes();
+    for (NodeContainer::Iterator it = gwNodes.Begin(); it != gwNodes.End(); it++)
     {
-        Ptr<Node> node = gwNodes.Get(i);
-        os << "  GW: ID = " << gwNodes.Get(i)->GetId();
+        Ptr<Node> node = *it;
+        os << "  GW: ID = " << node->GetId();
         os << ", at " << GeoCoordinate(node->GetObject<SatMobilityModel>()->GetPosition())
            << std::endl;
         os << "  Devices " << std::endl;

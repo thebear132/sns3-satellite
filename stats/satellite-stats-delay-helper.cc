@@ -884,7 +884,7 @@ SatStatsFwdDevDelayHelper::DoInstallProbes()
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
     // Enable statistics-related tags on the transmitting device.
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
         NetDeviceContainer devs = GetGwSatNetDevice(*it);
@@ -992,7 +992,7 @@ SatStatsFwdMacDelayHelper::DoInstallProbes()
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
     // Enable statistics-related tags on the transmitting device.
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
         NetDeviceContainer devs = GetGwSatNetDevice(*it);
@@ -1134,7 +1134,7 @@ SatStatsFwdPhyDelayHelper::DoInstallProbes()
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
     // Enable statistics-related tags on the transmitting device.
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
         NetDeviceContainer devs = GetGwSatNetDevice(*it);
@@ -1437,7 +1437,7 @@ SatStatsRtnDevDelayHelper::DoInstallProbes()
 
     // Connect to trace sources at GW nodes.
 
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     Callback<void, const Time&, const Address&> callback =
         MakeCallback(&SatStatsRtnDevDelayHelper::RxDelayCallback, this);
 
@@ -1515,7 +1515,7 @@ SatStatsRtnMacDelayHelper::DoInstallProbes()
 
     // Connect to trace sources at GW nodes.
 
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     Callback<void, const Time&, const Address&> callback =
         MakeCallback(&SatStatsRtnMacDelayHelper::RxDelayCallback, this);
 
@@ -1626,7 +1626,7 @@ SatStatsRtnPhyDelayHelper::DoInstallProbes()
 
     // Connect to trace sources at GW nodes.
 
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     Callback<void, const Time&, const Address&> callback =
         MakeCallback(&SatStatsRtnPhyDelayHelper::RxDelayCallback, this);
 

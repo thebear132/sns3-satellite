@@ -614,7 +614,7 @@ SatStatsFwdFeederDevThroughputHelper::DoInstallProbes()
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
     // Enable statistics-related tags on the transmitting device.
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
         NetDeviceContainer devs = GetGwSatNetDevice(*it);
@@ -707,7 +707,7 @@ SatStatsFwdUserDevThroughputHelper::DoInstallProbes()
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
     // Enable statistics-related tags on the transmitting device.
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
         NetDeviceContainer devs = GetGwSatNetDevice(*it);
@@ -841,7 +841,7 @@ SatStatsFwdFeederMacThroughputHelper::DoInstallProbes()
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
     // Enable statistics-related tags on the transmitting device.
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
         NetDeviceContainer devs = GetGwSatNetDevice(*it);
@@ -969,7 +969,7 @@ SatStatsFwdUserMacThroughputHelper::DoInstallProbes()
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
     // Enable statistics-related tags on the transmitting device.
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
         NetDeviceContainer devs = GetGwSatNetDevice(*it);
@@ -1111,7 +1111,7 @@ SatStatsFwdFeederPhyThroughputHelper::DoInstallProbes()
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
     // Enable statistics-related tags on the transmitting device.
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
         NetDeviceContainer devs = GetGwSatNetDevice(*it);
@@ -1238,7 +1238,7 @@ SatStatsFwdUserPhyThroughputHelper::DoInstallProbes()
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
     // Enable statistics-related tags on the transmitting device.
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
         NetDeviceContainer devs = GetGwSatNetDevice(*it);
@@ -1468,7 +1468,7 @@ SatStatsRtnFeederDevThroughputHelper::DoInstallProbes()
 
     // Connect to trace sources at GW nodes.
 
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     Callback<void, Ptr<const Packet>, const Address&> callback =
         MakeCallback(&SatStatsRtnFeederDevThroughputHelper::RxCallback, this);
 
@@ -1570,7 +1570,7 @@ SatStatsRtnUserDevThroughputHelper::DoInstallProbes()
 
     // Connect to trace sources at GW nodes.
 
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
 
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
@@ -1664,7 +1664,7 @@ SatStatsRtnFeederMacThroughputHelper::DoInstallProbes()
 
     // Connect to trace sources at GW nodes.
 
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     Callback<void, Ptr<const Packet>, const Address&> callback =
         MakeCallback(&SatStatsRtnFeederMacThroughputHelper::RxCallback, this);
 
@@ -1793,7 +1793,7 @@ SatStatsRtnUserMacThroughputHelper::DoInstallProbes()
 
     // Connect to trace sources at GW nodes.
 
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
 
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
@@ -1890,7 +1890,7 @@ SatStatsRtnFeederPhyThroughputHelper::DoInstallProbes()
 
     // Connect to trace sources at GW nodes.
 
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     Callback<void, Ptr<const Packet>, const Address&> callback =
         MakeCallback(&SatStatsRtnFeederPhyThroughputHelper::RxCallback, this);
 
@@ -2019,7 +2019,7 @@ SatStatsRtnUserPhyThroughputHelper::DoInstallProbes()
 
     // Connect to trace sources at GW nodes.
 
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
 
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {

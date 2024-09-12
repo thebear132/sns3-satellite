@@ -65,9 +65,10 @@ class SatTopology : public Object
     /**
      * Add a GW node to the topology
      *
+     * \param gwId ID of the GW
      * \param gw The GW node to add
      */
-    void AddGwNode(Ptr<Node> gw);
+    void AddGwNode(uint32_t gwId, Ptr<Node> gw);
 
     /**
      * Add a UT node to the topology
@@ -130,7 +131,7 @@ class SatTopology : public Object
     /**
      * Get the wanted GW node
      *
-     * \param nodeId ID of the node needed
+     * \param nodeId ID of the node needed (index in vector)
      *
      * \return The GW node
      */
@@ -168,9 +169,10 @@ class SatTopology : public Object
     }
 
   private:
-    NodeContainer m_gws;      // List of GW nodes
-    NodeContainer m_uts;      // List of UT nodes
-    NodeContainer m_orbiters; // List of orbiter nodes
+    std::map<uint32_t, Ptr<Node>> m_gwIds; // List of GW nodes
+    NodeContainer m_gws;                   // List of GW nodes
+    NodeContainer m_uts;                   // List of UT nodes
+    NodeContainer m_orbiters;              // List of orbiter nodes
 
     std::map<Ptr<Node>, Ptr<Node>> m_utToGwMap; // Map of GW connected for each UT
 

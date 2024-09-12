@@ -148,8 +148,8 @@ main(int argc, char* argv[])
                                           Seconds(0.1),
                                           Seconds(0.25));
 
-    NodeContainer gw = helper->GwNodes();
-    Ptr<SatMobilityModel> gwMob = gw.Get(0)->GetObject<SatMobilityModel>();
+    Ptr<SatMobilityModel> gwMob =
+        Singleton<SatTopology>::Get()->GetGwNode(0)->GetObject<SatMobilityModel>();
 
     Ptr<Node> sat = Singleton<SatTopology>::Get()->GetOrbiterNode(0);
     Ptr<SatMobilityModel> satMob = sat->GetObject<SatMobilityModel>();

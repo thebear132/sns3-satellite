@@ -36,7 +36,9 @@
 #include <ns3/satellite-phy-rx-carrier.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/scalar-collector.h>
+#include <ns3/singleton.h>
 #include <ns3/string.h>
 #include <ns3/unit-conversion-collector.h>
 
@@ -336,7 +338,7 @@ SatStatsRtnFeederWindowLoadHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
         NetDeviceContainer devs = GetGwSatNetDevice(*it);

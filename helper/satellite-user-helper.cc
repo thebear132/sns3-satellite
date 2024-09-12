@@ -35,6 +35,7 @@
 #include <ns3/satellite-mobility-observer.h>
 #include <ns3/satellite-net-device.h>
 #include <ns3/satellite-simple-net-device.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/satellite-typedefs.h>
 #include <ns3/singleton.h>
 
@@ -240,7 +241,7 @@ SatUserHelper::InstallUt(Ptr<Node> ut, uint32_t userCount)
 }
 
 NodeContainer
-SatUserHelper::InstallGw(NodeContainer gw, uint32_t userCount)
+SatUserHelper::InstallGw(uint32_t userCount)
 {
     NS_LOG_FUNCTION(this << userCount);
 
@@ -250,7 +251,7 @@ SatUserHelper::InstallGw(NodeContainer gw, uint32_t userCount)
     {
         m_router = CreateObject<Node>();
         internet.Install(m_router);
-        InstallRouter(gw, m_router);
+        InstallRouter(m_router);
     }
 
     // create users and csma links between Router and users and add IP routes
@@ -412,11 +413,13 @@ SatUserHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBas
 }
 
 void
-SatUserHelper::InstallRouter(NodeContainer gw, Ptr<Node> router)
+SatUserHelper::InstallRouter(Ptr<Node> router)
 {
     NS_LOG_FUNCTION(this);
 
-    for (NodeContainer::Iterator i = gw.Begin(); i != gw.End(); i++)
+    NodeContainer gwNodes = Singleton<SatTopology>::Get()->GetGwNodes();
+
+    for (NodeContainer::Iterator i = gwNodes.Begin(); i != gwNodes.End(); i++)
     {
         NodeContainer gwRouter = NodeContainer((*i), router);
 

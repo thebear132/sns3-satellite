@@ -658,7 +658,7 @@ SatStatsFwdFeederLinkModcodHelper::DoInstallProbes()
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
     // Enable statistics-related tags on the transmitting device.
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
         NetDeviceContainer devs = GetGwSatNetDevice(*it);
@@ -768,7 +768,7 @@ SatStatsFwdUserLinkModcodHelper::DoInstallProbes()
     } // end of `for (it = uts.Begin(); it != uts.End (); ++it)`
 
     // Enable statistics-related tags on the transmitting device.
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
         NetDeviceContainer devs = GetGwSatNetDevice(*it);
@@ -859,7 +859,7 @@ SatStatsRtnFeederLinkModcodHelper::DoInstallProbes()
 
     // Connect to trace sources at GW nodes.
 
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     Callback<void, uint32_t, const Address&> callback =
         MakeCallback(&SatStatsRtnFeederLinkModcodHelper::RxLinkModcodCallback, this);
 
@@ -984,7 +984,7 @@ SatStatsRtnUserLinkModcodHelper::DoInstallProbes()
 
     // Connect to trace sources at GW nodes.
 
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
 
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {

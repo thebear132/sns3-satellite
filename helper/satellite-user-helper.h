@@ -202,7 +202,6 @@ class SatUserHelper : public Object
     NodeContainer InstallUt(Ptr<Node> ut, uint32_t users);
 
     /**
-     * \param gw a set of GW nodes
      * \param users number of users to install for GWs. If gw has more than one GWs then
      * IP router is added between GWs and users.
      *
@@ -214,7 +213,7 @@ class SatUserHelper : public Object
      * \return  node container of created users for the GWs (and router).
      *
      */
-    NodeContainer InstallGw(NodeContainer gw, uint32_t users);
+    NodeContainer InstallGw(uint32_t users);
 
     /**
      * \return A container having all GW user nodes in satellite network.
@@ -350,10 +349,9 @@ class SatUserHelper : public Object
     /**
      * Install IP router to to Gateways. Creates csma link between gateways and router.
      *
-     * \param gw      container having GWs
      * \param router  pointer to IP router
      */
-    void InstallRouter(NodeContainer gw, Ptr<Node> router);
+    void InstallRouter(Ptr<Node> router);
 
     CsmaHelper m_csma;
     Ipv4AddressHelper m_ipv4Ut;

@@ -747,7 +747,7 @@ SatStatsRtnFeederLinkRxPowerHelper::DoInstallProbes()
         SaveAddressAndIdentifier(*it);
     }
 
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
     {
         NetDeviceContainer devs = GetGwSatNetDevice(*it);

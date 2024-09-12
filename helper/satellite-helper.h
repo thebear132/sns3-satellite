@@ -293,11 +293,6 @@ class SatHelper : public Object
                                  Ipv4Address sourceAddress,
                                  Ipv4Address groupAddress);
 
-    inline NodeContainer GwNodes()
-    {
-        return m_beamHelper->GetGwNodes();
-    }
-
     inline NodeContainer UtNodes()
     {
         return m_beamHelper->GetUtNodes();

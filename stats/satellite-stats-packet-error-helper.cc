@@ -268,7 +268,7 @@ SatStatsPacketErrorHelper::DoInstall()
         }
 
         // Connect to trace sources at GW nodes.
-        NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+        NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
         for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
         {
             InstallProbeOnGw(*it);

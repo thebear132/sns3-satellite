@@ -35,7 +35,9 @@
 #include <ns3/satellite-gw-mac.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-ncc.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/scalar-collector.h>
+#include <ns3/singleton.h>
 #include <ns3/string.h>
 
 #include <list>
@@ -110,7 +112,7 @@ SatStatsBeamServiceTimeHelper::DoInstall()
         MakeCallback(&SatStatsBeamServiceTimeHelper::BeamServiceCallback, this);
 
     // Connect SatGwMac of each beam by identifier (global, gw, beam) to callback
-    NodeContainer gwNodes = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gwNodes = Singleton<SatTopology>::Get()->GetGwNodes();
     for (auto node = gwNodes.Begin(); node != gwNodes.End(); node++)
     {
         for (uint32_t i = 0; i < (*node)->GetNDevices(); i++)

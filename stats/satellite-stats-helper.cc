@@ -335,7 +335,7 @@ SatStatsHelper::CreateCollectorPerIdentifier(CollectorMap& collectorMap) const
     }
 
     case SatStatsHelper::IDENTIFIER_GW: {
-        NodeContainer gws = m_satHelper->GetBeamHelper()->GetGwNodes();
+        NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
         for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
         {
             const uint32_t gwId = GetGwId(*it);

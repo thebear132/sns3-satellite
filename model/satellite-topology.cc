@@ -66,6 +66,7 @@ SatTopology::Reset()
     NS_LOG_FUNCTION(this);
 
     m_gws = NodeContainer();
+    m_gwIds.clear();
     m_uts = NodeContainer();
     m_orbiters = NodeContainer();
     m_utToGwMap.clear();
@@ -74,11 +75,17 @@ SatTopology::Reset()
 }
 
 void
-SatTopology::AddGwNode(Ptr<Node> gw)
+SatTopology::AddGwNode(uint32_t gwId, Ptr<Node> gw)
 {
     NS_LOG_FUNCTION(this << gw);
 
-    m_gws.Add(gw);
+    m_gwIds.insert(std::make_pair(gwId, gw));
+
+    m_gws = NodeContainer();
+    for (std::map<uint32_t, Ptr<Node>>::const_iterator i = m_gwIds.begin(); i != m_gwIds.end(); i++)
+    {
+        m_gws.Add(i->second);
+    }
 }
 
 void

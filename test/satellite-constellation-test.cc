@@ -130,7 +130,7 @@ SatConstellationTest1::DoRun(void)
     m_helper = simulationHelper->GetSatelliteHelper();
 
     NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
-    NodeContainer gws = m_helper->GwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     NodeContainer uts = m_helper->UtNodes();
     NodeContainer gwUsers = m_helper->GetGwUsers();
     NodeContainer utUsers = m_helper->GetUtUsers();
@@ -841,7 +841,7 @@ SatConstellationTest4::DoRun(void)
     m_helper = simulationHelper->GetSatelliteHelper();
 
     NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
-    NodeContainer gws = m_helper->GwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     NodeContainer uts = m_helper->UtNodes();
     NodeContainer gwUsers = m_helper->GetGwUsers();
     NodeContainer utUsers = m_helper->GetUtUsers();

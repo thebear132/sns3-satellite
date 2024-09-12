@@ -988,22 +988,6 @@ SatBeamHelper::GetOrbiterHelper() const
 }
 
 NodeContainer
-SatBeamHelper::GetGwNodes() const
-{
-    NS_LOG_FUNCTION(this);
-
-    NodeContainer gwNodes;
-
-    for (std::map<uint32_t, Ptr<Node>>::const_iterator i = m_gwNode.begin(); i != m_gwNode.end();
-         ++i)
-    {
-        gwNodes.Add(i->second);
-    }
-
-    return gwNodes;
-}
-
-NodeContainer
 SatBeamHelper::GetUtNodes() const
 {
     NS_LOG_FUNCTION(this);
@@ -1129,7 +1113,7 @@ SatBeamHelper::AddMulticastGroupRoutes(MulticastBeamInfo_t beamInfo,
         NS_FATAL_ERROR("Invalid address for multicast group");
     }
 
-    NodeContainer gwNodes = GetGwNodes();
+    NodeContainer gwNodes = Singleton<SatTopology>::Get()->GetGwNodes();
 
     // go through all GW nodes and devices in them
     for (NodeContainer::Iterator it = gwNodes.Begin(); it != gwNodes.End(); it++)
@@ -1617,6 +1601,7 @@ SatBeamHelper::StoreGwNode(uint32_t id, Ptr<Node> node)
         std::pair<std::map<uint32_t, Ptr<Node>>::iterator, bool> result =
             m_gwNode.insert(std::make_pair(id, node));
         storingSuccess = result.second;
+        Singleton<SatTopology>::Get()->AddGwNode(id, node);
     }
 
     return storingSuccess;

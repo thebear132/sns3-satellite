@@ -33,7 +33,9 @@
 #include <ns3/satellite-beam-scheduler.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-ncc.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/scalar-collector.h>
+#include <ns3/singleton.h>
 #include <ns3/string.h>
 
 #include <list>
@@ -185,7 +187,7 @@ SatStatsWaveformUsageHelper::WaveformUsageCallback(std::string context, uint32_t
         }
 
         case SatStatsHelper::IDENTIFIER_GW: {
-            NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+            NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
             for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
             {
                 const uint32_t gwId = GetGwId(*it);

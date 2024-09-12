@@ -25,6 +25,7 @@
 #include "ns3/enum.h"
 #include "ns3/satellite-id-mapper.h"
 #include "ns3/satellite-rx-cno-input-trace-container.h"
+#include "ns3/satellite-topology.h"
 #include "ns3/singleton.h"
 
 NS_LOG_COMPONENT_DEFINE("SatelliteCnoHelper");
@@ -120,7 +121,7 @@ SatCnoHelper::SetUtNodeCno(Ptr<Node> node, SatEnums::ChannelType_t channel, doub
 void
 SatCnoHelper::SetGwNodeCno(uint32_t nodeId, SatEnums::ChannelType_t channel, double cno)
 {
-    SetGwNodeCno(m_satHelper->GetBeamHelper()->GetGwNodes().Get(nodeId), channel, cno);
+    SetGwNodeCno(Singleton<SatTopology>::Get()->GetGwNode(nodeId), channel, cno);
 }
 
 void
@@ -194,7 +195,7 @@ SatCnoHelper::SetUtNodeCnoFile(Ptr<Node> node, SatEnums::ChannelType_t channel, 
 void
 SatCnoHelper::SetGwNodeCnoFile(uint32_t nodeId, SatEnums::ChannelType_t channel, std::string path)
 {
-    SetGwNodeCnoFile(m_satHelper->GetBeamHelper()->GetGwNodes().Get(nodeId), channel, path);
+    SetGwNodeCnoFile(Singleton<SatTopology>::Get()->GetGwNode(nodeId), channel, path);
 }
 
 void
@@ -214,9 +215,9 @@ SatCnoHelper::ApplyConfiguration()
     {
         // use power calculation from satellite-channel
         Ptr<Node> gwNode;
-        for (uint32_t i = 0; i < m_satHelper->GetBeamHelper()->GetGwNodes().GetN(); i++)
+        for (uint32_t i = 0; i < Singleton<SatTopology>::Get()->GetGwNodes().GetN(); i++)
         {
-            gwNode = m_satHelper->GetBeamHelper()->GetGwNodes().Get(i);
+            gwNode = Singleton<SatTopology>::Get()->GetGwNode(i);
             key = std::make_pair(Singleton<SatIdMapper>::Get()->GetGwMacWithNode(gwNode),
                                  SatEnums::FORWARD_FEEDER_CH);
             Singleton<SatRxCnoInputTraceContainer>::Get()->SetRxCno(key, 0);
@@ -240,9 +241,9 @@ SatCnoHelper::ApplyConfiguration()
     {
         // use input files from data/rxcnotraces/input folder
         Ptr<Node> gwNode;
-        for (uint32_t i = 0; i < m_satHelper->GetBeamHelper()->GetGwNodes().GetN(); i++)
+        for (uint32_t i = 0; i < Singleton<SatTopology>::Get()->GetGwNodes().GetN(); i++)
         {
-            gwNode = m_satHelper->GetBeamHelper()->GetGwNodes().Get(i);
+            gwNode = Singleton<SatTopology>::Get()->GetGwNode(i);
             key = std::make_pair(Singleton<SatIdMapper>::Get()->GetGwMacWithNode(gwNode),
                                  SatEnums::FORWARD_FEEDER_CH);
             Singleton<SatRxCnoInputTraceContainer>::Get()->AddNode(key);

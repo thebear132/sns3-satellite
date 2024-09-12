@@ -188,7 +188,7 @@ SatRegenerationTest1::DoRun(void)
     gwAppsReturn.Start(Seconds(1.0));
     gwAppsReturn.Stop(Seconds(10.0));
 
-    m_gwAddress = m_helper->GwNodes().Get(0)->GetDevice(1)->GetAddress();
+    m_gwAddress = Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1)->GetAddress();
     m_stAddress = m_helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
 
     Ptr<SatOrbiterFeederPhy> satOrbiterFeederPhy = DynamicCast<SatOrbiterFeederPhy>(
@@ -216,7 +216,7 @@ SatRegenerationTest1::DoRun(void)
     Ptr<PropagationDelayModel> userDelayModel = userChannel->GetPropagationDelayModel();
 
     Time feederDelay = feederDelayModel->GetDelay(
-        DynamicCast<SatNetDevice>(m_helper->GwNodes().Get(0)->GetDevice(1))
+        DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1))
             ->GetPhy()
             ->GetPhyTx()
             ->GetMobility(),
@@ -830,7 +830,7 @@ SatRegenerationTest3::DoRun(void)
             Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
             ->GetUserPhy(1));
 
-    m_gwAddress = m_helper->GwNodes().Get(0)->GetDevice(1)->GetAddress();
+    m_gwAddress = Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1)->GetAddress();
 
     satOrbiterFeederPhy->TraceConnectWithoutContext(
         "PacketTrace",
@@ -999,7 +999,7 @@ SatRegenerationTest4::DoRun(void)
 
     m_helper = simulationHelper->GetSatelliteHelper();
 
-    NodeContainer gws = m_helper->GwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     NodeContainer uts = m_helper->UtNodes();
 
     uint32_t i;
@@ -1218,7 +1218,7 @@ SatRegenerationTest5::DoRun(void)
 
     m_helper = simulationHelper->GetSatelliteHelper();
 
-    Ptr<Node> gwNode = m_helper->GwNodes().Get(0);
+    Ptr<Node> gwNode = Singleton<SatTopology>::Get()->GetGwNode(0);
     Ptr<Node> utNode = m_helper->UtNodes().Get(0);
     Ptr<Node> satNode = Singleton<SatTopology>::Get()->GetOrbiterNode(0);
     Ptr<SatOrbiterFeederPhy> satOrbiterFeederPhy = DynamicCast<SatOrbiterFeederPhy>(
@@ -1443,7 +1443,7 @@ SatRegenerationTest6::DoRun(void)
 
     m_helper = simulationHelper->GetSatelliteHelper();
 
-    NodeContainer gws = m_helper->GwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     NodeContainer uts = m_helper->UtNodes();
 
     uint32_t i;
@@ -1651,7 +1651,7 @@ SatRegenerationTest7::DoRun(void)
 
     m_helper = simulationHelper->GetSatelliteHelper();
 
-    Ptr<Node> gwNode = m_helper->GwNodes().Get(0);
+    Ptr<Node> gwNode = Singleton<SatTopology>::Get()->GetGwNode(0);
     Ptr<Node> utNode = m_helper->UtNodes().Get(0);
     Ptr<Node> satNode = Singleton<SatTopology>::Get()->GetOrbiterNode(0);
     Ptr<SatOrbiterFeederPhy> satOrbiterFeederPhy = DynamicCast<SatOrbiterFeederPhy>(
