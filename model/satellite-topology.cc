@@ -422,4 +422,162 @@ SatTopology::GetUtPhy(Ptr<Node> ut) const
     return m_utLayers.at(ut).m_phy;
 }
 
+void
+SatTopology::AddOrbiterFeederLayers(Ptr<Node> orbiter,
+                                    uint32_t satId,
+                                    uint32_t beamId,
+                                    Ptr<SatOrbiterNetDevice> netDevice,
+                                    Ptr<SatOrbiterFeederMac> mac,
+                                    Ptr<SatOrbiterFeederPhy> phy)
+{
+    NS_LOG_FUNCTION(this << orbiter << satId << beamId << netDevice << mac << phy);
+
+    std::map<Ptr<Node>, OrbiterLayers_s>::iterator it = m_orbiterLayers.find(orbiter);
+    OrbiterLayers_s layers;
+    if (it != m_orbiterLayers.end())
+    {
+        layers = it->second;
+        NS_ASSERT_MSG(
+            layers.m_satId == satId,
+            "Orbiter has already a different satellite ID that the one in argument of this method");
+        NS_ASSERT_MSG(layers.m_netDevice == netDevice,
+                      "Orbiter has already a different SatOrbiterNetDevice that the one in "
+                      "argument of this method");
+        NS_ASSERT_MSG(layers.m_feederMac.find(beamId) == layers.m_feederMac.end(),
+                      "Feeder MAC already stored for this pair orbiter/beam");
+        NS_ASSERT_MSG(layers.m_feederPhy.find(beamId) == layers.m_feederPhy.end(),
+                      "Feeder physical layer already stored for this pair orbiter/beam");
+    }
+    else
+    {
+        layers.m_satId = satId;
+        layers.m_netDevice = netDevice;
+    }
+
+    layers.m_feederMac.insert(std::make_pair(beamId, mac));
+    layers.m_feederPhy.insert(std::make_pair(beamId, phy));
+
+    m_orbiterLayers[orbiter] = layers;
+}
+
+void
+SatTopology::AddOrbiterUserLayers(Ptr<Node> orbiter,
+                                  uint32_t satId,
+                                  uint32_t beamId,
+                                  Ptr<SatOrbiterNetDevice> netDevice,
+                                  Ptr<SatOrbiterUserMac> mac,
+                                  Ptr<SatOrbiterUserPhy> phy)
+{
+    NS_LOG_FUNCTION(this << orbiter << satId << beamId << netDevice << mac << phy);
+
+    std::map<Ptr<Node>, OrbiterLayers_s>::iterator it = m_orbiterLayers.find(orbiter);
+    OrbiterLayers_s layers;
+    if (it != m_orbiterLayers.end())
+    {
+        layers = it->second;
+        NS_ASSERT_MSG(
+            layers.m_satId == satId,
+            "Orbiter has already a different satellite ID that the one in argument of this method");
+        NS_ASSERT_MSG(layers.m_netDevice == netDevice,
+                      "Orbiter has already a different SatOrbiterNetDevice that the one in "
+                      "argument of this method");
+        NS_ASSERT_MSG(layers.m_userMac.find(beamId) == layers.m_userMac.end(),
+                      "User MAC already stored for this pair orbiter/beam");
+        NS_ASSERT_MSG(layers.m_userPhy.find(beamId) == layers.m_userPhy.end(),
+                      "User physical layer already stored for this pair orbiter/beam");
+    }
+    else
+    {
+        layers.m_satId = satId;
+        layers.m_netDevice = netDevice;
+    }
+
+    layers.m_userMac.insert(std::make_pair(beamId, mac));
+    layers.m_userPhy.insert(std::make_pair(beamId, phy));
+
+    m_orbiterLayers[orbiter] = layers;
+}
+
+uint32_t
+SatTopology::GetOrbiterSatId(Ptr<Node> orbiter) const
+{
+    NS_LOG_FUNCTION(this << orbiter);
+
+    NS_ASSERT_MSG(m_orbiterLayers.find(orbiter) != m_orbiterLayers.end(),
+                  "Layers do not exist for this UT");
+
+    return m_orbiterLayers.at(orbiter).m_satId;
+}
+
+Ptr<SatOrbiterNetDevice>
+SatTopology::GetOrbiterNetDevice(Ptr<Node> orbiter) const
+{
+    NS_LOG_FUNCTION(this << orbiter);
+
+    NS_ASSERT_MSG(m_orbiterLayers.find(orbiter) != m_orbiterLayers.end(),
+                  "Layers do not exist for this UT");
+
+    return m_orbiterLayers.at(orbiter).m_netDevice;
+}
+
+Ptr<SatOrbiterFeederMac>
+SatTopology::GetOrbiterFeederMac(Ptr<Node> orbiter, uint32_t beamId) const
+{
+    NS_LOG_FUNCTION(this << orbiter << beamId);
+
+    std::map<Ptr<Node>, OrbiterLayers_s>::const_iterator it = m_orbiterLayers.find(orbiter);
+    NS_ASSERT_MSG(it != m_orbiterLayers.end(), "Layers do not exist for this UT");
+
+    OrbiterLayers_s layers = it->second;
+    NS_ASSERT_MSG(layers.m_feederMac.find(beamId) != layers.m_feederMac.end(),
+                  "Feeder MAC not stored for this pair orbiter/beam");
+
+    return layers.m_feederMac.at(beamId);
+}
+
+Ptr<SatOrbiterUserMac>
+SatTopology::GetOrbiterUserMac(Ptr<Node> orbiter, uint32_t beamId) const
+{
+    NS_LOG_FUNCTION(this << orbiter << beamId);
+
+    std::map<Ptr<Node>, OrbiterLayers_s>::const_iterator it = m_orbiterLayers.find(orbiter);
+    NS_ASSERT_MSG(it != m_orbiterLayers.end(), "Layers do not exist for this UT");
+
+    OrbiterLayers_s layers = it->second;
+    NS_ASSERT_MSG(layers.m_userMac.find(beamId) != layers.m_userMac.end(),
+                  "Feeder MAC not stored for this pair orbiter/beam");
+
+    return layers.m_userMac.at(beamId);
+}
+
+Ptr<SatOrbiterFeederPhy>
+SatTopology::GetOrbiterFeederPhy(Ptr<Node> orbiter, uint32_t beamId) const
+{
+    NS_LOG_FUNCTION(this << orbiter << beamId);
+
+    std::map<Ptr<Node>, OrbiterLayers_s>::const_iterator it = m_orbiterLayers.find(orbiter);
+    NS_ASSERT_MSG(it != m_orbiterLayers.end(), "Layers do not exist for this UT");
+
+    OrbiterLayers_s layers = it->second;
+    NS_ASSERT_MSG(layers.m_feederPhy.find(beamId) != layers.m_feederPhy.end(),
+                  "Feeder MAC not stored for this pair orbiter/beam");
+
+    return layers.m_feederPhy.at(beamId);
+}
+
+Ptr<SatOrbiterUserPhy>
+SatTopology::GetOrbiterUserPhy(Ptr<Node> orbiter, uint32_t beamId) const
+{
+    NS_LOG_FUNCTION(this << orbiter << beamId);
+
+    std::map<Ptr<Node>, OrbiterLayers_s>::const_iterator it = m_orbiterLayers.find(orbiter);
+    NS_ASSERT_MSG(it != m_orbiterLayers.end(), "Layers do not exist for this UT");
+
+    OrbiterLayers_s layers = it->second;
+    NS_ASSERT_MSG(layers.m_userPhy.find(beamId) != layers.m_userPhy.end(),
+                  "Feeder MAC not stored for this pair orbiter/beam");
+
+    return layers.m_userPhy.at(beamId);
+}
+
 } // namespace ns3
