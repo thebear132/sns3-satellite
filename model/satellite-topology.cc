@@ -220,7 +220,13 @@ SatTopology::GetOrbiterNode(uint32_t nodeId) const
 }
 
 void
-SatTopology::AddGwLayers(Ptr<Node> gw, uint32_t satId, uint32_t beamId, Ptr<SatNetDevice> netDevice, Ptr<SatGwLlc> llc, Ptr<SatGwMac> mac, Ptr<SatGwPhy> phy)
+SatTopology::AddGwLayers(Ptr<Node> gw,
+                         uint32_t satId,
+                         uint32_t beamId,
+                         Ptr<SatNetDevice> netDevice,
+                         Ptr<SatGwLlc> llc,
+                         Ptr<SatGwMac> mac,
+                         Ptr<SatGwPhy> phy)
 {
     NS_LOG_FUNCTION(this << gw << satId << beamId << netDevice << llc << mac << phy);
 
@@ -306,6 +312,114 @@ SatTopology::GetGwPhy(Ptr<Node> gw) const
     NS_ASSERT_MSG(m_gwLayers.find(gw) != m_gwLayers.end(), "Layers do not exist for this GW");
 
     return m_gwLayers.at(gw).m_phy;
+}
+
+void
+SatTopology::AddUtLayers(Ptr<Node> ut,
+                         uint32_t satId,
+                         uint32_t beamId,
+                         uint32_t groupId,
+                         Ptr<SatNetDevice> netDevice,
+                         Ptr<SatUtLlc> llc,
+                         Ptr<SatUtMac> mac,
+                         Ptr<SatUtPhy> phy)
+{
+    NS_LOG_FUNCTION(this << ut << satId << beamId << groupId << netDevice << llc << mac << phy);
+
+    NS_ASSERT_MSG(m_utLayers.find(ut) == m_utLayers.end(), "Layers already added to this UT node");
+
+    UtLayers_s layers;
+    layers.m_satId = satId;
+    layers.m_beamId = beamId;
+    layers.m_groupId = groupId;
+    layers.m_netDevice = netDevice;
+    layers.m_llc = llc;
+    layers.m_mac = mac;
+    layers.m_phy = phy;
+
+    m_utLayers.insert(std::make_pair(ut, layers));
+}
+
+void
+SatTopology::UpdateUtSatAndBeam(Ptr<Node> ut, uint32_t satId, uint32_t beamId, uint32_t groupId)
+{
+    NS_LOG_FUNCTION(this << ut << satId << beamId << groupId);
+
+    NS_ASSERT_MSG(m_utLayers.find(ut) != m_utLayers.end(), "Layers do not exist for this UT");
+
+    m_utLayers[ut].m_satId = satId;
+    m_utLayers[ut].m_beamId = beamId;
+    m_utLayers[ut].m_groupId = groupId;
+}
+
+uint32_t
+SatTopology::GetUtSatId(Ptr<Node> ut) const
+{
+    NS_LOG_FUNCTION(this << ut);
+
+    NS_ASSERT_MSG(m_utLayers.find(ut) != m_utLayers.end(), "Layers do not exist for this UT");
+
+    return m_utLayers.at(ut).m_satId;
+}
+
+uint32_t
+SatTopology::GetUtBeamId(Ptr<Node> ut) const
+{
+    NS_LOG_FUNCTION(this << ut);
+
+    NS_ASSERT_MSG(m_utLayers.find(ut) != m_utLayers.end(), "Layers do not exist for this UT");
+
+    return m_utLayers.at(ut).m_beamId;
+}
+
+uint32_t
+SatTopology::GetUtGroupId(Ptr<Node> ut) const
+{
+    NS_LOG_FUNCTION(this << ut);
+
+    NS_ASSERT_MSG(m_utLayers.find(ut) != m_utLayers.end(), "Layers do not exist for this UT");
+
+    return m_utLayers.at(ut).m_groupId;
+}
+
+Ptr<SatNetDevice>
+SatTopology::GetUtNetDevice(Ptr<Node> ut) const
+{
+    NS_LOG_FUNCTION(this << ut);
+
+    NS_ASSERT_MSG(m_utLayers.find(ut) != m_utLayers.end(), "Layers do not exist for this UT");
+
+    return m_utLayers.at(ut).m_netDevice;
+}
+
+Ptr<SatUtLlc>
+SatTopology::GetUtLlc(Ptr<Node> ut) const
+{
+    NS_LOG_FUNCTION(this << ut);
+
+    NS_ASSERT_MSG(m_utLayers.find(ut) != m_utLayers.end(), "Layers do not exist for this UT");
+
+    return m_utLayers.at(ut).m_llc;
+}
+
+Ptr<SatUtMac>
+SatTopology::GetUtMac(Ptr<Node> ut) const
+{
+    NS_LOG_FUNCTION(this << ut);
+
+    NS_ASSERT_MSG(m_utLayers.find(ut) != m_utLayers.end(), "Layers do not exist for this UT");
+
+    return m_utLayers.at(ut).m_mac;
+}
+
+Ptr<SatUtPhy>
+SatTopology::GetUtPhy(Ptr<Node> ut) const
+{
+    NS_LOG_FUNCTION(this << ut);
+
+    NS_ASSERT_MSG(m_utLayers.find(ut) != m_utLayers.end(), "Layers do not exist for this UT");
+
+    return m_utLayers.at(ut).m_phy;
 }
 
 } // namespace ns3
