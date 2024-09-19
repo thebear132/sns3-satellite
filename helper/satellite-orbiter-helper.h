@@ -175,7 +175,7 @@ class SatOrbiterHelper : public Object
      * \param ncc NCC (Network Control Center)
      * \param satId ID of satellite associated to this channel
      * \param gwId ID of GW associated to this channel
-     * \param userBeamId Id of the beam
+     * \param userBeamId Id of the user beam
      * \param forwardLinkRegenerationMode Regeneration mode on forward
      * \param returnLinkRegenerationMode Regeneration mode on return
      */
@@ -202,7 +202,7 @@ class SatOrbiterHelper : public Object
      * \param ncc NCC (Network Control Center)
      * \param satId ID of satellite associated to this channel
      * \param gwId ID of GW associated to this channel
-     * \param userBeamId Id of the beam
+     * \param userBeamId Id of the user beam
      * \param forwardLinkRegenerationMode Regeneration mode on forward
      * \param returnLinkRegenerationMode Regeneration mode on return
      */

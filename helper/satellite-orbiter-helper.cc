@@ -405,7 +405,7 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatOrbiterNetDevice> dev,
     fPhy->Initialize();
 
     Ptr<SatOrbiterFeederMac> fMac;
-    Ptr<SatOrbiterLlc> fLlc;
+    Ptr<SatOrbiterFeederLlc> fLlc;
     bool startScheduler = false;
 
     // Create MAC layer
@@ -433,7 +433,8 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatOrbiterNetDevice> dev,
     }
     case SatEnums::REGENERATION_LINK: {
         // Create LLC layer
-        fLlc = CreateObject<SatOrbiterLlc>(forwardLinkRegenerationMode, returnLinkRegenerationMode);
+        fLlc = CreateObject<SatOrbiterFeederLlc>(forwardLinkRegenerationMode,
+                                                 returnLinkRegenerationMode);
 
         if (m_gwMacMap.count(std::make_pair(satId, gwId)))
         {
@@ -562,6 +563,15 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatOrbiterNetDevice> dev,
     default:
         NS_FATAL_ERROR("Return link regeneration mode unknown");
     }
+
+    Singleton<SatTopology>::Get()->AddOrbiterFeederLayers(dev->GetNode(),
+                                                          dev->GetNode()->GetId(),
+                                                          satId,
+                                                          userBeamId,
+                                                          dev,
+                                                          fLlc,
+                                                          fMac,
+                                                          fPhy);
 }
 
 void
@@ -626,7 +636,7 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatOrbiterNetDevice> dev,
     uPhy->Initialize();
 
     Ptr<SatOrbiterUserMac> uMac;
-    Ptr<SatOrbiterLlc> uLlc;
+    Ptr<SatOrbiterUserLlc> uLlc;
 
     uMac = CreateObject<SatOrbiterUserMac>(satId,
                                            userBeamId,
@@ -652,7 +662,8 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatOrbiterNetDevice> dev,
     }
     case SatEnums::REGENERATION_LINK: {
         // Create LLC layer
-        uLlc = CreateObject<SatOrbiterLlc>(forwardLinkRegenerationMode, returnLinkRegenerationMode);
+        uLlc = CreateObject<SatOrbiterUserLlc>(forwardLinkRegenerationMode,
+                                               returnLinkRegenerationMode);
 
         dev->AddUserMac(uMac, userBeamId);
 
@@ -770,6 +781,9 @@ SatOrbiterHelper::AttachChannelsUser(Ptr<SatOrbiterNetDevice> dev,
         uPhy->SetSendControlMsgToFeederCallback(
             MakeCallback(&SatOrbiterNetDevice::SendControlMsgToFeeder, dev));
     }
+
+    Singleton<SatTopology>::Get()
+        ->AddOrbiterUserLayers(dev->GetNode(), satId, userBeamId, dev, uLlc, uMac, uPhy);
 }
 
 void

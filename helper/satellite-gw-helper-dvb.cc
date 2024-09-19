@@ -41,6 +41,7 @@
 #include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-packet-classifier.h>
 #include <ns3/satellite-phy-rx-carrier-conf.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/satellite-typedefs.h>
 #include <ns3/singleton.h>
 
@@ -349,6 +350,9 @@ SatGwHelperDvb::Install(Ptr<Node> n,
         mac->SetBeamSchedulerCallback(MakeCallback(&SatNcc::GetBeamScheduler, ncc));
         mac->SetHandoverModule(handoverModule);
     }
+
+    Singleton<SatTopology>::Get()
+        ->AddGwLayers(n, feederSatId, feederBeamId, satId, beamId, dev, llc, mac, phy);
 
     return dev;
 }

@@ -24,9 +24,11 @@
 #include "satellite-gw-mac.h"
 #include "satellite-gw-phy.h"
 #include "satellite-net-device.h"
+#include "satellite-orbiter-feeder-llc.h"
 #include "satellite-orbiter-feeder-mac.h"
 #include "satellite-orbiter-feeder-phy.h"
 #include "satellite-orbiter-net-device.h"
+#include "satellite-orbiter-user-llc.h"
 #include "satellite-orbiter-user-mac.h"
 #include "satellite-orbiter-user-phy.h"
 #include "satellite-ut-llc.h"
@@ -53,10 +55,10 @@ class SatTopology : public Object
     {
         uint32_t m_satId;
         uint32_t m_beamId;
-        Ptr<SatNetDevice> m_netDevice;
-        Ptr<SatGwLlc> m_llc;
-        Ptr<SatGwMac> m_mac;
-        Ptr<SatGwPhy> m_phy;
+        std::map<std::pair<uint32_t, uint32_t>, Ptr<SatNetDevice>> m_netDevice;
+        std::map<std::pair<uint32_t, uint32_t>, Ptr<SatGwLlc>> m_llc;
+        std::map<std::pair<uint32_t, uint32_t>, Ptr<SatGwMac>> m_mac;
+        std::map<std::pair<uint32_t, uint32_t>, Ptr<SatGwPhy>> m_phy;
     } GwLayers_s;
 
     typedef struct
@@ -74,9 +76,11 @@ class SatTopology : public Object
     {
         uint32_t m_satId;
         Ptr<SatOrbiterNetDevice> m_netDevice;
-        std::map<uint32_t, Ptr<SatOrbiterFeederMac>> m_feederMac;
+        std::map<std::pair<uint32_t, uint32_t>, Ptr<SatOrbiterFeederLlc>> m_feederLlc;
+        std::map<uint32_t, Ptr<SatOrbiterUserLlc>> m_userLlc;
+        std::map<std::pair<uint32_t, uint32_t>, Ptr<SatOrbiterFeederMac>> m_feederMac;
         std::map<uint32_t, Ptr<SatOrbiterUserMac>> m_userMac;
-        std::map<uint32_t, Ptr<SatOrbiterFeederPhy>> m_feederPhy;
+        std::map<std::pair<uint32_t, uint32_t>, Ptr<SatOrbiterFeederPhy>> m_feederPhy;
         std::map<uint32_t, Ptr<SatOrbiterUserPhy>> m_userPhy;
     } OrbiterLayers_s;
 
@@ -224,16 +228,20 @@ class SatTopology : public Object
      * Add GW layers for given node, associated to chosen satellite and beam
      *
      * \param gw GW node to consider
-     * \param satId ID of satellite linked to this stack
-     * \param beamId ID of beam linked to this stack
-     * \param netDevice SatNetDevice of this node
-     * \param llc LLC layer of this node
-     * \param mac MAC layer of this node
-     * \param phy PHY layer of this node
+     * \param gwSatId ID of satellite linked to this stack
+     * \param gwBeamId ID of beam linked to this stack
+     * \param utSatId ID of satellite serving UTs for this stack
+     * \param utBeamId ID of beam serving UTs for this stack
+     * \param netDevice SatNetDevice for pair UT satellite/UT beam
+     * \param llc LLC layer for pair UT satellite/UT beam
+     * \param mac MAC layer for pair UT satellite/UT beam
+     * \param phy PHY layer for pair UT satellite/UT beam
      */
     void AddGwLayers(Ptr<Node> gw,
-                     uint32_t satId,
-                     uint32_t beamId,
+                     uint32_t gwSatId,
+                     uint32_t gwBeamId,
+                     uint32_t utSatId,
+                     uint32_t utBeamId,
                      Ptr<SatNetDevice> netDevice,
                      Ptr<SatGwLlc> llc,
                      Ptr<SatGwMac> mac,
@@ -270,37 +278,45 @@ class SatTopology : public Object
      * Get SatNetDevice instance of a GW
      *
      * \param gw GW node to consider
+     * \param utSatId ID of satellite serving the UTs
+     * \param utBeamId ID of beam serving the UTs
      *
      * \return SatNetDevice instance of a GW
      */
-    Ptr<SatNetDevice> GetGwNetDevice(Ptr<Node> gw) const;
+    Ptr<SatNetDevice> GetGwNetDevice(Ptr<Node> gw, uint32_t utSatId, uint32_t utBeamId) const;
 
     /**
      * Get SatGwLlc instance of a GW
      *
      * \param gw GW node to consider
+     * \param utSatId ID of satellite serving the UTs
+     * \param utBeamId ID of beam serving the UTs
      *
      * \return SatGwLlc instance of a GW
      */
-    Ptr<SatGwLlc> GetGwLlc(Ptr<Node> gw) const;
+    Ptr<SatGwLlc> GetGwLlc(Ptr<Node> gw, uint32_t utSatId, uint32_t utBeamId) const;
 
     /**
      * Get SatGwMac instance of a GW
      *
      * \param gw GW node to consider
+     * \param utSatId ID of satellite serving the UTs
+     * \param utBeamId ID of beam serving the UTs
      *
      * \return SatGwMac instance of a GW
      */
-    Ptr<SatGwMac> GetGwMac(Ptr<Node> gw) const;
+    Ptr<SatGwMac> GetGwMac(Ptr<Node> gw, uint32_t utSatId, uint32_t utBeamId) const;
 
     /**
      * Get SatGwPhy instance of a GW
      *
      * \param gw GW node to consider
+     * \param utSatId ID of satellite serving the UTs
+     * \param utBeamId ID of beam serving the UTs
      *
      * \return SatGwPhy instance of a GW
      */
-    Ptr<SatGwPhy> GetGwPhy(Ptr<Node> gw) const;
+    Ptr<SatGwPhy> GetGwPhy(Ptr<Node> gw, uint32_t utSatId, uint32_t utBeamId) const;
 
     /**
      * Add UT layers for given node, associated to chosen satellite and beam
@@ -401,15 +417,19 @@ class SatTopology : public Object
      *
      * \param orbiter UT node to consider
      * \param satId ID of satellite linked to this stack
-     * \param beamId ID of beam linked to this stack
+     * \param utSatId ID of UT satellite linked to this stack
+     * \param utBeamId ID of UT beam linked to this stack
      * \param netDevice SatNetDevice of this node
+     * \param mac LLC layer of this node
      * \param mac MAC layer of this node
      * \param phy PHY layer of this node
      */
     void AddOrbiterFeederLayers(Ptr<Node> orbiter,
                                 uint32_t satId,
-                                uint32_t beamId,
+                                uint32_t utSatId,
+                                uint32_t utBeamId,
                                 Ptr<SatOrbiterNetDevice> netDevice,
+                                Ptr<SatOrbiterFeederLlc> llc,
                                 Ptr<SatOrbiterFeederMac> mac,
                                 Ptr<SatOrbiterFeederPhy> phy);
 
@@ -420,6 +440,7 @@ class SatTopology : public Object
      * \param satId ID of satellite linked to this stack
      * \param beamId ID of beam linked to this stack
      * \param netDevice SatNetDevice of this node
+     * \param mac LLC layer of this node
      * \param mac MAC layer of this node
      * \param phy PHY layer of this node
      */
@@ -427,6 +448,7 @@ class SatTopology : public Object
                               uint32_t satId,
                               uint32_t beamId,
                               Ptr<SatOrbiterNetDevice> netDevice,
+                              Ptr<SatOrbiterUserLlc> llc,
                               Ptr<SatOrbiterUserMac> mac,
                               Ptr<SatOrbiterUserPhy> phy);
 
@@ -449,14 +471,40 @@ class SatTopology : public Object
     Ptr<SatOrbiterNetDevice> GetOrbiterNetDevice(Ptr<Node> orbiter) const;
 
     /**
+     * Get SatOrbiterFeederLlc instance of an orbiter serving wanted beam ID
+     *
+     * \param orbiter Orbiter node to consider
+     * \param utSatId UT satellite ID served by this feeder LLC layer
+     * \param utBeamId UT Beam ID served by this feeder LLC layer
+     *
+     * \return SatOrbiterFeederLlc instance of an orbiter
+     */
+    Ptr<SatOrbiterFeederLlc> GetOrbiterFeederLlc(Ptr<Node> orbiter,
+                                                 uint32_t utSatId,
+                                                 uint32_t utBeamId) const;
+
+    /**
+     * Get SatOrbiterUserLlc instance of an orbiter serving wanted beam ID
+     *
+     * \param orbiter Orbiter node to consider
+     * \param beamId Beam ID served by this user LLC layer
+     *
+     * \return SatOrbiterUserLlc instance of an orbiter
+     */
+    Ptr<SatOrbiterUserLlc> GetOrbiterUserLlc(Ptr<Node> orbiter, uint32_t beamId) const;
+
+    /**
      * Get SatOrbiterFeederMac instance of an orbiter serving wanted beam ID
      *
      * \param orbiter Orbiter node to consider
-     * \param beamId Beam ID served by this feeder MAC layer
+     * \param utSatId UT satellite ID served by this feeder MAC layer
+     * \param utBeamId UT Beam ID served by this feeder MAC layer
      *
      * \return SatOrbiterFeederMac instance of an orbiter
      */
-    Ptr<SatOrbiterFeederMac> GetOrbiterFeederMac(Ptr<Node> orbiter, uint32_t beamId) const;
+    Ptr<SatOrbiterFeederMac> GetOrbiterFeederMac(Ptr<Node> orbiter,
+                                                 uint32_t utSatId,
+                                                 uint32_t utBeamId) const;
 
     /**
      * Get SatOrbiterUserMac instance of an orbiter serving wanted beam ID
@@ -472,11 +520,14 @@ class SatTopology : public Object
      * Get SatOrbiterFeederPhy instance of an orbiter serving wanted beam ID
      *
      * \param orbiter Orbiter node to consider
-     * \param beamId Beam ID served by this feeder physical layer
+     * \param utSatId UT satellite ID served by this feeder PHY layer
+     * \param utBeamId UT Beam ID served by this feeder PHY layer
      *
      * \return SatOrbiterFeederPhy instance of an orbiter
      */
-    Ptr<SatOrbiterFeederPhy> GetOrbiterFeederPhy(Ptr<Node> orbiter, uint32_t beamId) const;
+    Ptr<SatOrbiterFeederPhy> GetOrbiterFeederPhy(Ptr<Node> orbiter,
+                                                 uint32_t utSatId,
+                                                 uint32_t utBeamId) const;
 
     /**
      * Get SatOrbiterUserPhy instance of an orbiter serving wanted beam ID
