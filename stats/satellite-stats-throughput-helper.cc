@@ -460,7 +460,7 @@ void
 SatStatsFwdAppThroughputHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
-    NodeContainer utUsers = GetSatHelper()->GetUtUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
 
     for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End(); ++it)
     {
@@ -1314,7 +1314,7 @@ SatStatsRtnAppThroughputHelper::DoInstallProbes()
     NS_LOG_FUNCTION(this);
 
     // Create a map of UT user addresses and identifiers.
-    NodeContainer utUsers = GetSatHelper()->GetUtUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
     for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End(); ++it)
     {
         SaveIpv4AddressAndIdentifier(*it);
@@ -1322,7 +1322,7 @@ SatStatsRtnAppThroughputHelper::DoInstallProbes()
 
     // Connect to trace sources at GW user node's applications.
 
-    NodeContainer gwUsers = GetSatHelper()->GetGwUsers();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
     Callback<void, Ptr<const Packet>, const Address&> callback =
         MakeCallback(&SatStatsRtnAppThroughputHelper::Ipv4Callback, this);
 

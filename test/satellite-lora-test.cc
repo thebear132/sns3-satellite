@@ -807,8 +807,8 @@ SatLoraCbrTestCase::DoRun(void)
         Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-    NodeContainer utUsers = helper->GetUtUsers();
-    NodeContainer gwUsers = helper->GetGwUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
     InetSocketAddress gwUserAddr = InetSocketAddress(helper->GetUserAddress(gwUsers.Get(0)), 9);
 
     PacketSinkHelper sinkHelper("ns3::UdpSocketFactory", Address());

@@ -140,8 +140,8 @@ main(int argc, char* argv[])
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(satScenario);
 
     // get users
-    // NodeContainer utUsers = helper->GetUtUsers ();
-    NodeContainer gwUsers = helper->GetGwUsers();
+    // NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
 
     // uint16_t port = 9;
     // const std::string protocol = "ns3::UdpSocketFactory";

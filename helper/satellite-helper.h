@@ -183,28 +183,6 @@ class SatHelper : public Object
     Ipv4Address GetUserAddress(Ptr<Node> node);
 
     /**
-     * \return container having UT users
-     */
-    NodeContainer GetUtUsers() const;
-
-    /**
-     * \param utNode Pointer to UT node, which user nodes are requested.
-     * \return A container having UT specific user nodes in satellite network.
-     */
-    NodeContainer GetUtUsers(Ptr<Node> utNode) const;
-
-    /**
-     * \param utNodes Container to UT nodes, which user nodes are requested.
-     * \return A container having UT specific user nodes in satellite network.
-     */
-    NodeContainer GetUtUsers(NodeContainer utNodes) const;
-
-    /**
-     * \return container having GW users.
-     */
-    NodeContainer GetGwUsers() const;
-
-    /**
      * \return pointer to beam helper.
      */
     Ptr<SatBeamHelper> GetBeamHelper() const;
@@ -363,11 +341,6 @@ class SatHelper : public Object
      * Group helper
      */
     Ptr<SatGroupHelper> m_groupHelper;
-
-    /**
-     * Gateway container
-     */
-    NodeContainer m_gwUser;
 
     /**
      * Configuration for satellite network.

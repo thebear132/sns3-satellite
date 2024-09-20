@@ -67,7 +67,7 @@ main(int argc, char* argv[])
     // ----------------------------------
     // ----- CREATE CBR APPLICATION -----
     // ----------------------------------
-    NodeContainer utUsers = helper->GetUtUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
 
     NS_ASSERT(utUsers.GetN() == 1);
 

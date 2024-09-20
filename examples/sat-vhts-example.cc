@@ -261,14 +261,14 @@ main(int argc, char* argv[])
     Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper();
     trafficHelper->AddVoipTraffic(SatTrafficHelper::FWD_LINK,
                                   SatTrafficHelper::G_711_1,
-                                  satHelper->GetGwUsers(),
-                                  satHelper->GetUtUsers(),
+                                  Singleton<SatTopology>::Get()->GetGwUserNodes(),
+                                  Singleton<SatTopology>::Get()->GetUtUserNodes(),
                                   appStartTime,
                                   simLength,
                                   Seconds(0.001));
     trafficHelper->AddHttpTraffic(SatTrafficHelper::FWD_LINK,
-                                  satHelper->GetGwUsers(),
-                                  satHelper->GetUtUsers(),
+                                  Singleton<SatTopology>::Get()->GetGwUserNodes(),
+                                  Singleton<SatTopology>::Get()->GetUtUserNodes(),
                                   appStartTime,
                                   simLength,
                                   Seconds(0.001));

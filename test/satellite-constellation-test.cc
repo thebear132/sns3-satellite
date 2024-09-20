@@ -132,8 +132,8 @@ SatConstellationTest1::DoRun(void)
     NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
-    NodeContainer gwUsers = m_helper->GetGwUsers();
-    NodeContainer utUsers = m_helper->GetUtUsers();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
 
     uint32_t countNetDevices = 0;
     for (uint32_t i = 0; i < sats.GetN(); i++)
@@ -843,8 +843,8 @@ SatConstellationTest4::DoRun(void)
     NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
-    NodeContainer gwUsers = m_helper->GetGwUsers();
-    NodeContainer utUsers = m_helper->GetUtUsers();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
 
     uint32_t countNetDevices = 0;
     uint32_t countIslNetDevice = 0;

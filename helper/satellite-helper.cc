@@ -431,41 +431,12 @@ SatHelper::GetUserAddress(Ptr<Node> node)
     NS_LOG_FUNCTION(this);
 
     Ptr<Ipv4> ipv4 = node->GetObject<Ipv4>(); // Get Ipv4 instance of the node
+
+    std::cout << "ipv4 " << ipv4 << std::endl;
+    std::cout << "ipv4->GetAddress(1, 0) " << ipv4->GetAddress(1, 0) << std::endl;
+
     return ipv4->GetAddress(1, 0)
         .GetLocal(); // Get Ipv4InterfaceAddress of interface csma interface.
-}
-
-NodeContainer
-SatHelper::GetUtUsers() const
-{
-    NS_LOG_FUNCTION(this);
-
-    return m_userHelper->GetUtUsers();
-}
-
-NodeContainer
-SatHelper::GetUtUsers(Ptr<Node> utNode) const
-{
-    return m_userHelper->GetUtUsers(utNode);
-}
-
-NodeContainer
-SatHelper::GetUtUsers(NodeContainer utNodes) const
-{
-    NodeContainer total;
-    for (NodeContainer::Iterator i = utNodes.Begin(); i != utNodes.End(); i++)
-    {
-        total.Add(GetUtUsers(*i));
-    }
-    return total;
-}
-
-NodeContainer
-SatHelper::GetGwUsers() const
-{
-    NS_LOG_FUNCTION(this);
-
-    return m_userHelper->GetGwUsers();
 }
 
 Ptr<SatBeamHelper>
@@ -1462,7 +1433,7 @@ SatHelper::SetMulticastGroupRoutes(Ptr<Node> source,
 
     MulticastBeamInfo_t beamInfo;
     Ptr<NetDevice> routerUserOutputDev;
-    Ptr<Node> sourceUtNode = m_userHelper->GetUtNode(source);
+    Ptr<Node> sourceUtNode = Singleton<SatTopology>::Get()->GetUtNode(source);
 
     // Construct multicast info from source UT node and receivers. In case that sourceUtNode is
     // NULL, source is some GW user. As a result is given flag indicating if traffic shall be
@@ -1581,8 +1552,8 @@ SatHelper::CreateCreationSummary(std::string title)
 
     oss << std::endl << std::endl << title << std::endl << std::endl;
     oss << "--- User Info ---" << std::endl << std::endl;
-    oss << "Created GW users: " << m_userHelper->GetGwUserCount() << ", ";
-    oss << "Created UT users: " << m_userHelper->GetUtUserCount() << std::endl << std::endl;
+    oss << "Created GW users: " << Singleton<SatTopology>::Get()->GetNGwUserNodes() << ", ";
+    oss << "Created UT users: " << Singleton<SatTopology>::Get()->GetNUtUserNodes() << std::endl;
     oss << m_userHelper->GetRouterInfo() << std::endl << std::endl;
     oss << m_beamHelper->GetBeamInfo() << std::endl;
 
@@ -1711,15 +1682,15 @@ SatHelper::PrintTopology(std::ostream& os) const
     }
 
     os << "GW users" << std::endl;
-    NodeContainer gwUserNodes = m_userHelper->GetGwUsers();
-    for (uint32_t i = 0; i < gwUserNodes.GetN(); i++)
+    NodeContainer gwUserNodes = Singleton<SatTopology>::Get()->GetGwUserNodes();
+    for (NodeContainer::Iterator it = gwUserNodes.Begin(); it != gwUserNodes.End(); it++)
     {
-        Ptr<Node> node = gwUserNodes.Get(i);
-        os << "  GW user: ID = " << gwUserNodes.Get(i)->GetId() << std::endl;
+        Ptr<Node> node = *it;
+        os << "  GW user: ID = " << node->GetId() << std::endl;
     }
 
     os << "UT users" << std::endl;
-    NodeContainer utUserNodes = m_userHelper->GetUtUsers();
+    NodeContainer utUserNodes = Singleton<SatTopology>::Get()->GetUtUserNodes();
     for (uint32_t i = 0; i < utUserNodes.GetN(); i++)
     {
         Ptr<Node> node = utUserNodes.Get(i);
@@ -1831,7 +1802,7 @@ SatHelper::ConstructMulticastInfo(Ptr<Node> sourceUtNode,
     for (uint32_t i = 0; i < receivers.GetN(); i++)
     {
         Ptr<Node> receiverNode = receivers.Get(i);
-        Ptr<Node> utNode = m_userHelper->GetUtNode(receiverNode);
+        Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(receiverNode);
 
         // check if user is connected to UT or GW
 

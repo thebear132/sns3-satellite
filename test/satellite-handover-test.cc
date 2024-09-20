@@ -42,6 +42,7 @@
 #include "ns3/satellite-orbiter-net-device.h"
 #include "ns3/satellite-orbiter-user-phy.h"
 #include "ns3/satellite-phy-rx-carrier.h"
+#include "ns3/satellite-topology.h"
 #include "ns3/satellite-ut-mac-state.h"
 #include "ns3/simulation-helper.h"
 #include "ns3/simulator.h"
@@ -516,8 +517,8 @@ SatHandoverTest2::DoRun(void)
 
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE);
 
-    NodeContainer utUsers = helper->GetUtUsers();
-    NodeContainer gwUsers = helper->GetGwUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
 
     Config::SetDefault("ns3::CbrApplication::Interval", StringValue("100ms"));
     Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));

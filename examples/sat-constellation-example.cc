@@ -131,8 +131,8 @@ main(int argc, char* argv[])
 
     NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
-    NodeContainer gwUsers = helper->GetGwUsers();
-    NodeContainer utUsers = helper->GetUtUsers(uts);
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes(uts);
 
     // Total is 3*6 = 18 flows
     // Global App rate is pktSize*ptkPerSecond*nbFlows = 512*8*50*18 = 3686kb/s on both FWD and RTN

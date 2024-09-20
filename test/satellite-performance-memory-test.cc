@@ -28,9 +28,6 @@
  *
  */
 
-#include "../helper/satellite-helper.h"
-#include "../utils/satellite-env-variables.h"
-
 #include "ns3/cbr-application.h"
 #include "ns3/cbr-helper.h"
 #include "ns3/config.h"
@@ -38,6 +35,9 @@
 #include "ns3/log.h"
 #include "ns3/packet-sink-helper.h"
 #include "ns3/packet-sink.h"
+#include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-helper.h"
+#include "ns3/satellite-topology.h"
 #include "ns3/simulator.h"
 #include "ns3/singleton.h"
 #include "ns3/string.h"
@@ -110,8 +110,8 @@ Pm1::DoRun(void)
         Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E");
     helper->CreatePredefinedScenario(SatHelper::FULL);
 
-    NodeContainer gwUsers = helper->GetGwUsers();
-    NodeContainer utUsers = helper->GetUtUsers();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
 
     uint16_t port = 9; // Discard port (RFC 863)
     CbrHelper cbr("ns3::UdpSocketFactory",

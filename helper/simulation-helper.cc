@@ -1581,11 +1581,14 @@ SimulationHelper::InstallTrafficModel(TrafficModel_t trafficModel,
         protocol == SimulationHelper::TCP ? "ns3::TcpSocketFactory" : "ns3::UdpSocketFactory";
 
     // get users
-    NodeContainer utAllUsers = m_satHelper->GetUtUsers();
-    NodeContainer gwUsers = m_satHelper->GetGwUsers();
+    NodeContainer utAllUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
     NS_ASSERT_MSG(m_gwUserId < gwUsers.GetN(),
                   "The number of GW users configured was too low. " << m_gwUserId << " "
                                                                     << gwUsers.GetN());
+
+    std::cout << "Number of GW users " << Singleton<SatTopology>::Get()->GetNGwUserNodes()
+              << std::endl;
 
     // Filter UT users to keep only a given percentage on which installing the application
     Ptr<UniformRandomVariable> rng = CreateObject<UniformRandomVariable>();
@@ -1600,6 +1603,9 @@ SimulationHelper::InstallTrafficModel(TrafficModel_t trafficModel,
 
     std::cout << "Installing traffic model on " << utUsers.GetN() << "/" << utAllUsers.GetN()
               << " UT users" << std::endl;
+
+    std::cout << "m_gwUserId " << m_gwUserId << std::endl;
+    std::cout << "gwUsers.Get(m_gwUserId) " << gwUsers.Get(m_gwUserId) << std::endl;
 
     switch (trafficModel)
     {
@@ -1785,7 +1791,7 @@ SimulationHelper::InstallLoraTrafficModel(LoraTrafficModel_t trafficModel,
     NS_LOG_FUNCTION(this << trafficModel << interval << packetSize << startTime << stopTime);
 
     NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
-    NodeContainer utUsers = m_satHelper->GetUtUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
     Ptr<Node> node;
 
     std::cout << "Installing Lora traffic model on " << uts.GetN() << " UTs" << std::endl;
@@ -1812,7 +1818,7 @@ SimulationHelper::InstallLoraTrafficModel(LoraTrafficModel_t trafficModel,
         break;
     }
     case SimulationHelper::LORA_CBR: {
-        NodeContainer gwUsers = m_satHelper->GetGwUsers();
+        NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
 
         uint16_t port = 9;
         InetSocketAddress gwUserAddr =
@@ -1966,8 +1972,8 @@ SimulationHelper::RunSimulation()
     NS_LOG_INFO("--- " << m_simulationName << "---");
     NS_LOG_INFO("  Simulation length: " << m_simTime.GetSeconds());
     NS_LOG_INFO("  Enabled beams: " << m_enabledBeamsStr);
-    NS_LOG_INFO("  Number of UTs: " << m_satHelper->GetGwUsers().GetN());
-    NS_LOG_INFO("  Number of end users: " << m_satHelper->GetUtUsers().GetN());
+    NS_LOG_INFO("  Number of UTs: " << Singleton<SatTopology>::Get()->GetNGwUserNodes());
+    NS_LOG_INFO("  Number of end users: " << Singleton<SatTopology>::Get()->GetNUtUserNodes());
 
     Simulator::Stop(m_simTime);
     Simulator::Run();

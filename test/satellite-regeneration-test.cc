@@ -155,8 +155,8 @@ SatRegenerationTest1::DoRun(void)
                                        "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-    NodeContainer utUsers = m_helper->GetUtUsers();
-    NodeContainer gwUsers = m_helper->GetGwUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
     uint16_t port = 9;
 
     // Install forward traffic
@@ -460,8 +460,8 @@ SatRegenerationTest2::DoRun(void)
                                        "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-    NodeContainer utUsers = m_helper->GetUtUsers();
-    NodeContainer gwUsers = m_helper->GetGwUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
     uint16_t port = 9;
 
     // Install forward traffic

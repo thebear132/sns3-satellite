@@ -122,9 +122,8 @@ main(int argc, char* argv[])
 
         // get users
         NodeContainer uts = helper->GetBeamHelper()->GetUtNodes(0, beamIdInFullScenario);
-        NodeContainer utUsers = helper->GetUserHelper()->GetUtUsers(uts.Get(0));
-
-        NodeContainer gwUsers = helper->GetGwUsers();
+        NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes(uts.Get(0));
+        NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
 
         uint16_t port = 9;
 

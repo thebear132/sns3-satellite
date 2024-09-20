@@ -329,8 +329,8 @@ SatPerPacketFwdLinkUserTestCase::DoRun(void)
     Config::Connect("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
                     MakeCallback(&LinkBudgetTraceCb));
 
-    NodeContainer utUsers = helper->GetUtUsers();
-    NodeContainer gwUsers = helper->GetGwUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
     uint16_t port = 9;
 
     // create Sink helper
@@ -519,8 +519,8 @@ SatPerPacketFwdLinkFullTestCase::DoRun(void)
     Config::Connect("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
                     MakeCallback(&LinkBudgetTraceCb));
 
-    NodeContainer utUsers = helper->GetUtUsers();
-    NodeContainer gwUsers = helper->GetGwUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
     uint16_t port = 9;
 
     // create Sink helper
@@ -718,8 +718,8 @@ SatPerPacketRtnLinkUserTestCase::DoRun(void)
     Config::Connect("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
                     MakeCallback(&LinkBudgetTraceCb));
 
-    NodeContainer utUsers = helper->GetUtUsers();
-    NodeContainer gwUsers = helper->GetGwUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
     uint16_t port = 9;
 
     // create Sink helper
@@ -877,8 +877,8 @@ SatPerPacketRtnLinkFullTestCase::DoRun(void)
     Config::Connect("/NodeList/*/DeviceList/*/FeederPhy/*/PhyRx/RxCarrierList/*/LinkBudgetTrace",
                     MakeCallback(&LinkBudgetTraceCb));
 
-    NodeContainer utUsers = helper->GetUtUsers();
-    NodeContainer gwUsers = helper->GetGwUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
     uint16_t port = 9;
 
     // create Sink helper

@@ -227,20 +227,15 @@ SatUserHelper::InstallUt(Ptr<Node> ut, uint32_t userCount)
 
     m_ipv4Ut.NewNetwork();
 
-    std::pair<UtUsersContainer_t::const_iterator, bool> result =
-        m_utUsers.insert(std::make_pair(ut, users));
-
-    if (result.second == false)
+    for (NodeContainer::Iterator it = users.Begin(); it != users.End(); it++)
     {
-        NS_FATAL_ERROR("UT is already installed.");
+        Singleton<SatTopology>::Get()->AddUtUserNode(*it, ut);
     }
-
-    m_allUtUsers.Add(users);
 
     return users;
 }
 
-NodeContainer
+void
 SatUserHelper::InstallGw(uint32_t userCount)
 {
     NS_LOG_FUNCTION(this << userCount);
@@ -288,20 +283,13 @@ SatUserHelper::InstallGw(uint32_t userCount)
         Ptr<Ipv4StaticRouting> routing = ipv4RoutingHelper.GetStaticRouting(ipv4);
         routing->SetDefaultRoute(addresses.GetAddress(0), 1);
         NS_LOG_INFO("User default route: " << addresses.GetAddress(0));
+
+        Singleton<SatTopology>::Get()->AddGwUserNode(*i);
+
+        std::cout << "Add GW user " << *i << std::endl;
     }
 
-    m_gwUsers.Add(users);
     m_ipv4Gw.NewNetwork();
-
-    return m_gwUsers;
-}
-
-NodeContainer
-SatUserHelper::GetGwUsers() const
-{
-    NS_LOG_FUNCTION(this);
-
-    return m_gwUsers;
 }
 
 bool
@@ -311,8 +299,9 @@ SatUserHelper::IsGwUser(Ptr<Node> node) const
 
     bool isGwUser = false;
 
-    for (NodeContainer::Iterator it = m_gwUsers.Begin(); ((it != m_gwUsers.End()) && !isGwUser);
-         it++)
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
+
+    for (NodeContainer::Iterator it = gwUsers.Begin(); ((it != gwUsers.End()) && !isGwUser); it++)
     {
         if (*it == node)
         {
@@ -321,87 +310,6 @@ SatUserHelper::IsGwUser(Ptr<Node> node) const
     }
 
     return isGwUser;
-}
-
-NodeContainer
-SatUserHelper::GetUtUsers() const
-{
-    NS_LOG_FUNCTION(this);
-
-    return m_allUtUsers;
-}
-
-NodeContainer
-SatUserHelper::GetUtUsers(Ptr<Node> ut) const
-{
-    NS_LOG_FUNCTION(this);
-
-    UtUsersContainer_t::const_iterator it = m_utUsers.find(ut);
-
-    if (it == m_utUsers.end())
-    {
-        NS_FATAL_ERROR("UT which users are requested in not installed!!!");
-    }
-
-    return it->second;
-}
-
-uint32_t
-SatUserHelper::GetGwUserCount() const
-{
-    NS_LOG_FUNCTION(this);
-
-    return m_gwUsers.GetN();
-}
-
-uint32_t
-SatUserHelper::GetUtUserCount() const
-{
-    NS_LOG_FUNCTION(this);
-
-    return m_allUtUsers.GetN();
-}
-
-uint32_t
-SatUserHelper::GetUtUserCount(Ptr<Node> ut) const
-{
-    NS_LOG_FUNCTION(this);
-
-    UtUsersContainer_t::const_iterator it = m_utUsers.find(ut);
-
-    if (it == m_utUsers.end())
-    {
-        NS_FATAL_ERROR("UT which user count is requested in not installed!!!");
-    }
-
-    return it->second.GetN();
-}
-
-Ptr<Node>
-SatUserHelper::GetUtNode(Ptr<Node> utUserNode) const
-{
-    std::map<Ptr<Node>, Ptr<Node>>::const_iterator it = m_utMap.find(utUserNode);
-
-    if (it == m_utMap.end())
-    {
-        return 0;
-    }
-    else
-    {
-        return it->second;
-    }
-}
-
-NodeContainer
-SatUserHelper::GetUtNodes() const
-{
-    NodeContainer nodes;
-    for (auto& nodeInfo : m_utUsers)
-    {
-        nodes.Add(nodeInfo.first);
-    }
-
-    return nodes;
 }
 
 void

@@ -264,38 +264,42 @@ main(int argc, char* argv[])
 
     // Setup custom traffics
     Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper();
-    trafficHelper->AddCbrTraffic(SatTrafficHelper::FWD_LINK,
-                                 "100ms",
-                                 packetSize,
-                                 satHelper->GetGwUsers().Get(0),
-                                 satHelper->GetUtUsers(groupHelper->GetUtNodes(2)),
-                                 appStartTime,
-                                 appStartTime + simLength,
-                                 Seconds(0.05));
+    trafficHelper->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        "100ms",
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNode(0),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(groupHelper->GetUtNodes(2)),
+        appStartTime,
+        appStartTime + simLength,
+        Seconds(0.05));
 
-    trafficHelper->AddCbrTraffic(SatTrafficHelper::RTN_LINK,
-                                 "1000ms",
-                                 packetSize,
-                                 satHelper->GetGwUsers().Get(0),
-                                 satHelper->GetUtUsers(groupHelper->GetUtNodes(0)),
-                                 appStartTime,
-                                 appStartTime + simLength,
-                                 Seconds(0.05));
+    trafficHelper->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        "1000ms",
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNode(0),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(groupHelper->GetUtNodes(0)),
+        appStartTime,
+        appStartTime + simLength,
+        Seconds(0.05));
 
-    trafficHelper->AddHttpTraffic(SatTrafficHelper::FWD_LINK,
-                                  satHelper->GetGwUsers().Get(0),
-                                  satHelper->GetUtUsers(groupHelper->GetUtNodes(1)),
-                                  appStartTime,
-                                  appStartTime + simLength,
-                                  Seconds(0.05));
+    trafficHelper->AddHttpTraffic(
+        SatTrafficHelper::FWD_LINK,
+        Singleton<SatTopology>::Get()->GetGwUserNode(0),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(groupHelper->GetUtNodes(1)),
+        appStartTime,
+        appStartTime + simLength,
+        Seconds(0.05));
 
-    trafficHelper->AddVoipTraffic(SatTrafficHelper::FWD_LINK,
-                                  SatTrafficHelper::G_711_1,
-                                  satHelper->GetGwUsers().Get(0),
-                                  satHelper->GetUtUsers(groupHelper->GetUtNodes(5)),
-                                  appStartTime,
-                                  appStartTime + simLength,
-                                  Seconds(0.05));
+    trafficHelper->AddVoipTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::G_711_1,
+        Singleton<SatTopology>::Get()->GetGwUserNode(0),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(groupHelper->GetUtNodes(5)),
+        appStartTime,
+        appStartTime + simLength,
+        Seconds(0.05));
 
     NS_LOG_INFO("--- sat-group-example ---");
     NS_LOG_INFO("  Packet size in bytes: " << packetSize);

@@ -44,6 +44,7 @@
 #include <ns3/satellite-net-device.h>
 #include <ns3/satellite-phy.h>
 #include <ns3/satellite-time-tag.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
@@ -655,7 +656,7 @@ void
 SatStatsFwdAppPltHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
-    NodeContainer utUsers = GetSatHelper()->GetUtUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
 
     for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End(); ++it)
     {
@@ -766,7 +767,7 @@ SatStatsRtnAppPltHelper::DoInstallProbes()
     NS_LOG_FUNCTION(this);
 
     // Connect to trace sources at GW user node's applications.
-    NodeContainer gwUsers = GetSatHelper()->GetGwUsers();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
     Callback<void, const Time&, const Address&> rxPltCallback =
         MakeCallback(&SatStatsRtnAppPltHelper::Ipv4Callback, this);
 

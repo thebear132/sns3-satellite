@@ -69,6 +69,8 @@ SatTopology::Reset()
     m_gwIds.clear();
     m_uts = NodeContainer();
     m_orbiters = NodeContainer();
+    m_gwUsers = NodeContainer();
+    m_utUsers = NodeContainer();
     m_utToGwMap.clear();
 
     m_enableMapPrint = false;
@@ -102,6 +104,27 @@ SatTopology::AddOrbiterNode(Ptr<Node> orbiter)
     NS_LOG_FUNCTION(this << orbiter);
 
     m_orbiters.Add(orbiter);
+}
+
+void
+SatTopology::AddGwUserNode(Ptr<Node> gwUser)
+{
+    NS_LOG_FUNCTION(this << gwUser);
+
+    m_gwUsers.Add(gwUser);
+}
+
+void
+SatTopology::AddUtUserNode(Ptr<Node> utUser, Ptr<Node> ut)
+{
+    NS_LOG_FUNCTION(this << utUser);
+
+    if (m_detailledUtUsers.find(ut) == m_detailledUtUsers.end())
+    {
+        m_detailledUtUsers[ut] = NodeContainer();
+    }
+    m_detailledUtUsers[ut].Add(utUser);
+    m_utUsers.Add(utUser);
 }
 
 void
@@ -171,6 +194,69 @@ SatTopology::GetOrbiterNodes() const
     return m_orbiters;
 }
 
+NodeContainer
+SatTopology::GetGwUserNodes() const
+{
+    NS_LOG_FUNCTION(this);
+
+    return m_gwUsers;
+}
+
+NodeContainer
+SatTopology::GetUtUserNodes() const
+{
+    NS_LOG_FUNCTION(this);
+
+    return m_utUsers;
+}
+
+NodeContainer
+SatTopology::GetUtUserNodes(NodeContainer uts) const
+{
+    NS_LOG_FUNCTION(this);
+
+    NodeContainer total;
+    for (NodeContainer::Iterator i = uts.Begin(); i != uts.End(); i++)
+    {
+        total.Add(GetUtUserNodes(*i));
+    }
+    return total;
+}
+
+NodeContainer
+SatTopology::GetUtUserNodes(Ptr<Node> ut) const
+{
+    NS_LOG_FUNCTION(this << ut);
+
+    std::map<Ptr<Node>, NodeContainer>::const_iterator it = m_detailledUtUsers.find(ut);
+
+    if (it == m_detailledUtUsers.end())
+    {
+        NS_FATAL_ERROR("UT which users are requested in not installed!!!");
+    }
+
+    return it->second;
+}
+
+Ptr<Node>
+SatTopology::GetUtNode(Ptr<Node> utUser) const
+{
+    for (std::map<Ptr<Node>, NodeContainer>::const_iterator it = m_detailledUtUsers.begin();
+         it != m_detailledUtUsers.end();
+         it++)
+    {
+        for (NodeContainer::Iterator it2 = it->second.Begin(); it2 != it->second.End(); it2++)
+        {
+            if (*it2 == utUser)
+            {
+                return it->first;
+            }
+        }
+    }
+
+    return nullptr;
+}
+
 uint32_t
 SatTopology::GetNGwNodes() const
 {
@@ -193,6 +279,22 @@ SatTopology::GetNOrbiterNodes() const
     NS_LOG_FUNCTION(this);
 
     return m_orbiters.GetN();
+}
+
+uint32_t
+SatTopology::GetNGwUserNodes() const
+{
+    NS_LOG_FUNCTION(this);
+
+    return m_gwUsers.GetN();
+}
+
+uint32_t
+SatTopology::GetNUtUserNodes() const
+{
+    NS_LOG_FUNCTION(this);
+
+    return m_utUsers.GetN();
 }
 
 Ptr<Node>
@@ -219,6 +321,22 @@ SatTopology::GetOrbiterNode(uint32_t nodeId) const
     return m_orbiters.Get(nodeId);
 }
 
+Ptr<Node>
+SatTopology::GetGwUserNode(uint32_t nodeId) const
+{
+    NS_LOG_FUNCTION(this << nodeId);
+
+    return m_gwUsers.Get(nodeId);
+}
+
+Ptr<Node>
+SatTopology::GetUtUserNode(uint32_t nodeId) const
+{
+    NS_LOG_FUNCTION(this << nodeId);
+
+    return m_utUsers.Get(nodeId);
+}
+
 void
 SatTopology::AddGwLayers(Ptr<Node> gw,
                          uint32_t gwSatId,
@@ -232,9 +350,6 @@ SatTopology::AddGwLayers(Ptr<Node> gw,
 {
     NS_LOG_FUNCTION(this << gw << gwSatId << gwBeamId << utSatId << utBeamId << netDevice << llc
                          << mac << phy);
-
-    std::cout << "SatTopology::AddGwLayers " << gw << " " << gwSatId << " " << gwBeamId << " "
-              << utSatId << " " << utBeamId << std::endl;
 
     std::map<Ptr<Node>, GwLayers_s>::iterator it = m_gwLayers.find(gw);
     GwLayers_s layers;

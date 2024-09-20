@@ -153,15 +153,15 @@ main(int argc, char* argv[])
     if (scenario == "full")
     {
         NodeContainer uts = helper->GetBeamHelper()->GetUtNodes(0, 1);
-        utUsers = helper->GetUserHelper()->GetUtUsers(uts.Get(0));
+        utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes(uts.Get(0));
     }
     else
     {
-        utUsers = helper->GetUtUsers();
+        utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
     }
 
     // get GW users
-    NodeContainer gwUsers = helper->GetGwUsers();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
 
     uint16_t port = 9;
 

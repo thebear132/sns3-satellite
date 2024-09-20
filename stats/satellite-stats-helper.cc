@@ -395,7 +395,7 @@ SatStatsHelper::CreateCollectorPerIdentifier(CollectorMap& collectorMap) const
     }
 
     case SatStatsHelper::IDENTIFIER_UT_USER: {
-        NodeContainer utUsers = m_satHelper->GetUtUsers();
+        NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
         for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End(); ++it)
         {
             const uint32_t utUserId = GetUtUserId(*it);
@@ -669,7 +669,7 @@ SatStatsHelper::GetIdentifierForUtUser(Ptr<Node> utUserNode) const
         break;
 
     case SatStatsHelper::IDENTIFIER_GW: {
-        Ptr<Node> utNode = m_satHelper->GetUserHelper()->GetUtNode(utUserNode);
+        Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(utUserNode);
 
         if (utNode == nullptr)
         {
@@ -703,7 +703,7 @@ SatStatsHelper::GetIdentifierForUtUser(Ptr<Node> utUserNode) const
     }
 
     case SatStatsHelper::IDENTIFIER_SAT: {
-        Ptr<Node> utNode = m_satHelper->GetUserHelper()->GetUtNode(utUserNode);
+        Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(utUserNode);
 
         const SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
         const Address utMac = satIdMapper->GetUtMacWithNode(utNode);
@@ -720,7 +720,7 @@ SatStatsHelper::GetIdentifierForUtUser(Ptr<Node> utUserNode) const
     }
 
     case SatStatsHelper::IDENTIFIER_BEAM: {
-        Ptr<Node> utNode = m_satHelper->GetUserHelper()->GetUtNode(utUserNode);
+        Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(utUserNode);
 
         if (utNode == nullptr)
         {
@@ -750,7 +750,7 @@ SatStatsHelper::GetIdentifierForUtUser(Ptr<Node> utUserNode) const
     }
 
     case SatStatsHelper::IDENTIFIER_GROUP: {
-        Ptr<Node> utNode = m_satHelper->GetUserHelper()->GetUtNode(utUserNode);
+        Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(utUserNode);
 
         if (utNode == nullptr)
         {
@@ -773,7 +773,7 @@ SatStatsHelper::GetIdentifierForUtUser(Ptr<Node> utUserNode) const
     }
 
     case SatStatsHelper::IDENTIFIER_UT: {
-        Ptr<Node> utNode = m_satHelper->GetUserHelper()->GetUtNode(utUserNode);
+        Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(utUserNode);
 
         if (utNode == nullptr)
         {

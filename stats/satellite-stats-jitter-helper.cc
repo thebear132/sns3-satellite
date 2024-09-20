@@ -657,7 +657,7 @@ void
 SatStatsFwdAppJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
-    NodeContainer utUsers = GetSatHelper()->GetUtUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
 
     for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End(); ++it)
     {
@@ -724,7 +724,7 @@ SatStatsFwdAppJitterHelper::DoInstallProbes()
      * Some sender applications might need a special attribute to be enabled
      * before jitter statistics can be computed. We enable it here.
      */
-    NodeContainer gwUsers = GetSatHelper()->GetGwUsers();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
     for (NodeContainer::Iterator it = gwUsers.Begin(); it != gwUsers.End(); ++it)
     {
         for (uint32_t i = 0; i < (*it)->GetNApplications(); i++)
@@ -1202,7 +1202,7 @@ SatStatsRtnAppJitterHelper::DoInstallProbes()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer utUsers = GetSatHelper()->GetUtUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
     for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End(); ++it)
     {
         // Create a map of UT user addresses and identifiers.
@@ -1231,7 +1231,7 @@ SatStatsRtnAppJitterHelper::DoInstallProbes()
 
     // Connect to trace sources at GW user node's applications.
 
-    NodeContainer gwUsers = GetSatHelper()->GetGwUsers();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
     Callback<void, const Time&, const Address&> rxJitterCallback =
         MakeCallback(&SatStatsRtnAppJitterHelper::Ipv4Callback, this);
     Callback<void, Ptr<const Packet>, const Address&> rxCallback =

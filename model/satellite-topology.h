@@ -133,6 +133,21 @@ class SatTopology : public Object
     void AddOrbiterNode(Ptr<Node> orbiter);
 
     /**
+     * Add a GW user node to the topology
+     *
+     * \param gwUser The GW user node to add
+     */
+    void AddGwUserNode(Ptr<Node> gwUser);
+
+    /**
+     * Add a UT user node to the topology
+     *
+     * \param utUser The UT user node to add
+     * \param ut Associated UT node
+     */
+    void AddUtUserNode(Ptr<Node> utUser, Ptr<Node> ut);
+
+    /**
      * Connect a GW to a UT. UT must not have an associated GW yet
      *
      * \param ut The UT to consider
@@ -177,6 +192,48 @@ class SatTopology : public Object
     NodeContainer GetOrbiterNodes() const;
 
     /**
+     * Get the list of GW user nodes
+     *
+     * \return The list of GW user nodes
+     */
+    NodeContainer GetGwUserNodes() const;
+
+    /**
+     * Get the list of UT user nodes
+     *
+     * \return The list of UT user nodes
+     */
+    NodeContainer GetUtUserNodes() const;
+
+    /**
+     * Get the list of UT user nodes connected to UTs
+     *
+     * \param uts List of UT nodes
+     *
+     * \return The list of UT user nodes
+     */
+    NodeContainer GetUtUserNodes(NodeContainer uts) const;
+
+    /**
+     * Get the list of UT user nodes connected to on UT
+     *
+     * \param ut UT node
+     *
+     * \return The list of UT user nodes
+     */
+    NodeContainer GetUtUserNodes(Ptr<Node> ut) const;
+
+    /**
+     * Get UT node linked to some UT user
+     *
+     * \param utUser Pointer to the UT user node
+     *
+     * \return a pointer to the UT node which serves the specified UT user node,
+     *         or nullptr if the UT user node is invalid
+     */
+    Ptr<Node> GetUtNode(Ptr<Node> utUser) const;
+
+    /**
      * Get the number of GW nodes
      *
      * \return The number of GW nodes
@@ -196,6 +253,20 @@ class SatTopology : public Object
      * \return The number of orbiter nodes
      */
     uint32_t GetNOrbiterNodes() const;
+
+    /**
+     * Get the number of GW user nodes
+     *
+     * \return The number of GW user nodes
+     */
+    uint32_t GetNGwUserNodes() const;
+
+    /**
+     * Get the number of UT user nodes
+     *
+     * \return The number of UT user nodes
+     */
+    uint32_t GetNUtUserNodes() const;
 
     /**
      * Get the wanted GW node
@@ -223,6 +294,24 @@ class SatTopology : public Object
      * \return The orbiter node
      */
     Ptr<Node> GetOrbiterNode(uint32_t nodeId) const;
+
+    /**
+     * Get the wanted GW user node
+     *
+     * \param nodeId ID of the node needed
+     *
+     * \return The GW user node
+     */
+    Ptr<Node> GetGwUserNode(uint32_t nodeId) const;
+
+    /**
+     * Get the wanted UT user node
+     *
+     * \param nodeId ID of the node needed
+     *
+     * \return The UT user node
+     */
+    Ptr<Node> GetUtUserNode(uint32_t nodeId) const;
 
     /**
      * Add GW layers for given node, associated to chosen satellite and beam
@@ -560,10 +649,13 @@ class SatTopology : public Object
     }
 
   private:
-    std::map<uint32_t, Ptr<Node>> m_gwIds; // List of GW nodes
-    NodeContainer m_gws;                   // List of GW nodes
-    NodeContainer m_uts;                   // List of UT nodes
-    NodeContainer m_orbiters;              // List of orbiter nodes
+    std::map<uint32_t, Ptr<Node>> m_gwIds;                 // List of GW nodes
+    NodeContainer m_gws;                                   // List of GW nodes
+    NodeContainer m_uts;                                   // List of UT nodes
+    NodeContainer m_orbiters;                              // List of orbiter nodes
+    NodeContainer m_gwUsers;                               // List of GW user nodes
+    NodeContainer m_utUsers;                               // List of UT user nodes
+    std::map<Ptr<Node>, NodeContainer> m_detailledUtUsers; // Map associating UT to UT users
 
     std::map<Ptr<Node>, GwLayers_s> m_gwLayers; // Map giving protocol layers for all GWs
     std::map<Ptr<Node>, UtLayers_s> m_utLayers; // Map giving protocol layers for all UTs

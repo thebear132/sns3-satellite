@@ -142,7 +142,7 @@ SatNcrTest1::DoRun(void)
                                        "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-    NodeContainer gwUsers = m_helper->GetGwUsers();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
 
     // Create the Cbr application to send UDP datagrams of size
     // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 100ms)
@@ -150,7 +150,7 @@ SatNcrTest1::DoRun(void)
     CbrHelper cbr("ns3::UdpSocketFactory",
                   Address(InetSocketAddress(m_helper->GetUserAddress(gwUsers.Get(0)), port)));
     cbr.SetAttribute("Interval", StringValue("100ms"));
-    ApplicationContainer utApps = cbr.Install(m_helper->GetUtUsers());
+    ApplicationContainer utApps = cbr.Install(Singleton<SatTopology>::Get()->GetUtUserNodes());
     utApps.Start(Seconds(1.0));
     utApps.Stop(Seconds(59.0));
 
@@ -323,7 +323,7 @@ SatNcrTest2::DoRun(void)
                                        "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-    NodeContainer gwUsers = m_helper->GetGwUsers();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
 
     // Create the Cbr application to send UDP datagrams of size
     // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 100ms)
@@ -331,7 +331,7 @@ SatNcrTest2::DoRun(void)
     CbrHelper cbr("ns3::UdpSocketFactory",
                   Address(InetSocketAddress(m_helper->GetUserAddress(gwUsers.Get(0)), port)));
     cbr.SetAttribute("Interval", StringValue("100ms"));
-    ApplicationContainer utApps = cbr.Install(m_helper->GetUtUsers());
+    ApplicationContainer utApps = cbr.Install(Singleton<SatTopology>::Get()->GetUtUserNodes());
     utApps.Start(Seconds(1.0));
     utApps.Stop(Seconds(59.0));
 
@@ -556,7 +556,7 @@ SatNcrTest3::DoRun(void)
                                        "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-    NodeContainer gwUsers = m_helper->GetGwUsers();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
 
     // Create the Cbr application to send UDP datagrams of size
     // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 100ms)
@@ -564,7 +564,7 @@ SatNcrTest3::DoRun(void)
     CbrHelper cbr("ns3::UdpSocketFactory",
                   Address(InetSocketAddress(m_helper->GetUserAddress(gwUsers.Get(0)), port)));
     cbr.SetAttribute("Interval", StringValue("100ms"));
-    ApplicationContainer utApps = cbr.Install(m_helper->GetUtUsers());
+    ApplicationContainer utApps = cbr.Install(Singleton<SatTopology>::Get()->GetUtUserNodes());
     utApps.Start(Seconds(1.0));
     utApps.Stop(Seconds(119.0));
 

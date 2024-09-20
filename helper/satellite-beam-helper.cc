@@ -714,9 +714,6 @@ SatBeamHelper::InstallFeeder(Ptr<SatOrbiterNetDevice> orbiterNetDevice,
 {
     NS_LOG_FUNCTION(this << gwNode << gwId << satId << beamId << rtnFlFreqId << fwdFlFreqId);
 
-    std::cout << "SatBeamHelper::InstallFeeder " << gwNode << " " << gwId << " " << feederSatId
-              << " " << feederBeamId << " " << satId << " " << beamId << std::endl;
-
     // Set trace files if options ask for it
     if (m_enableTracesOnReturnLink)
     {
