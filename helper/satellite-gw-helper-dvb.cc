@@ -194,7 +194,8 @@ SatGwHelperDvb::Install(Ptr<Node> n,
     phy->SetTxFadingContainer(n->GetObject<SatBaseFading>());
     phy->SetRxFadingContainer(n->GetObject<SatBaseFading>());
 
-    Ptr<SatGwMac> mac = CreateObject<SatGwMac>(satId,
+    Ptr<SatGwMac> mac = CreateObject<SatGwMac>(n,
+                                               satId,
                                                beamId,
                                                feederSatId,
                                                feederBeamId,

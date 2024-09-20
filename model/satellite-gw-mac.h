@@ -71,6 +71,7 @@ class SatGwMac : public SatMac
      *
      * This is the constructor for the SatGwMac
      *
+     * \param node Node containing this MAC
      * \param satId ID of sat for UT
      * \param beamId ID of beam for UT
      * \param satId ID of sat for GW
@@ -78,7 +79,8 @@ class SatGwMac : public SatMac
      * \param forwardLinkRegenerationMode Forward link regeneration mode
      * \param returnLinkRegenerationMode Return link regeneration mode
      */
-    SatGwMac(uint32_t satId,
+    SatGwMac(Ptr<Node> node,
+             uint32_t satId,
              uint32_t beamId,
              uint32_t feederSatId,
              uint32_t feederBeamId,
@@ -333,6 +335,11 @@ class SatGwMac : public SatMac
      * \return True if at least a device is connected, false otherwise
      */
     bool HasPeer();
+
+    /**
+     * Node containing this MAC
+     */
+    Ptr<Node> m_node;
 
     /**
      * ID of satellite linked to this GW

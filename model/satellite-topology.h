@@ -345,9 +345,16 @@ class SatTopology : public Object
      * \param ut UT node to consider
      * \param satId ID of satellite linked to this stack
      * \param beamId ID of beam linked to this stack
+     */
+    void UpdateUtSatAndBeam(Ptr<Node> ut, uint32_t satId, uint32_t beamId);
+
+    /**
+     * Update satellite and beam associated to a UT
+     *
+     * \param ut UT node to consider
      * \param groupId ID of group linked to this stack
      */
-    void UpdateUtSatAndBeam(Ptr<Node> ut, uint32_t satId, uint32_t beamId, uint32_t groupId);
+    void UpdateUtGroup(Ptr<Node> ut, uint32_t groupId);
 
     /**
      * Get ID of satellite linked to a UT

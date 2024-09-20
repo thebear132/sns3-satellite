@@ -394,14 +394,23 @@ SatTopology::AddUtLayers(Ptr<Node> ut,
 }
 
 void
-SatTopology::UpdateUtSatAndBeam(Ptr<Node> ut, uint32_t satId, uint32_t beamId, uint32_t groupId)
+SatTopology::UpdateUtSatAndBeam(Ptr<Node> ut, uint32_t satId, uint32_t beamId)
 {
-    NS_LOG_FUNCTION(this << ut << satId << beamId << groupId);
+    NS_LOG_FUNCTION(this << ut << satId << beamId);
 
     NS_ASSERT_MSG(m_utLayers.find(ut) != m_utLayers.end(), "Layers do not exist for this UT");
 
     m_utLayers[ut].m_satId = satId;
     m_utLayers[ut].m_beamId = beamId;
+}
+
+void
+SatTopology::UpdateUtGroup(Ptr<Node> ut, uint32_t groupId)
+{
+    NS_LOG_FUNCTION(this << ut << groupId);
+
+    NS_ASSERT_MSG(m_utLayers.find(ut) != m_utLayers.end(), "Layers do not exist for this UT");
+
     m_utLayers[ut].m_groupId = groupId;
 }
 

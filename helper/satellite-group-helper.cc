@@ -111,11 +111,7 @@ SatGroupHelper::AddUtNodeToGroup(uint32_t groupId, Ptr<Node> node)
         Singleton<SatIdMapper>::Get()->GetUtMacWithNode(node),
         groupId);
 
-    Ptr<SatTopology> topology = Singleton<SatTopology>::Get();
-    topology->UpdateUtSatAndBeam(node,
-                                 topology->GetUtSatId(node),
-                                 topology->GetUtBeamId(node),
-                                 groupId);
+    Singleton<SatTopology>::Get()->UpdateUtGroup(node, groupId);
 }
 
 void

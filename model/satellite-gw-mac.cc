@@ -125,13 +125,15 @@ SatGwMac::SatGwMac()
     NS_FATAL_ERROR("SatUtMac::SatGwMac - Constructor not in use");
 }
 
-SatGwMac::SatGwMac(uint32_t satId,
+SatGwMac::SatGwMac(Ptr<Node> node,
+                   uint32_t satId,
                    uint32_t beamId,
                    uint32_t feederSatId,
                    uint32_t feederBeamId,
                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
                    SatEnums::RegenerationMode_t returnLinkRegenerationMode)
     : SatMac(satId, beamId, forwardLinkRegenerationMode, returnLinkRegenerationMode),
+      m_node(node),
       m_feederSatId(feederSatId),
       m_feederBeamId(feederBeamId),
       m_fwdScheduler(),
@@ -417,6 +419,10 @@ SatGwMac::StartTransmission(uint32_t carrierId)
             {
                 m_gwLlcSetSatelliteAddress(satFeederAddress);
             }
+
+            Singleton<SatTopology>::Get()->UpdateGwSatAndBeam(m_node,
+                                                              m_feederSatId,
+                                                              m_feederBeamId);
 
             m_beamCallback(m_feederSatId, m_beamId);
 

@@ -34,6 +34,7 @@
 #include "satellite-rtn-link-time.h"
 #include "satellite-superframe-sequence.h"
 #include "satellite-tbtp-container.h"
+#include "satellite-topology.h"
 #include "satellite-utils.h"
 #include "satellite-wave-form-conf.h"
 
@@ -1992,6 +1993,7 @@ SatUtMac::DoFrameStart()
         SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
         satIdMapper->UpdateMacToSatId(m_nodeInfo->GetMacAddress(), m_satId);
         satIdMapper->UpdateMacToBeamId(m_nodeInfo->GetMacAddress(), m_beamId);
+        Singleton<SatTopology>::Get()->UpdateUtSatAndBeam(m_node, m_satId, m_beamId);
         m_updateIslCallback();
 
         if (!m_updateAddressAndIdentifierCallback.IsNull())
