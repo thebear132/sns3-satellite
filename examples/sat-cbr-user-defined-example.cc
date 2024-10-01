@@ -124,15 +124,16 @@ main(int argc, char* argv[])
     // >>> Start of actual test using Full scenario >>>
 
     // setup CBR traffic
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(interval));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          appStartTime,
-                                          simLength,
-                                          Seconds(0.05));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        Time(interval),
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        appStartTime,
+        simLength,
+        Seconds(0.05));
 
     NS_LOG_INFO("--- sat-cbr-user-defined-example ---");
     NS_LOG_INFO("  Packet size in bytes: " << packetSize);

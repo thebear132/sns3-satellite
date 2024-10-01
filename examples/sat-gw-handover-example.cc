@@ -81,20 +81,27 @@ main(int argc, char* argv[])
 
     helper->PrintTopology(std::cout);
 
-    Config::SetDefault("ns3::CbrApplication::Interval", StringValue("100ms"));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(100),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1.0),
+        Seconds(100.0),
+        Seconds(0));
 
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(1.0),
-                                          Seconds(100.0));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(1.0),
-                                          Seconds(100.0));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(100),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1.0),
+        Seconds(100.0),
+        Seconds(0));
 
     // To store attributes to file
     Config::SetDefault("ns3::ConfigStore::Filename", StringValue("output-attributes.xml"));

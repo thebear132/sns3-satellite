@@ -285,8 +285,6 @@ SatUserHelper::InstallGw(uint32_t userCount)
         NS_LOG_INFO("User default route: " << addresses.GetAddress(0));
 
         Singleton<SatTopology>::Get()->AddGwUserNode(*i);
-
-        std::cout << "Add GW user " << *i << std::endl;
     }
 
     m_ipv4Gw.NewNetwork();

@@ -198,18 +198,18 @@ main(int argc, char* argv[])
 
     simulationHelper->CreateSatScenario();
 
-    Config::SetDefault("ns3::OnOffApplication::PacketSize", UintegerValue(packetSize));
-    Config::SetDefault("ns3::OnOffApplication::DataRate", StringValue(dataRate));
-    Config::SetDefault("ns3::OnOffApplication::OnTime",
-                       StringValue("ns3::ConstantRandomVariable[Constant=" + onTime + "]"));
-    Config::SetDefault("ns3::OnOffApplication::OffTime",
-                       StringValue("ns3::ConstantRandomVariable[Constant=" + offTime + "]"));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::ONOFF,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          appStartTime,
-                                          simLength);
+    simulationHelper->GetTrafficHelper()->AddOnOffTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        dataRate,
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        "ns3::ConstantRandomVariable[Constant=" + onTime + "]",
+        "ns3::ConstantRandomVariable[Constant=" + offTime + "]",
+        appStartTime,
+        simLength,
+        Seconds(0));
 
     // Outputs
     simulationHelper->EnableProgressLogs();

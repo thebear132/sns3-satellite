@@ -111,16 +111,17 @@ main(int argc, char* argv[])
 
     if (endUsersPerUt * utsPerBeam > 0)
     {
-        Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(Time(interval)));
-        Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
-
         /// Create applicationa on GW user
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::FWD_LINK,
-                                              appStartTime,
-                                              simLength,
-                                              Seconds(0.001));
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::FWD_LINK,
+            SatTrafficHelper::UDP,
+            interval,
+            packetSize,
+            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            appStartTime,
+            simLength,
+            Seconds(0.001));
     }
     //---- Stop CBR application definitions
 

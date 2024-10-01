@@ -432,9 +432,6 @@ SatHelper::GetUserAddress(Ptr<Node> node)
 
     Ptr<Ipv4> ipv4 = node->GetObject<Ipv4>(); // Get Ipv4 instance of the node
 
-    std::cout << "ipv4 " << ipv4 << std::endl;
-    std::cout << "ipv4->GetAddress(1, 0) " << ipv4->GetAddress(1, 0) << std::endl;
-
     return ipv4->GetAddress(1, 0)
         .GetLocal(); // Get Ipv4InterfaceAddress of interface csma interface.
 }

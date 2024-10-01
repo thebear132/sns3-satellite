@@ -126,21 +126,29 @@ main(int argc, char* argv[])
 
     simulationHelper->LoadScenario("geo-33E");
 
-    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(satScenario);
+    simulationHelper->CreateSatScenario(satScenario);
 
-    Config::SetDefault("ns3::CbrApplication::Interval", StringValue(interval));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        Time(interval),
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1.0),
+        Seconds(29.0),
+        Seconds(0));
 
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(1.0),
-                                          Seconds(29.0));
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(1.0),
-                                          Seconds(29.0));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        Time(interval),
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1.0),
+        Seconds(29.0),
+        Seconds(0));
 
     NS_LOG_INFO("--- sat-regeneration-example ---");
     NS_LOG_INFO("  Scenario used: " << scenario);

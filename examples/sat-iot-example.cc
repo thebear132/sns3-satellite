@@ -172,7 +172,7 @@ main(int argc, char* argv[])
     trafficHelper->AddPoissonTraffic(SatTrafficHelper::RTN_LINK,
                                      Seconds(1),
                                      Seconds(0.1),
-                                     "200kb/s",
+                                     DataRate("200kb/s"),
                                      300,
                                      Singleton<SatTopology>::Get()->GetGwUserNodes(),
                                      Singleton<SatTopology>::Get()->GetUtUserNodes(),
@@ -180,7 +180,8 @@ main(int argc, char* argv[])
                                      simLength,
                                      Seconds(0.001)); // 200kb/s == 100kBaud
     trafficHelper->AddCbrTraffic(SatTrafficHelper::RTN_LINK,
-                                 "8.5ms",
+                                 SatTrafficHelper::UDP,
+                                 MilliSeconds(8.5),
                                  300,
                                  Singleton<SatTopology>::Get()->GetGwUserNodes(),
                                  Singleton<SatTopology>::Get()->GetUtUserNodes(),

@@ -32,7 +32,6 @@
 #include <ns3/config.h>
 #include <ns3/enum.h>
 #include <ns3/log.h>
-#include <ns3/lora-periodic-sender.h>
 #include <ns3/nrtv-helper.h>
 #include <ns3/packet-sink-helper.h>
 #include <ns3/packet-sink.h>
@@ -57,66 +56,144 @@ NS_OBJECT_ENSURE_REGISTERED(SimulationHelperConf);
  * for traffic models in method GetTypeId.
  *
  * \param index Name of the traffic model which attributes are added to the configuration.
- * \param a1    'Percentage of users' attribute value
- * \param a2    'Transport layer protocol' attribute value
- * \param a3    'Traffic direction' attribute value
- * \param a4    'Start time' attribute value
- * \param a5    'Stop time' attribute value
- * \param a6    'Start delay' attribute value
+ * \param value Attribute value
  *
  * \return TypeId
  */
-#define SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES(index, a1, a2, a3, a4, a5, a6)                            \
-    AddAttribute("Traffic" TOSTRING(index) "Percentage",                                           \
-                 "Percentage of final users that will use this traffic model",                     \
-                 DoubleValue(a1),                                                                  \
-                 MakeDoubleAccessor(&SimulationHelperConf::SetTraffic##index##Percentage,          \
-                                    &SimulationHelperConf::GetTraffic##index##Percentage),         \
-                 MakeDoubleChecker<double>(0, 1))                                                  \
-        .AddAttribute("Traffic" TOSTRING(index) "Protocol",                                        \
-                      "Network protocol that this traffic model will use",                         \
-                      EnumValue(a2),                                                               \
-                      MakeEnumAccessor<SimulationHelperConf::TransportLayerProtocol_t>(            \
-                          &SimulationHelperConf::SetTraffic##index##Protocol,                      \
-                          &SimulationHelperConf::GetTraffic##index##Protocol),                     \
-                      MakeEnumChecker(SimulationHelperConf::PROTOCOL_UDP,                          \
-                                      "UDP",                                                       \
-                                      SimulationHelperConf::PROTOCOL_TCP,                          \
-                                      "TCP",                                                       \
-                                      SimulationHelperConf::PROTOCOL_BOTH,                         \
-                                      "BOTH"))                                                     \
-        .AddAttribute("Traffic" TOSTRING(index) "Direction",                                       \
-                      "Satellite link direction that this traffic model will use",                 \
-                      EnumValue(a3),                                                               \
-                      MakeEnumAccessor<SimulationHelperConf::TrafficDirection_t>(                  \
-                          &SimulationHelperConf::SetTraffic##index##Direction,                     \
-                          &SimulationHelperConf::GetTraffic##index##Direction),                    \
-                      MakeEnumChecker(SimulationHelperConf::RTN_LINK,                              \
-                                      "ReturnLink",                                                \
-                                      SimulationHelperConf::FWD_LINK,                              \
-                                      "ForwardLink",                                               \
-                                      SimulationHelperConf::BOTH_LINK,                             \
-                                      "BothLinks"))                                                \
-        .AddAttribute(                                                                             \
-            "Traffic" TOSTRING(index) "StartTime",                                                 \
-            "Time into the simulation when this traffic model will be started on each user",       \
-            TimeValue(a4),                                                                         \
-            MakeTimeAccessor(&SimulationHelperConf::SetTraffic##index##StartTime,                  \
-                             &SimulationHelperConf::GetTraffic##index##StartTime),                 \
-            MakeTimeChecker(Seconds(0)))                                                           \
-        .AddAttribute("Traffic" TOSTRING(index) "StopTime",                                        \
-                      "Time into the simulation when this traffic model will be stopped "          \
-                      "on each user. 0 means endless traffic generation.",                         \
-                      TimeValue(a5),                                                               \
-                      MakeTimeAccessor(&SimulationHelperConf::SetTraffic##index##StopTime,         \
-                                       &SimulationHelperConf::GetTraffic##index##StopTime),        \
-                      MakeTimeChecker(Seconds(0)))                                                 \
-        .AddAttribute("Traffic" TOSTRING(index) "StartDelay",                                      \
-                      "Cummulative delay for each user before starting this traffic model",        \
-                      TimeValue(a6),                                                               \
-                      MakeTimeAccessor(&SimulationHelperConf::SetTraffic##index##StartDelay,       \
-                                       &SimulationHelperConf::GetTraffic##index##StartDelay),      \
-                      MakeTimeChecker(Seconds(0)))
+#define SIM_ADD_TRAFFIC_MODEL_PROTOCOL_ATTRIBUTE(index, value)                                     \
+    .AddAttribute("Traffic" TOSTRING(index) "Protocol",                                            \
+                  "Network protocol that this traffic model will use",                             \
+                  EnumValue(value),                                                                \
+                  MakeEnumAccessor<SimulationHelperConf::TransportLayerProtocol_t>(                \
+                      &SimulationHelperConf::SetTraffic##index##Protocol,                          \
+                      &SimulationHelperConf::GetTraffic##index##Protocol),                         \
+                  MakeEnumChecker(SimulationHelperConf::PROTOCOL_UDP,                              \
+                                  "UDP",                                                           \
+                                  SimulationHelperConf::PROTOCOL_TCP,                              \
+                                  "TCP",                                                           \
+                                  SimulationHelperConf::PROTOCOL_BOTH,                             \
+                                  "BOTH"))
+
+#define SIM_ADD_TRAFFIC_MODEL_DIRECTION_ATTRIBUTE(index, value)                                    \
+    .AddAttribute("Traffic" TOSTRING(index) "Direction",                                           \
+                  "Satellite link direction that this traffic model will use",                     \
+                  EnumValue(value),                                                                \
+                  MakeEnumAccessor<SimulationHelperConf::TrafficDirection_t>(                      \
+                      &SimulationHelperConf::SetTraffic##index##Direction,                         \
+                      &SimulationHelperConf::GetTraffic##index##Direction),                        \
+                  MakeEnumChecker(SimulationHelperConf::RTN_LINK,                                  \
+                                  "ReturnLink",                                                    \
+                                  SimulationHelperConf::FWD_LINK,                                  \
+                                  "ForwardLink",                                                   \
+                                  SimulationHelperConf::BOTH_LINK,                                 \
+                                  "BothLinks"))
+
+#define SIM_ADD_TRAFFIC_MODEL_INTERVAL_ATTRIBUTE(index, value)                                     \
+    .AddAttribute("Traffic" TOSTRING(index) "Interval",                                            \
+                  "Interval between packets",                                                      \
+                  TimeValue(value),                                                                \
+                  MakeTimeAccessor(&SimulationHelperConf::SetTraffic##index##Interval,             \
+                                   &SimulationHelperConf::GetTraffic##index##Interval),            \
+                  MakeTimeChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_DATA_RATE_ATTRIBUTE(index, value)                                    \
+    .AddAttribute("Traffic" TOSTRING(index) "DataRate",                                            \
+                  "Data rate of traffic",                                                          \
+                  DataRateValue(value),                                                            \
+                  MakeDataRateAccessor(&SimulationHelperConf::SetTraffic##index##DataRate,         \
+                                       &SimulationHelperConf::GetTraffic##index##DataRate),        \
+                  MakeDataRateChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_PACKET_SIZE_ATTRIBUTE(index, value)                                  \
+    .AddAttribute("Traffic" TOSTRING(index) "PacketSize",                                          \
+                  "Packet size in bytes",                                                          \
+                  UintegerValue(value),                                                            \
+                  MakeUintegerAccessor(&SimulationHelperConf::SetTraffic##index##PacketSize,       \
+                                       &SimulationHelperConf::GetTraffic##index##PacketSize),      \
+                  MakeUintegerChecker<uint32_t>())
+
+#define SIM_ADD_TRAFFIC_MODEL_ON_TIME_PATTERN_ATTRIBUTE(index, value)                              \
+    .AddAttribute("Traffic" TOSTRING(index) "OnTimePattern",                                       \
+                  "On time patter for on/off traffic",                                             \
+                  StringValue(value),                                                              \
+                  MakeStringAccessor(&SimulationHelperConf::SetTraffic##index##OnTimePattern,      \
+                                     &SimulationHelperConf::GetTraffic##index##OnTimePattern),     \
+                  MakeStringChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_OFF_TIME_PATTERN_ATTRIBUTE(index, value)                             \
+    .AddAttribute("Traffic" TOSTRING(index) "OffTimePattern",                                      \
+                  "Off time patter for on/off traffic",                                            \
+                  StringValue(value),                                                              \
+                  MakeStringAccessor(&SimulationHelperConf::SetTraffic##index##OffTimePattern,     \
+                                     &SimulationHelperConf::GetTraffic##index##OffTimePattern),    \
+                  MakeStringChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_ON_TIME_ATTRIBUTE(index, value)                                      \
+    .AddAttribute("Traffic" TOSTRING(index) "OnTime",                                              \
+                  "On time value for Poisson traffic",                                             \
+                  TimeValue(value),                                                                \
+                  MakeTimeAccessor(&SimulationHelperConf::SetTraffic##index##OnTime,               \
+                                   &SimulationHelperConf::GetTraffic##index##OnTime),              \
+                  MakeTimeChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_OFF_TIME_ATTRIBUTE(index, value)                                     \
+    .AddAttribute("Traffic" TOSTRING(index) "OffTime",                                             \
+                  "Off time value for Poisson traffic",                                            \
+                  TimeValue(value),                                                                \
+                  MakeTimeAccessor(&SimulationHelperConf::SetTraffic##index##OffTime,              \
+                                   &SimulationHelperConf::GetTraffic##index##OffTime),             \
+                  MakeTimeChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_CODEC_ATTRIBUTE(index, value)                                        \
+    .AddAttribute("Traffic" TOSTRING(index) "Codec",                                               \
+                  "Codec used for VoIP traffic",                                                   \
+                  EnumValue(value),                                                                \
+                  MakeEnumAccessor<SatTrafficHelper::VoipCodec_t>(                                 \
+                      &SimulationHelperConf::SetTraffic##index##Codec,                             \
+                      &SimulationHelperConf::GetTraffic##index##Codec),                            \
+                  MakeEnumChecker(SatTrafficHelper::G_711_1,                                       \
+                                  "G_711_1",                                                       \
+                                  SatTrafficHelper::G_711_2,                                       \
+                                  "G_711_2",                                                       \
+                                  SatTrafficHelper::G_723_1,                                       \
+                                  "G_723_1",                                                       \
+                                  SatTrafficHelper::G_729_2,                                       \
+                                  "G_729_2",                                                       \
+                                  SatTrafficHelper::G_729_3,                                       \
+                                  "G_729_3"))
+
+#define SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(index, value)                                   \
+    .AddAttribute("Traffic" TOSTRING(index) "StartTime",                                           \
+                  "Time into the simulation when this traffic model will be started on each user", \
+                  TimeValue(value),                                                                \
+                  MakeTimeAccessor(&SimulationHelperConf::SetTraffic##index##StartTime,            \
+                                   &SimulationHelperConf::GetTraffic##index##StartTime),           \
+                  MakeTimeChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(index, value)                                    \
+    .AddAttribute("Traffic" TOSTRING(index) "StopTime",                                            \
+                  "Time into the simulation when this traffic model will be stopped "              \
+                  "on each user. 0 means endless traffic generation.",                             \
+                  TimeValue(value),                                                                \
+                  MakeTimeAccessor(&SimulationHelperConf::SetTraffic##index##StopTime,             \
+                                   &SimulationHelperConf::GetTraffic##index##StopTime),            \
+                  MakeTimeChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(index, value)                                  \
+    .AddAttribute("Traffic" TOSTRING(index) "StartDelay",                                          \
+                  "Cummulative delay for each user before starting this traffic model",            \
+                  TimeValue(value),                                                                \
+                  MakeTimeAccessor(&SimulationHelperConf::SetTraffic##index##StartDelay,           \
+                                   &SimulationHelperConf::GetTraffic##index##StartDelay),          \
+                  MakeTimeChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(index, value)                                   \
+    .AddAttribute("Traffic" TOSTRING(index) "Percentage",                                          \
+                  "Percentage of final users that will use this traffic model",                    \
+                  DoubleValue(value),                                                              \
+                  MakeDoubleAccessor(&SimulationHelperConf::SetTraffic##index##Percentage,         \
+                                     &SimulationHelperConf::GetTraffic##index##Percentage),        \
+                  MakeDoubleChecker<double>(0, 1))
 
 TypeId
 SimulationHelperConf::GetTypeId(void)
@@ -160,40 +237,138 @@ SimulationHelperConf::GetTypeId(void)
                           BooleanValue(true),
                           MakeBooleanAccessor(&SimulationHelperConf::m_activateProgressLogging),
                           MakeBooleanChecker())
-            .AddAttribute("MobileUtsFolder",
-                          "Select the folder where mobile UTs traces should be found",
-                          StringValue(Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
-                                      "/utpositions/mobiles/"),
-                          MakeStringAccessor(&SimulationHelperConf::m_mobileUtsFolder),
-                          MakeStringChecker())
-            .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES(Cbr,
-                                              1.0,
-                                              PROTOCOL_UDP,
-                                              RTN_LINK,
-                                              Seconds(0.1),
-                                              Seconds(0),
-                                              MilliSeconds(10))
-            .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES(Http,
-                                              0,
-                                              PROTOCOL_TCP,
-                                              RTN_LINK,
-                                              Seconds(0.1),
-                                              Seconds(0),
-                                              MilliSeconds(10))
-            .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES(OnOff,
-                                              0,
-                                              PROTOCOL_UDP,
-                                              RTN_LINK,
-                                              Seconds(0.1),
-                                              Seconds(0),
-                                              MilliSeconds(10))
-            .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES(Nrtv,
-                                              0,
-                                              PROTOCOL_TCP,
-                                              RTN_LINK,
-                                              Seconds(0.1),
-                                              Seconds(0),
-                                              MilliSeconds(10));
+            .AddAttribute(
+                "MobileUtsFolder",
+                "Select the folder where mobile UTs traces should be found",
+                StringValue(Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
+                            "/utpositions/mobiles/"),
+                MakeStringAccessor(&SimulationHelperConf::m_mobileUtsFolder),
+                MakeStringChecker()) SIM_ADD_TRAFFIC_MODEL_INTERVAL_ATTRIBUTE(LoraPeriodic,
+                                                                              Seconds(1))
+                SIM_ADD_TRAFFIC_MODEL_PACKET_SIZE_ATTRIBUTE(LoraPeriodic, 512) SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(
+                    LoraPeriodic,
+                    Seconds(0.1)) SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(LoraPeriodic,
+                                                                            Seconds(0))
+                    SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(
+                        LoraPeriodic,
+                        MilliSeconds(10)) SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(LoraPeriodic,
+                                                                                     0)
+
+                        SIM_ADD_TRAFFIC_MODEL_INTERVAL_ATTRIBUTE(LoraCbr, Seconds(1)) SIM_ADD_TRAFFIC_MODEL_PACKET_SIZE_ATTRIBUTE(
+                            LoraCbr,
+                            512) SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(LoraCbr, Seconds(0.1))
+                            SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(LoraCbr, Seconds(0)) SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(
+                                LoraCbr,
+                                MilliSeconds(
+                                    10)) SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(LoraCbr, 0)
+
+                                SIM_ADD_TRAFFIC_MODEL_PROTOCOL_ATTRIBUTE(Cbr, SimulationHelperConf::PROTOCOL_UDP) SIM_ADD_TRAFFIC_MODEL_DIRECTION_ATTRIBUTE(
+                                    Cbr,
+                                    SimulationHelperConf::
+                                        RTN_LINK) SIM_ADD_TRAFFIC_MODEL_INTERVAL_ATTRIBUTE(Cbr,
+                                                                                           Seconds(
+                                                                                               1))
+                                    SIM_ADD_TRAFFIC_MODEL_PACKET_SIZE_ATTRIBUTE(Cbr, 512) SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(
+                                        Cbr,
+                                        Seconds(
+                                            0.1)) SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(Cbr,
+                                                                                            Seconds(
+                                                                                                0))
+                                        SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(
+                                            Cbr,
+                                            MilliSeconds(
+                                                10)) SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(Cbr,
+                                                                                                1)
+
+                                            SIM_ADD_TRAFFIC_MODEL_PROTOCOL_ATTRIBUTE(OnOff, SimulationHelperConf::PROTOCOL_UDP) SIM_ADD_TRAFFIC_MODEL_DIRECTION_ATTRIBUTE(
+                                                OnOff,
+                                                SimulationHelperConf::
+                                                    RTN_LINK) SIM_ADD_TRAFFIC_MODEL_DATA_RATE_ATTRIBUTE(OnOff, DataRate("500kb/s"))
+                                                SIM_ADD_TRAFFIC_MODEL_PACKET_SIZE_ATTRIBUTE(OnOff, 512) SIM_ADD_TRAFFIC_MODEL_ON_TIME_PATTERN_ATTRIBUTE(
+                                                    OnOff,
+                                                    "ns3::ConstantRandomVariable[Constant=1000]")
+                                                    SIM_ADD_TRAFFIC_MODEL_OFF_TIME_PATTERN_ATTRIBUTE(OnOff, "ns3::ConstantRandomVariable[Constant=0]") SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(
+                                                        OnOff,
+                                                        Seconds(
+                                                            0.1)) SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(OnOff, Seconds(0))
+                                                        SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(
+                                                            OnOff,
+                                                            MilliSeconds(
+                                                                10)) SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(OnOff, 0)
+
+                                                            SIM_ADD_TRAFFIC_MODEL_DIRECTION_ATTRIBUTE(
+                                                                Http,
+                                                                SimulationHelperConf::
+                                                                    RTN_LINK)
+                                                                SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(
+                                                                    Http,
+                                                                    Seconds(
+                                                                        0.1)) SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(Http,
+                                                                                                                        Seconds(
+                                                                                                                            0))
+                                                                    SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(
+                                                                        Http,
+                                                                        MilliSeconds(
+                                                                            10)) SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(Http,
+                                                                                                                            0)
+
+                                                                        SIM_ADD_TRAFFIC_MODEL_DIRECTION_ATTRIBUTE(
+                                                                            Nrtv,
+                                                                            SimulationHelperConf::
+                                                                                RTN_LINK)
+                                                                            SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(
+                                                                                Nrtv,
+                                                                                Seconds(0.1))
+                                                                                SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(
+                                                                                    Nrtv,
+                                                                                    Seconds(0))
+                                                                                    SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(
+                                                                                        Nrtv,
+                                                                                        MilliSeconds(
+                                                                                            10))
+                                                                                        SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(
+                                                                                            Nrtv,
+                                                                                            0)
+
+                                                                                            SIM_ADD_TRAFFIC_MODEL_DIRECTION_ATTRIBUTE(
+                                                                                                Poisson,
+                                                                                                SimulationHelperConf::RTN_LINK) SIM_ADD_TRAFFIC_MODEL_ON_TIME_ATTRIBUTE(Poisson,
+                                                                                                                                                                        Seconds(1)) SIM_ADD_TRAFFIC_MODEL_OFF_TIME_ATTRIBUTE(Poisson, MilliSeconds(100)) SIM_ADD_TRAFFIC_MODEL_DATA_RATE_ATTRIBUTE(Poisson,
+                                                                                                                                                                                                                                                                                                   DataRate(
+                                                                                                                                                                                                                                                                                                       "500kb/s")) SIM_ADD_TRAFFIC_MODEL_PACKET_SIZE_ATTRIBUTE(Poisson,
+                                                                                                                                                                                                                                                                                                                                                               512) SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(Poisson,
+                                                                                                                                                                                                                                                                                                                                                                                                               Seconds(
+                                                                                                                                                                                                                                                                                                                                                                                                                   0.1)) SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(Poisson,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   Seconds(0)) SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(Poisson, MilliSeconds(10))
+                                                                                                SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(
+                                                                                                    Poisson,
+                                                                                                    0)
+
+                                                                                                    SIM_ADD_TRAFFIC_MODEL_DIRECTION_ATTRIBUTE(
+                                                                                                        Voip,
+                                                                                                        SimulationHelperConf::
+                                                                                                            RTN_LINK)
+                                                                                                        SIM_ADD_TRAFFIC_MODEL_CODEC_ATTRIBUTE(
+                                                                                                            Voip,
+                                                                                                            SatTrafficHelper::
+                                                                                                                VoipCodec_t::
+                                                                                                                    G_711_1)
+                                                                                                            SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(
+                                                                                                                Voip,
+                                                                                                                Seconds(
+                                                                                                                    0.1))
+                                                                                                                SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(
+                                                                                                                    Voip,
+                                                                                                                    Seconds(
+                                                                                                                        0))
+                                                                                                                    SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(
+                                                                                                                        Voip,
+                                                                                                                        MilliSeconds(
+                                                                                                                            10))
+                                                                                                                        SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(
+                                                                                                                            Voip,
+                                                                                                                            0);
+
     return tid;
 }
 
@@ -258,7 +433,6 @@ SimulationHelper::SimulationHelper()
       m_randomAccessConfigured(false),
       m_inputFileUtListPositions(""),
       m_inputFileUtPositionsCheckBeams(true),
-      m_gwUserId(0),
       m_progressLoggingEnabled(false),
       m_progressUpdateInterval(Seconds(0.5))
 {
@@ -283,7 +457,6 @@ SimulationHelper::SimulationHelper(std::string simulationName)
       m_randomAccessConfigured(false),
       m_inputFileUtListPositions(""),
       m_inputFileUtPositionsCheckBeams(true),
-      m_gwUserId(0),
       m_progressLoggingEnabled(false),
       m_progressUpdateInterval(Seconds(0.5))
 {
@@ -1567,296 +1740,6 @@ SimulationHelper::HasSinkInstalled(Ptr<Node> node, uint16_t port)
 }
 
 void
-SimulationHelper::InstallTrafficModel(TrafficModel_t trafficModel,
-                                      TransportLayerProtocol_t protocol,
-                                      TrafficDirection_t direction,
-                                      Time startTime,
-                                      Time stopTime,
-                                      Time startDelay,
-                                      double percentage)
-{
-    NS_LOG_FUNCTION(this);
-
-    std::string socketFactory =
-        protocol == SimulationHelper::TCP ? "ns3::TcpSocketFactory" : "ns3::UdpSocketFactory";
-
-    // get users
-    NodeContainer utAllUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
-    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
-    NS_ASSERT_MSG(m_gwUserId < gwUsers.GetN(),
-                  "The number of GW users configured was too low. " << m_gwUserId << " "
-                                                                    << gwUsers.GetN());
-
-    std::cout << "Number of GW users " << Singleton<SatTopology>::Get()->GetNGwUserNodes()
-              << std::endl;
-
-    // Filter UT users to keep only a given percentage on which installing the application
-    Ptr<UniformRandomVariable> rng = CreateObject<UniformRandomVariable>();
-    NodeContainer utUsers;
-    for (uint32_t i = 0; i < utAllUsers.GetN(); ++i)
-    {
-        if (rng->GetValue(0.0, 1.0) < percentage)
-        {
-            utUsers.Add(utAllUsers.Get(i));
-        }
-    }
-
-    std::cout << "Installing traffic model on " << utUsers.GetN() << "/" << utAllUsers.GetN()
-              << " UT users" << std::endl;
-
-    std::cout << "m_gwUserId " << m_gwUserId << std::endl;
-    std::cout << "gwUsers.Get(m_gwUserId) " << gwUsers.Get(m_gwUserId) << std::endl;
-
-    switch (trafficModel)
-    {
-    case SimulationHelper::CBR: {
-        uint16_t port = 9;
-        InetSocketAddress gwUserAddr =
-            InetSocketAddress(m_satHelper->GetUserAddress(gwUsers.Get(m_gwUserId)), port);
-
-        PacketSinkHelper sinkHelper(socketFactory, Address());
-        CbrHelper cbrHelper(socketFactory, Address());
-        ApplicationContainer sinkContainer;
-        ApplicationContainer cbrContainer;
-        if (direction == SimulationHelper::RTN_LINK)
-        {
-            // create sink application on GW user
-            if (!HasSinkInstalled(gwUsers.Get(m_gwUserId), port))
-            {
-                sinkHelper.SetAttribute("Local", AddressValue(Address(gwUserAddr)));
-                sinkContainer.Add(sinkHelper.Install(gwUsers.Get(m_gwUserId)));
-            }
-
-            cbrHelper.SetAttribute("Remote", AddressValue(Address(gwUserAddr)));
-
-            // create CBR applications on UT users
-            for (uint32_t i = 0; i < utUsers.GetN(); i++)
-            {
-                auto app = cbrHelper.Install(utUsers.Get(i)).Get(0);
-                app->SetStartTime(startTime + (i + 1) * startDelay);
-                cbrContainer.Add(app);
-            }
-        }
-        else if (direction == SimulationHelper::FWD_LINK)
-        {
-            // create CBR applications on UT users
-            for (uint32_t i = 0; i < utUsers.GetN(); i++)
-            {
-                InetSocketAddress utUserAddr =
-                    InetSocketAddress(m_satHelper->GetUserAddress(utUsers.Get(i)), port);
-                if (!HasSinkInstalled(utUsers.Get(i), port))
-                {
-                    sinkHelper.SetAttribute("Local", AddressValue(Address(utUserAddr)));
-                    sinkContainer.Add(sinkHelper.Install(utUsers.Get(i)));
-                }
-
-                cbrHelper.SetAttribute("Remote", AddressValue(Address(utUserAddr)));
-                auto app = cbrHelper.Install(gwUsers.Get(m_gwUserId)).Get(0);
-                app->SetStartTime(startTime + (i + 1) * startDelay);
-                cbrContainer.Add(app);
-            }
-        }
-        sinkContainer.Start(startTime);
-        sinkContainer.Stop(stopTime);
-    }
-    break;
-
-    case SimulationHelper::ONOFF: {
-        uint16_t port = 9;
-        InetSocketAddress gwUserAddr =
-            InetSocketAddress(m_satHelper->GetUserAddress(gwUsers.Get(m_gwUserId)), port);
-
-        PacketSinkHelper sinkHelper(socketFactory, Address());
-        SatOnOffHelper onOffHelper(socketFactory, Address());
-        ApplicationContainer sinkContainer;
-        ApplicationContainer onOffContainer;
-        if (direction == SimulationHelper::RTN_LINK)
-        {
-            // create sink application on GW user
-            if (!HasSinkInstalled(gwUsers.Get(m_gwUserId), port))
-            {
-                sinkHelper.SetAttribute("Local", AddressValue(Address(gwUserAddr)));
-                sinkContainer.Add(sinkHelper.Install(gwUsers.Get(m_gwUserId)));
-            }
-
-            onOffHelper.SetAttribute("Remote", AddressValue(Address(gwUserAddr)));
-
-            // create OnOff applications on UT users
-            for (uint32_t i = 0; i < utUsers.GetN(); i++)
-            {
-                auto app = onOffHelper.Install(utUsers.Get(i)).Get(0);
-                app->SetStartTime(startTime + (i + 1) * startDelay);
-                onOffContainer.Add(app);
-            }
-        }
-        else if (direction == SimulationHelper::FWD_LINK)
-        {
-            // create OnOff applications on UT users
-            for (uint32_t i = 0; i < utUsers.GetN(); i++)
-            {
-                InetSocketAddress utUserAddr =
-                    InetSocketAddress(m_satHelper->GetUserAddress(utUsers.Get(i)), port);
-
-                if (!HasSinkInstalled(utUsers.Get(i), port))
-                {
-                    sinkHelper.SetAttribute("Local", AddressValue(Address(utUserAddr)));
-                    sinkContainer.Add(sinkHelper.Install(utUsers.Get(i)));
-                }
-
-                onOffHelper.SetAttribute("Remote", AddressValue(Address(utUserAddr)));
-                auto app = onOffHelper.Install(gwUsers.Get(m_gwUserId)).Get(0);
-                app->SetStartTime(startTime + (i + 1) * startDelay);
-                onOffContainer.Add(app);
-            }
-        }
-        sinkContainer.Start(startTime);
-        sinkContainer.Stop(stopTime);
-    }
-    break;
-
-    case SimulationHelper::HTTP: {
-        ThreeGppHttpHelper httpHelper;
-        // Since more content should be transferred from server to clients,
-        // we call server behind GW and clients behind UTs scenario DOWNLINK
-        if (direction == SimulationHelper::FWD_LINK)
-        {
-            auto apps = httpHelper.InstallUsingIpv4(gwUsers.Get(m_gwUserId), utUsers);
-            for (uint32_t i = 1; i < apps.GetN(); i++)
-            {
-                apps.Get(i)->SetStartTime(startTime + (i + 1) * startDelay);
-            }
-        }
-        // An unlikely, but possible scenario where a HTTP server
-        // (e.g. web user interface of a device) is reachable only by satellite.
-        // Note that parameters should be defined by user.
-        // We also assume that a single gateway user accesses all HTTP servers.
-        // Modify this if other scenarios are required.
-        else if (direction == SimulationHelper::RTN_LINK)
-        {
-            for (uint32_t i = 0; i < utUsers.GetN(); i++)
-            {
-                auto apps = httpHelper.InstallUsingIpv4(utUsers.Get(i), gwUsers.Get(m_gwUserId));
-                apps.Get(1)->SetStartTime(startTime + (i + 1) * startDelay);
-            }
-        }
-        httpHelper.GetServer().Start(startTime);
-        httpHelper.GetServer().Stop(stopTime);
-    }
-    break;
-
-    case SimulationHelper::NRTV: {
-        NrtvHelper nrtvHelper(TypeId::LookupByName(socketFactory));
-        // Since more content should be transferred from server to clients,
-        // we call server behind GW and clients behind UTs scenario DOWNLINK
-        if (direction == SimulationHelper::FWD_LINK)
-        {
-            auto apps = nrtvHelper.InstallUsingIpv4(gwUsers.Get(m_gwUserId), utUsers);
-            for (uint32_t i = 1; i < apps.GetN(); i++)
-            {
-                apps.Get(i)->SetStartTime(startTime + (i + 1) * startDelay);
-            }
-        }
-        // An unlikely, but possible scenario where an NRTV server
-        // (e.g. video surveillance feed) is reachable only by satellite.
-        // Note that parameters should be defined by user.
-        // We also assume that a single gateway user accesses all NRTV servers.
-        // Modify this if other scenarios are required.
-        else if (direction == SimulationHelper::RTN_LINK)
-        {
-            for (uint32_t i = 0; i < utUsers.GetN(); i++)
-            {
-                auto apps = nrtvHelper.InstallUsingIpv4(utUsers.Get(i), gwUsers.Get(m_gwUserId));
-                apps.Get(1)->SetStartTime(startTime + (i + 1) * startDelay);
-            }
-        }
-        nrtvHelper.GetServer().Start(startTime);
-        nrtvHelper.GetServer().Stop(stopTime);
-    }
-    break;
-
-    default:
-        NS_FATAL_ERROR("Invalid traffic model");
-        break;
-    }
-}
-
-void
-SimulationHelper::InstallLoraTrafficModel(LoraTrafficModel_t trafficModel,
-                                          Time interval,
-                                          uint32_t packetSize,
-                                          Time startTime,
-                                          Time stopTime,
-                                          Time startDelay)
-{
-    NS_LOG_FUNCTION(this << trafficModel << interval << packetSize << startTime << stopTime);
-
-    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
-    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
-    Ptr<Node> node;
-
-    std::cout << "Installing Lora traffic model on " << uts.GetN() << " UTs" << std::endl;
-
-    switch (trafficModel)
-    {
-    case SimulationHelper::PERIODIC: {
-        for (uint32_t i = 0; i < uts.GetN(); i++)
-        {
-            node = uts.Get(i);
-            Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
-
-            app->SetInterval(interval);
-            NS_LOG_DEBUG("Created an application with interval = " << interval.GetHours()
-                                                                   << " hours");
-
-            app->SetStartTime(startTime + (i + 1) * startDelay);
-            app->SetStopTime(stopTime);
-            app->SetPacketSize(packetSize);
-
-            app->SetNode(node);
-            node->AddApplication(app);
-        }
-        break;
-    }
-    case SimulationHelper::LORA_CBR: {
-        NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
-
-        uint16_t port = 9;
-        InetSocketAddress gwUserAddr =
-            InetSocketAddress(m_satHelper->GetUserAddress(gwUsers.Get(m_gwUserId)), port);
-
-        PacketSinkHelper sinkHelper("ns3::UdpSocketFactory", Address());
-        CbrHelper cbrHelper("ns3::UdpSocketFactory", Address());
-        ApplicationContainer sinkContainer;
-        ApplicationContainer cbrContainer;
-
-        // create sink application on GW user
-        if (!HasSinkInstalled(gwUsers.Get(m_gwUserId), port))
-        {
-            sinkHelper.SetAttribute("Local", AddressValue(Address(gwUserAddr)));
-            sinkContainer.Add(sinkHelper.Install(gwUsers.Get(m_gwUserId)));
-        }
-
-        cbrHelper.SetAttribute("Remote", AddressValue(Address(gwUserAddr)));
-
-        // create CBR applications on UT users
-        for (uint32_t i = 0; i < utUsers.GetN(); i++)
-        {
-            auto app = cbrHelper.Install(utUsers.Get(i)).Get(0);
-            app->SetStartTime(startTime + (i + 1) * startDelay);
-            cbrContainer.Add(app);
-        }
-
-        sinkContainer.Start(startTime);
-        sinkContainer.Stop(stopTime);
-        break;
-    }
-    case SimulationHelper::ONE_SHOT:
-    default:
-        NS_FATAL_ERROR("Traffic Model for Lora not implemented yet");
-    }
-}
-
-void
 SimulationHelper::SetCrTxConf(CrTxConf_t crTxConf)
 {
     switch (crTxConf)
@@ -2055,44 +1938,61 @@ SimulationHelper::ConfigureAttributesFromFile(std::string filePath,
         EnableProgressLogs();
     }
 
-    for (const auto& trafficModel : simulationConf->m_trafficModel)
+    for (const std::pair<const std::string, SimulationHelperConf::TrafficConfiguration_t>&
+             trafficModel : simulationConf->m_trafficModel)
     {
-        TrafficModel_t modelName;
-        if (trafficModel.first == "Cbr")
+        SatTrafficHelper::TrafficType_t modelName;
+        if (trafficModel.first == "LoraCbr")
         {
-            modelName = CBR;
+            modelName = SatTrafficHelper::LORA_PERIODIC;
+        }
+        else if (trafficModel.first == "LoraPeriodic")
+        {
+            modelName = SatTrafficHelper::LORA_CBR;
+        }
+        else if (trafficModel.first == "Cbr")
+        {
+            modelName = SatTrafficHelper::CBR;
         }
         else if (trafficModel.first == "OnOff")
         {
-            modelName = ONOFF;
+            modelName = SatTrafficHelper::ONOFF;
         }
         else if (trafficModel.first == "Http")
         {
-            modelName = HTTP;
+            modelName = SatTrafficHelper::HTTP;
         }
         else if (trafficModel.first == "Nrtv")
         {
-            modelName = NRTV;
+            modelName = SatTrafficHelper::NRTV;
+        }
+        else if (trafficModel.first == "Poisson")
+        {
+            modelName = SatTrafficHelper::POISSON;
+        }
+        else if (trafficModel.first == "Voip")
+        {
+            modelName = SatTrafficHelper::VOIP;
         }
         else
         {
             NS_FATAL_ERROR("Unknown traffic model has been configured: " << trafficModel.first);
         }
 
-        std::vector<SimulationHelper::TransportLayerProtocol_t> protocols;
+        std::vector<SatTrafficHelper::TransportLayerProtocol_t> protocols;
         switch (trafficModel.second.m_protocol)
         {
         case SimulationHelperConf::PROTOCOL_UDP: {
-            protocols.push_back(SimulationHelper::UDP);
+            protocols.push_back(SatTrafficHelper::UDP);
             break;
         }
         case SimulationHelperConf::PROTOCOL_TCP: {
-            protocols.push_back(SimulationHelper::TCP);
+            protocols.push_back(SatTrafficHelper::TCP);
             break;
         }
         case SimulationHelperConf::PROTOCOL_BOTH: {
-            protocols.push_back(SimulationHelper::TCP);
-            protocols.push_back(SimulationHelper::UDP);
+            protocols.push_back(SatTrafficHelper::TCP);
+            protocols.push_back(SatTrafficHelper::UDP);
             break;
         }
         default: {
@@ -2100,20 +2000,20 @@ SimulationHelper::ConfigureAttributesFromFile(std::string filePath,
         }
         }
 
-        std::vector<SimulationHelper::TrafficDirection_t> directions;
+        std::vector<SatTrafficHelper::TrafficDirection_t> directions;
         switch (trafficModel.second.m_direction)
         {
         case SimulationHelperConf::RTN_LINK: {
-            directions.push_back(SimulationHelper::RTN_LINK);
+            directions.push_back(SatTrafficHelper::RTN_LINK);
             break;
         }
         case SimulationHelperConf::FWD_LINK: {
-            directions.push_back(SimulationHelper::FWD_LINK);
+            directions.push_back(SatTrafficHelper::FWD_LINK);
             break;
         }
         case SimulationHelperConf::BOTH_LINK: {
-            directions.push_back(SimulationHelper::FWD_LINK);
-            directions.push_back(SimulationHelper::RTN_LINK);
+            directions.push_back(SatTrafficHelper::FWD_LINK);
+            directions.push_back(SatTrafficHelper::RTN_LINK);
             break;
         }
         default: {
@@ -2123,7 +2023,8 @@ SimulationHelper::ConfigureAttributesFromFile(std::string filePath,
 
         if (trafficModel.second.m_percentage > 0.0)
         {
-            Time startTime = trafficModel.second.m_startTime;
+            SimulationHelperConf::TrafficConfiguration_t conf = trafficModel.second;
+            Time startTime = conf.m_startTime;
             if (startTime > m_simTime)
             {
                 NS_FATAL_ERROR("Traffic model "
@@ -2131,7 +2032,7 @@ SimulationHelper::ConfigureAttributesFromFile(std::string filePath,
                                << " configured to start after the simulation ended");
             }
 
-            Time stopTime = trafficModel.second.m_stopTime;
+            Time stopTime = conf.m_stopTime;
             if (stopTime == Seconds(0))
             {
                 stopTime = m_simTime + Seconds(1);
@@ -2142,16 +2043,120 @@ SimulationHelper::ConfigureAttributesFromFile(std::string filePath,
                                                 << " configured to stop before it is started");
             }
 
-            for (auto& protocol : protocols)
+            NodeContainer gws = Singleton<SatTopology>::Get()->GetGwUserNodes();
+            NodeContainer uts;
+            if (modelName == SatTrafficHelper::LORA_PERIODIC)
             {
-                for (auto& direction : directions)
+                uts = Singleton<SatTopology>::Get()->GetUtNodes();
+            }
+            else
+            {
+                uts = Singleton<SatTopology>::Get()->GetUtUserNodes();
+            }
+
+            for (SatTrafficHelper::TransportLayerProtocol_t& protocol : protocols)
+            {
+                for (SatTrafficHelper::TrafficDirection_t& direction : directions)
                 {
-                    InstallTrafficModel(modelName,
-                                        protocol,
-                                        direction,
-                                        startTime,
-                                        stopTime,
-                                        trafficModel.second.m_startDelay);
+                    switch (modelName)
+                    {
+                    case SatTrafficHelper::LORA_PERIODIC: {
+                        GetTrafficHelper()->AddLoraPeriodicTraffic(conf.m_interval,
+                                                                   conf.m_packetSize,
+                                                                   uts,
+                                                                   startTime,
+                                                                   stopTime,
+                                                                   conf.m_startDelay,
+                                                                   conf.m_percentage);
+                        break;
+                    }
+                    case SatTrafficHelper::LORA_CBR: {
+                        GetTrafficHelper()->AddLoraCbrTraffic(conf.m_interval,
+                                                              conf.m_packetSize,
+                                                              gws,
+                                                              uts,
+                                                              startTime,
+                                                              stopTime,
+                                                              conf.m_startDelay,
+                                                              conf.m_percentage);
+                        break;
+                    }
+                    case SatTrafficHelper::CBR: {
+                        GetTrafficHelper()->AddCbrTraffic(direction,
+                                                          protocol,
+                                                          conf.m_interval,
+                                                          conf.m_packetSize,
+                                                          gws,
+                                                          uts,
+                                                          startTime,
+                                                          stopTime,
+                                                          conf.m_startDelay,
+                                                          conf.m_percentage);
+                        break;
+                    }
+                    case SatTrafficHelper::ONOFF: {
+                        GetTrafficHelper()->AddOnOffTraffic(direction,
+                                                            protocol,
+                                                            conf.m_dataRate,
+                                                            conf.m_packetSize,
+                                                            gws,
+                                                            uts,
+                                                            conf.m_onTimePattern,
+                                                            conf.m_offTimePattern,
+                                                            startTime,
+                                                            stopTime,
+                                                            conf.m_startDelay,
+                                                            conf.m_percentage);
+                        break;
+                    }
+                    case SatTrafficHelper::HTTP: {
+                        GetTrafficHelper()->AddHttpTraffic(direction,
+                                                           gws,
+                                                           uts,
+                                                           startTime,
+                                                           stopTime,
+                                                           conf.m_startDelay,
+                                                           conf.m_percentage);
+                        break;
+                    }
+                    case SatTrafficHelper::NRTV: {
+                        GetTrafficHelper()->AddNrtvTraffic(direction,
+                                                           gws,
+                                                           uts,
+                                                           startTime,
+                                                           stopTime,
+                                                           conf.m_startDelay,
+                                                           conf.m_percentage);
+                        break;
+                    }
+                    case SatTrafficHelper::POISSON: {
+                        GetTrafficHelper()->AddPoissonTraffic(direction,
+                                                              conf.m_onTime,
+                                                              conf.m_offTime,
+                                                              conf.m_dataRate,
+                                                              conf.m_packetSize,
+                                                              gws,
+                                                              uts,
+                                                              startTime,
+                                                              stopTime,
+                                                              conf.m_startDelay,
+                                                              conf.m_percentage);
+                        break;
+                    }
+                    case SatTrafficHelper::VOIP: {
+                        GetTrafficHelper()->AddVoipTraffic(direction,
+                                                           conf.m_codec,
+                                                           gws,
+                                                           uts,
+                                                           startTime,
+                                                           stopTime,
+                                                           conf.m_startDelay,
+                                                           conf.m_percentage);
+                        break;
+                    }
+                    default:
+                        NS_FATAL_ERROR("Unknown traffic model has been configured: " << modelName);
+                    }
                 }
             }
         }

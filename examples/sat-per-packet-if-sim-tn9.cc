@@ -195,15 +195,18 @@ main(int argc, char* argv[])
     // Creating the reference system.
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario();
 
-    /**
-     * Set-up CBR traffic
-     */
-    simulationHelper->InstallTrafficModel(SimulationHelper::ONOFF,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          appStartTime,
-                                          Seconds(simLength + 1),
-                                          MilliSeconds(50));
+    simulationHelper->GetTrafficHelper()->AddOnOffTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        dataRate,
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        "ns3::ConstantRandomVariable[Constant=1000]",
+        "ns3::ConstantRandomVariable[Constant=0]",
+        appStartTime,
+        Seconds(simLength + 1),
+        MilliSeconds(50));
 
     /**
      * Set-up statistics

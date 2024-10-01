@@ -59,7 +59,7 @@ main(int argc, char* argv[])
     double simLength(300.0); // in seconds
 
     /// Set simulation output details
-    auto sh = CreateObject<SimulationHelper>("example-ra-sim-tn9");
+    auto simulationHelper = CreateObject<SimulationHelper>("example-ra-sim-tn9");
 
     // To read attributes from file
     std::string inputFileNameWithPath =
@@ -75,7 +75,7 @@ main(int argc, char* argv[])
     cmd.AddValue("dataRate", "Data rate (e.g. 500kb/s)", dataRate);
     cmd.AddValue("onTime", "Time for packet sending is on in seconds", onTime);
     cmd.AddValue("offTime", "Time for packet sending is off in seconds", offTime);
-    sh->AddDefaultUiArguments(cmd, inputFileNameWithPath);
+    simulationHelper->AddDefaultUiArguments(cmd, inputFileNameWithPath);
     cmd.Parse(argc, argv);
 
     Config::SetDefault("ns3::ConfigStore::Filename", StringValue(inputFileNameWithPath));
@@ -260,35 +260,35 @@ main(int argc, char* argv[])
     }
 
     // Creating the reference system.
-    sh->SetSimulationTime(simLength);
-    sh->SetUserCountPerUt(endUsersPerUt);
-    sh->SetUtCountPerBeam(utsPerBeam);
-    sh->SetBeamSet({beamId});
+    simulationHelper->SetSimulationTime(simLength);
+    simulationHelper->SetUserCountPerUt(endUsersPerUt);
+    simulationHelper->SetUtCountPerBeam(utsPerBeam);
+    simulationHelper->SetBeamSet({beamId});
 
-    sh->LoadScenario("geo-33E");
+    simulationHelper->LoadScenario("geo-33E");
 
-    sh->CreateSatScenario();
+    simulationHelper->CreateSatScenario();
 
     /**
      * Set-up On-Off traffic
      */
-    // Set up user given parameters for on/off functionality.
-    Config::SetDefault("ns3::OnOffApplication::PacketSize", UintegerValue(packetSize));
-    Config::SetDefault("ns3::OnOffApplication::DataRate", StringValue(dataRate));
-    Config::SetDefault("ns3::OnOffApplication::OnTime",
-                       StringValue("ns3::ConstantRandomVariable[Constant=" + onTime + "]"));
-    Config::SetDefault("ns3::OnOffApplication::OffTime",
-                       StringValue("ns3::ConstantRandomVariable[Constant=" + offTime + "]"));
-    sh->InstallTrafficModel(SimulationHelper::ONOFF,
-                            SimulationHelper::UDP,
-                            SimulationHelper::RTN_LINK,
-                            Seconds(0),
-                            Seconds(simLength - 2.0));
+    simulationHelper->GetTrafficHelper()->AddOnOffTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        dataRate,
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        "ns3::ConstantRandomVariable[Constant=" + onTime + "]",
+        "ns3::ConstantRandomVariable[Constant=" + offTime + "]",
+        Seconds(0),
+        Seconds(simLength - 2.0),
+        Seconds(0));
 
     /**
      * Set-up statistics
      */
-    Ptr<SatStatsHelperContainer> s = sh->GetStatisticsContainer();
+    Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
 
     s->AddPerBeamRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
     s->AddPerBeamRtnFeederDevThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -363,7 +363,7 @@ main(int argc, char* argv[])
     /**
      * Run simulation
      */
-    sh->RunSimulation();
+    simulationHelper->RunSimulation();
 
     return 0;
 }

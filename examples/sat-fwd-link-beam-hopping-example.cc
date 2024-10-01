@@ -99,14 +99,16 @@ main(int argc, char* argv[])
     simulationHelper->CreateSatScenario();
 
     // Install traffic model
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(MilliSeconds(1)));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(0.001),
-                                          simLength,
-                                          Seconds(0.001));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(1),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        MilliSeconds(1),
+        simLength,
+        MilliSeconds(1));
 
     auto stats = simulationHelper->GetStatisticsContainer();
     stats->AddGlobalFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);

@@ -134,19 +134,27 @@ main(int argc, char* argv[])
         Singleton<SatTopology>::Get()->GetUtNode(0)->GetObject<SatMobilityModel>();
 
     // Install CBR traffic model
-    Config::SetDefault("ns3::CbrApplication::Interval", StringValue("0.1s"));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(0.1),
-                                          Seconds(0.25));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(100),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(0.1),
+        Seconds(0.25),
+        Seconds(0));
 
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(0.1),
-                                          Seconds(0.25));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(100),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(0.1),
+        Seconds(0.25),
+        Seconds(0));
 
     Ptr<SatMobilityModel> gwMob =
         Singleton<SatTopology>::Get()->GetGwNode(0)->GetObject<SatMobilityModel>();

@@ -109,19 +109,27 @@ main(int argc, char* argv[])
 
     simulationHelper->CreateSatScenario();
 
-    Config::SetDefault("ns3::CbrApplication::Interval", StringValue(interval));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        Time(interval),
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(0.1),
+        Seconds(simLength),
+        Seconds(0));
 
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(0.1),
-                                          Seconds(simLength));
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(0.1),
-                                          Seconds(simLength));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        Time(interval),
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(0.1),
+        Seconds(simLength),
+        Seconds(0));
 
     // To store attributes to file
     Config::SetDefault("ns3::ConfigStore::Filename", StringValue("output-attributes.xml"));

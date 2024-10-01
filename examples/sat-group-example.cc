@@ -266,9 +266,10 @@ main(int argc, char* argv[])
     Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper();
     trafficHelper->AddCbrTraffic(
         SatTrafficHelper::FWD_LINK,
-        "100ms",
+        SatTrafficHelper::UDP,
+        MilliSeconds(100),
         packetSize,
-        Singleton<SatTopology>::Get()->GetGwUserNode(0),
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
         Singleton<SatTopology>::Get()->GetUtUserNodes(groupHelper->GetUtNodes(2)),
         appStartTime,
         appStartTime + simLength,
@@ -276,9 +277,10 @@ main(int argc, char* argv[])
 
     trafficHelper->AddCbrTraffic(
         SatTrafficHelper::RTN_LINK,
-        "1000ms",
+        SatTrafficHelper::UDP,
+        Seconds(1),
         packetSize,
-        Singleton<SatTopology>::Get()->GetGwUserNode(0),
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
         Singleton<SatTopology>::Get()->GetUtUserNodes(groupHelper->GetUtNodes(0)),
         appStartTime,
         appStartTime + simLength,
@@ -286,7 +288,7 @@ main(int argc, char* argv[])
 
     trafficHelper->AddHttpTraffic(
         SatTrafficHelper::FWD_LINK,
-        Singleton<SatTopology>::Get()->GetGwUserNode(0),
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
         Singleton<SatTopology>::Get()->GetUtUserNodes(groupHelper->GetUtNodes(1)),
         appStartTime,
         appStartTime + simLength,
@@ -295,7 +297,7 @@ main(int argc, char* argv[])
     trafficHelper->AddVoipTraffic(
         SatTrafficHelper::FWD_LINK,
         SatTrafficHelper::G_711_1,
-        Singleton<SatTopology>::Get()->GetGwUserNode(0),
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
         Singleton<SatTopology>::Get()->GetUtUserNodes(groupHelper->GetUtNodes(5)),
         appStartTime,
         appStartTime + simLength,

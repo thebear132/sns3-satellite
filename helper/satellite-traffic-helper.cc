@@ -26,9 +26,12 @@
 
 #include <ns3/cbr-helper.h>
 #include <ns3/log.h>
+#include <ns3/lora-periodic-sender.h>
 #include <ns3/nrtv-helper.h>
 #include <ns3/packet-sink-helper.h>
 #include <ns3/packet-sink.h>
+#include <ns3/satellite-topology.h>
+#include <ns3/singleton.h>
 #include <ns3/three-gpp-http-satellite-helper.h>
 #include <ns3/type-id.h>
 
@@ -43,7 +46,14 @@ TypeId
 SatTrafficHelper::GetTypeId(void)
 {
     static TypeId tid =
-        TypeId("ns3::SatTrafficHelper").SetParent<Object>().AddConstructor<SatTrafficHelper>();
+        TypeId("ns3::SatTrafficHelper")
+            .SetParent<Object>()
+            .AddConstructor<SatTrafficHelper>()
+            .AddAttribute("EnableDefaultStatistics",
+                          "Enable outputing values from stats helpers",
+                          BooleanValue(true),
+                          MakeBooleanAccessor(&SatTrafficHelper::m_enableDefaultStatistics),
+                          MakeBooleanChecker());
     return tid;
 }
 
@@ -65,35 +75,192 @@ SatTrafficHelper::SatTrafficHelper()
 SatTrafficHelper::SatTrafficHelper(Ptr<SatHelper> satHelper,
                                    Ptr<SatStatsHelperContainer> satStatsHelperContainer)
     : m_satHelper(satHelper),
-      m_satStatsHelperContainer(satStatsHelperContainer)
+      m_satStatsHelperContainer(satStatsHelperContainer),
+      m_enableDefaultStatistics(false)
 {
     m_last_custom_application.created = false;
 }
 
 void
-SatTrafficHelper::AddCbrTraffic(TrafficDirection_t direction,
-                                std::string interval,
-                                uint32_t packetSize,
-                                NodeContainer gws,
-                                NodeContainer uts,
-                                Time startTime,
-                                Time stopTime,
-                                Time startDelay)
+SatTrafficHelper::AddLoraPeriodicTraffic(Time interval,
+                                         uint32_t packetSize,
+                                         NodeContainer uts,
+                                         Time startTime,
+                                         Time stopTime,
+                                         Time startDelay)
 {
     NS_LOG_FUNCTION(this << interval << packetSize << startTime << stopTime << startDelay);
 
-    if (gws.GetN() == 0)
-    {
-        NS_LOG_WARN("Gateway container is empty");
-        return;
-    }
     if (uts.GetN() == 0)
     {
         NS_LOG_WARN("UT container is empty");
         return;
     }
 
-    std::string socketFactory = "ns3::UdpSocketFactory";
+    PacketSinkHelper sinkHelper("ns3::UdpSocketFactory", Address());
+    CbrHelper cbrHelper("ns3::UdpSocketFactory", Address());
+    ApplicationContainer sinkContainer;
+    ApplicationContainer cbrContainer;
+
+    Ptr<Node> node;
+
+    // create Lora Periodic sender applications from UT users to GW users
+    for (uint32_t i = 0; i < uts.GetN(); i++)
+    {
+        node = uts.Get(i);
+        Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
+
+        app->SetInterval(interval);
+        NS_LOG_DEBUG("Created an application with interval = " << interval.GetHours() << " hours");
+
+        app->SetStartTime(startTime + (i + 1) * startDelay);
+        app->SetStopTime(stopTime);
+        app->SetPacketSize(packetSize);
+
+        app->SetNode(node);
+        node->AddApplication(app);
+    }
+}
+
+void
+SatTrafficHelper::AddLoraPeriodicTraffic(Time interval,
+                                         uint32_t packetSize,
+                                         NodeContainer uts,
+                                         Time startTime,
+                                         Time stopTime,
+                                         Time startDelay,
+                                         double percentage)
+{
+    NS_LOG_FUNCTION(this << interval << packetSize << startTime << stopTime << startDelay
+                         << percentage);
+
+    // Filter UTs to keep only a given percentage on which installing the application
+    Ptr<UniformRandomVariable> rng = CreateObject<UniformRandomVariable>();
+    NodeContainer utsUpdated;
+    for (uint32_t i = 0; i < uts.GetN(); ++i)
+    {
+        if (rng->GetValue(0.0, 1.0) < percentage)
+        {
+            utsUpdated.Add(uts.Get(i));
+        }
+    }
+
+    AddLoraPeriodicTraffic(interval, packetSize, utsUpdated, startTime, stopTime, startDelay);
+}
+
+void
+SatTrafficHelper::AddLoraCbrTraffic(Time interval,
+                                    uint32_t packetSize,
+                                    NodeContainer gwUsers,
+                                    NodeContainer utUsers,
+                                    Time startTime,
+                                    Time stopTime,
+                                    Time startDelay)
+{
+    NS_LOG_FUNCTION(this << interval << packetSize << startTime << stopTime << startDelay);
+
+    if (gwUsers.GetN() == 0)
+    {
+        NS_LOG_WARN("Gateway users container is empty");
+        return;
+    }
+    if (utUsers.GetN() == 0)
+    {
+        NS_LOG_WARN("UT users container is empty");
+        return;
+    }
+
+    uint16_t port = 9;
+
+    PacketSinkHelper sinkHelper("ns3::UdpSocketFactory", Address());
+    CbrHelper cbrHelper("ns3::UdpSocketFactory", Address());
+    ApplicationContainer sinkContainer;
+    ApplicationContainer cbrContainer;
+
+    // create CBR applications from UT users to GW users
+    for (uint32_t j = 0; j < gwUsers.GetN(); j++)
+    {
+        for (uint32_t i = 0; i < utUsers.GetN(); i++)
+        {
+            InetSocketAddress gwUserAddr =
+                InetSocketAddress(m_satHelper->GetUserAddress(gwUsers.Get(j)), port);
+            if (!HasSinkInstalled(gwUsers.Get(j), port))
+            {
+                sinkHelper.SetAttribute("Local", AddressValue(Address(gwUserAddr)));
+                sinkContainer.Add(sinkHelper.Install(gwUsers.Get(j)));
+            }
+
+            cbrHelper.SetConstantTraffic(interval, packetSize);
+            cbrHelper.SetAttribute("Remote", AddressValue(Address(gwUserAddr)));
+            auto app = cbrHelper.Install(utUsers.Get(i)).Get(0);
+            app->SetStartTime(startTime + (i + j * gwUsers.GetN() + 1) * startDelay);
+            cbrContainer.Add(app);
+        }
+    }
+
+    sinkContainer.Start(startTime);
+    sinkContainer.Stop(stopTime);
+}
+
+void
+SatTrafficHelper::AddLoraCbrTraffic(Time interval,
+                                    uint32_t packetSize,
+                                    NodeContainer gwUsers,
+                                    NodeContainer utUsers,
+                                    Time startTime,
+                                    Time stopTime,
+                                    Time startDelay,
+                                    double percentage)
+{
+    NS_LOG_FUNCTION(this << interval << packetSize << startTime << stopTime << startDelay
+                         << percentage);
+
+    // Filter UT users to keep only a given percentage on which installing the application
+    Ptr<UniformRandomVariable> rng = CreateObject<UniformRandomVariable>();
+    NodeContainer utUsersUpdated;
+    for (uint32_t i = 0; i < utUsers.GetN(); ++i)
+    {
+        if (rng->GetValue(0.0, 1.0) < percentage)
+        {
+            utUsersUpdated.Add(utUsers.Get(i));
+        }
+    }
+
+    AddLoraCbrTraffic(interval,
+                      packetSize,
+                      gwUsers,
+                      utUsersUpdated,
+                      startTime,
+                      stopTime,
+                      startDelay);
+}
+
+void
+SatTrafficHelper::AddCbrTraffic(TrafficDirection_t direction,
+                                TransportLayerProtocol_t protocol,
+                                Time interval,
+                                uint32_t packetSize,
+                                NodeContainer gwUsers,
+                                NodeContainer utUsers,
+                                Time startTime,
+                                Time stopTime,
+                                Time startDelay)
+{
+    NS_LOG_FUNCTION(this << interval << packetSize << startTime << stopTime << startDelay);
+
+    if (gwUsers.GetN() == 0)
+    {
+        NS_LOG_WARN("Gateway users container is empty");
+        return;
+    }
+    if (utUsers.GetN() == 0)
+    {
+        NS_LOG_WARN("UT users container is empty");
+        return;
+    }
+
+    std::string socketFactory =
+        (protocol == SatTrafficHelper::TCP ? "ns3::TcpSocketFactory" : "ns3::UdpSocketFactory");
     uint16_t port = 9;
 
     PacketSinkHelper sinkHelper(socketFactory, Address());
@@ -102,40 +269,40 @@ SatTrafficHelper::AddCbrTraffic(TrafficDirection_t direction,
     ApplicationContainer cbrContainer;
 
     // create CBR applications from GWs to UT users
-    for (uint32_t j = 0; j < gws.GetN(); j++)
+    for (uint32_t j = 0; j < gwUsers.GetN(); j++)
     {
-        for (uint32_t i = 0; i < uts.GetN(); i++)
+        for (uint32_t i = 0; i < utUsers.GetN(); i++)
         {
             if (direction == RTN_LINK)
             {
                 InetSocketAddress gwUserAddr =
-                    InetSocketAddress(m_satHelper->GetUserAddress(gws.Get(j)), port);
-                if (!HasSinkInstalled(gws.Get(j), port))
+                    InetSocketAddress(m_satHelper->GetUserAddress(gwUsers.Get(j)), port);
+                if (!HasSinkInstalled(gwUsers.Get(j), port))
                 {
                     sinkHelper.SetAttribute("Local", AddressValue(Address(gwUserAddr)));
-                    sinkContainer.Add(sinkHelper.Install(gws.Get(j)));
+                    sinkContainer.Add(sinkHelper.Install(gwUsers.Get(j)));
                 }
 
-                cbrHelper.SetConstantTraffic(Time(interval), packetSize);
+                cbrHelper.SetConstantTraffic(interval, packetSize);
                 cbrHelper.SetAttribute("Remote", AddressValue(Address(gwUserAddr)));
-                auto app = cbrHelper.Install(uts.Get(i)).Get(0);
-                app->SetStartTime(startTime + (i + j * gws.GetN() + 1) * startDelay);
+                auto app = cbrHelper.Install(utUsers.Get(i)).Get(0);
+                app->SetStartTime(startTime + (i + j * gwUsers.GetN() + 1) * startDelay);
                 cbrContainer.Add(app);
             }
             else if (direction == FWD_LINK)
             {
                 InetSocketAddress utUserAddr =
-                    InetSocketAddress(m_satHelper->GetUserAddress(uts.Get(i)), port);
-                if (!HasSinkInstalled(uts.Get(i), port))
+                    InetSocketAddress(m_satHelper->GetUserAddress(utUsers.Get(i)), port);
+                if (!HasSinkInstalled(utUsers.Get(i), port))
                 {
                     sinkHelper.SetAttribute("Local", AddressValue(Address(utUserAddr)));
-                    sinkContainer.Add(sinkHelper.Install(uts.Get(i)));
+                    sinkContainer.Add(sinkHelper.Install(utUsers.Get(i)));
                 }
 
-                cbrHelper.SetConstantTraffic(Time(interval), packetSize);
+                cbrHelper.SetConstantTraffic(interval, packetSize);
                 cbrHelper.SetAttribute("Remote", AddressValue(Address(utUserAddr)));
-                auto app = cbrHelper.Install(gws.Get(j)).Get(0);
-                app->SetStartTime(startTime + (i + j * gws.GetN() + 1) * startDelay);
+                auto app = cbrHelper.Install(gwUsers.Get(j)).Get(0);
+                app->SetStartTime(startTime + (i + j * gwUsers.GetN() + 1) * startDelay);
                 cbrContainer.Add(app);
             }
         }
@@ -144,120 +311,397 @@ SatTrafficHelper::AddCbrTraffic(TrafficDirection_t direction,
     sinkContainer.Start(startTime);
     sinkContainer.Stop(stopTime);
 
-    // Add throuhgput statistics
-    if (direction == FWD_LINK)
+    if (m_enableDefaultStatistics)
     {
-        // Global scalar
-        m_satStatsHelperContainer->AddGlobalFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
+        // Add throuhgput statistics
+        if (direction == FWD_LINK)
+        {
+            // Global scalar
+            m_satStatsHelperContainer->AddGlobalFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Global scatter
-        m_satStatsHelperContainer->AddGlobalFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Global scatter
+            m_satStatsHelperContainer->AddGlobalFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per UT scalar
-        m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per UT scalar
+            m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per UT scatter
-        m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Per UT scatter
+            m_satStatsHelperContainer->AddPerUtFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per GW scalar
-        m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per GW scalar
+            m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per GW scatter
-        m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-    }
-    else if (direction == RTN_LINK)
-    {
-        // Global scalar
-        m_satStatsHelperContainer->AddGlobalRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per GW scatter
+            m_satStatsHelperContainer->AddPerGwFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
+        else if (direction == RTN_LINK)
+        {
+            // Global scalar
+            m_satStatsHelperContainer->AddGlobalRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Global scatter
-        m_satStatsHelperContainer->AddGlobalRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Global scatter
+            m_satStatsHelperContainer->AddGlobalRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per UT scalar
-        m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per UT scalar
+            m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per UT scatter
-        m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Per UT scatter
+            m_satStatsHelperContainer->AddPerUtRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per GW scalar
-        m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per GW scalar
+            m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per GW scatter
-        m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Per GW scatter
+            m_satStatsHelperContainer->AddPerGwRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
     }
 }
 
 void
+SatTrafficHelper::AddCbrTraffic(TrafficDirection_t direction,
+                                TransportLayerProtocol_t protocol,
+                                Time interval,
+                                uint32_t packetSize,
+                                NodeContainer gwUsers,
+                                NodeContainer utUsers,
+                                Time startTime,
+                                Time stopTime,
+                                Time startDelay,
+                                double percentage)
+{
+    NS_LOG_FUNCTION(this << interval << packetSize << startTime << stopTime << startDelay
+                         << percentage);
+
+    // Filter UT users to keep only a given percentage on which installing the application
+    Ptr<UniformRandomVariable> rng = CreateObject<UniformRandomVariable>();
+    NodeContainer utUsersUpdated;
+    for (uint32_t i = 0; i < utUsers.GetN(); ++i)
+    {
+        if (rng->GetValue(0.0, 1.0) < percentage)
+        {
+            utUsersUpdated.Add(utUsers.Get(i));
+        }
+    }
+
+    AddCbrTraffic(direction,
+                  protocol,
+                  interval,
+                  packetSize,
+                  gwUsers,
+                  utUsersUpdated,
+                  startTime,
+                  stopTime,
+                  startDelay);
+}
+
+void
+SatTrafficHelper::AddOnOffTraffic(TrafficDirection_t direction,
+                                  TransportLayerProtocol_t protocol,
+                                  DataRate dataRate,
+                                  uint32_t packetSize,
+                                  NodeContainer gwUsers,
+                                  NodeContainer utUsers,
+                                  std::string onTimePattern,
+                                  std::string offTimePattern,
+                                  Time startTime,
+                                  Time stopTime,
+                                  Time startDelay)
+{
+    NS_LOG_FUNCTION(this << dataRate << packetSize << onTimePattern << offTimePattern << startTime
+                         << stopTime << startDelay);
+
+    if (gwUsers.GetN() == 0)
+    {
+        NS_LOG_WARN("Gateway users container is empty");
+        return;
+    }
+    if (utUsers.GetN() == 0)
+    {
+        NS_LOG_WARN("UT users container is empty");
+        return;
+    }
+
+    std::string socketFactory =
+        (protocol == SatTrafficHelper::TCP ? "ns3::TcpSocketFactory" : "ns3::UdpSocketFactory");
+    uint16_t port = 9;
+
+    PacketSinkHelper sinkHelper(socketFactory, Address());
+    SatOnOffHelper onOffHelper(socketFactory, Address());
+    ApplicationContainer sinkContainer;
+    ApplicationContainer onOffContainer;
+
+    onOffHelper.SetAttribute("OnTime", StringValue(onTimePattern));
+    onOffHelper.SetAttribute("OffTime", StringValue(offTimePattern));
+    onOffHelper.SetAttribute("DataRate", DataRateValue(dataRate));
+    onOffHelper.SetAttribute("PacketSize", UintegerValue(packetSize));
+
+    // create ONOFF applications from GWs to UT users
+    for (uint32_t j = 0; j < gwUsers.GetN(); j++)
+    {
+        for (uint32_t i = 0; i < utUsers.GetN(); i++)
+        {
+            if (direction == RTN_LINK)
+            {
+                InetSocketAddress gwUserAddr =
+                    InetSocketAddress(m_satHelper->GetUserAddress(gwUsers.Get(j)), port);
+                if (!HasSinkInstalled(gwUsers.Get(j), port))
+                {
+                    sinkHelper.SetAttribute("Local", AddressValue(Address(gwUserAddr)));
+                    sinkContainer.Add(sinkHelper.Install(gwUsers.Get(j)));
+                }
+
+                onOffHelper.SetAttribute("Remote", AddressValue(Address(gwUserAddr)));
+                auto app = onOffHelper.Install(utUsers.Get(i)).Get(0);
+                app->SetStartTime(startTime + (i + j * gwUsers.GetN() + 1) * startDelay);
+                onOffContainer.Add(app);
+            }
+            else if (direction == FWD_LINK)
+            {
+                InetSocketAddress utUserAddr =
+                    InetSocketAddress(m_satHelper->GetUserAddress(utUsers.Get(i)), port);
+                if (!HasSinkInstalled(utUsers.Get(i), port))
+                {
+                    sinkHelper.SetAttribute("Local", AddressValue(Address(utUserAddr)));
+                    sinkContainer.Add(sinkHelper.Install(utUsers.Get(i)));
+                }
+
+                onOffHelper.SetAttribute("Remote", AddressValue(Address(utUserAddr)));
+                auto app = onOffHelper.Install(gwUsers.Get(j)).Get(0);
+                app->SetStartTime(startTime + (i + j * gwUsers.GetN() + 1) * startDelay);
+                onOffContainer.Add(app);
+            }
+        }
+    }
+
+    sinkContainer.Start(startTime);
+    sinkContainer.Stop(stopTime);
+
+    if (m_enableDefaultStatistics)
+    {
+        // Add throuhgput statistics
+        if (direction == FWD_LINK)
+        {
+            // Global scalar
+            m_satStatsHelperContainer->AddGlobalFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Global scatter
+            m_satStatsHelperContainer->AddGlobalFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+            // Per UT scalar
+            m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Per UT scatter
+            m_satStatsHelperContainer->AddPerUtFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+            // Per GW scalar
+            m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Per GW scatter
+            m_satStatsHelperContainer->AddPerGwFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
+        else if (direction == RTN_LINK)
+        {
+            // Global scalar
+            m_satStatsHelperContainer->AddGlobalRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Global scatter
+            m_satStatsHelperContainer->AddGlobalRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+            // Per UT scalar
+            m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Per UT scatter
+            m_satStatsHelperContainer->AddPerUtRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+            // Per GW scalar
+            m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Per GW scatter
+            m_satStatsHelperContainer->AddPerGwRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
+    }
+}
+
+void
+SatTrafficHelper::AddOnOffTraffic(TrafficDirection_t direction,
+                                  TransportLayerProtocol_t protocol,
+                                  DataRate dataRate,
+                                  uint32_t packetSize,
+                                  NodeContainer gwUsers,
+                                  NodeContainer utUsers,
+                                  std::string onTimePattern,
+                                  std::string offTimePattern,
+                                  Time startTime,
+                                  Time stopTime,
+                                  Time startDelay,
+                                  double percentage)
+{
+    NS_LOG_FUNCTION(this << dataRate << packetSize << onTimePattern << offTimePattern << startTime
+                         << stopTime << startDelay << percentage);
+
+    // Filter UT users to keep only a given percentage on which installing the application
+    Ptr<UniformRandomVariable> rng = CreateObject<UniformRandomVariable>();
+    NodeContainer utUsersUpdated;
+    for (uint32_t i = 0; i < utUsers.GetN(); ++i)
+    {
+        if (rng->GetValue(0.0, 1.0) < percentage)
+        {
+            utUsersUpdated.Add(utUsers.Get(i));
+        }
+    }
+
+    AddOnOffTraffic(direction,
+                    protocol,
+                    dataRate,
+                    packetSize,
+                    gwUsers,
+                    utUsersUpdated,
+                    onTimePattern,
+                    offTimePattern,
+                    startTime,
+                    stopTime,
+                    startDelay);
+}
+
+void
 SatTrafficHelper::AddHttpTraffic(TrafficDirection_t direction,
-                                 NodeContainer gws,
-                                 NodeContainer uts,
+                                 NodeContainer gwUsers,
+                                 NodeContainer utUsers,
                                  Time startTime,
                                  Time stopTime,
                                  Time startDelay)
 {
     NS_LOG_FUNCTION(this << direction << startTime << stopTime << startDelay);
 
-    if (gws.GetN() == 0)
+    if (gwUsers.GetN() == 0)
     {
-        NS_LOG_WARN("Gateway container is empty");
+        NS_LOG_WARN("Gateway users container is empty");
         return;
     }
-    if (uts.GetN() == 0)
+    if (utUsers.GetN() == 0)
     {
-        NS_LOG_WARN("UT container is empty");
+        NS_LOG_WARN("UT users container is empty");
         return;
     }
 
     ThreeGppHttpHelper httpHelper;
     if (direction == FWD_LINK)
     {
-        for (uint32_t j = 0; j < gws.GetN(); j++)
+        for (uint32_t j = 0; j < gwUsers.GetN(); j++)
         {
-            auto app = httpHelper.InstallUsingIpv4(gws.Get(j), uts).Get(1);
+            auto app = httpHelper.InstallUsingIpv4(gwUsers.Get(j), utUsers).Get(1);
             app->SetStartTime(startTime + (j + 1) * startDelay);
             httpHelper.GetServer().Start(startTime);
             httpHelper.GetServer().Stop(stopTime);
@@ -265,140 +709,180 @@ SatTrafficHelper::AddHttpTraffic(TrafficDirection_t direction,
     }
     else if (direction == RTN_LINK)
     {
-        for (uint32_t i = 0; i < uts.GetN(); i++)
+        for (uint32_t i = 0; i < utUsers.GetN(); i++)
         {
-            auto app = httpHelper.InstallUsingIpv4(uts.Get(i), gws).Get(1);
+            auto app = httpHelper.InstallUsingIpv4(utUsers.Get(i), gwUsers).Get(1);
             app->SetStartTime(startTime + (i + 1) * startDelay);
             httpHelper.GetServer().Start(startTime);
             httpHelper.GetServer().Stop(stopTime);
         }
     }
 
-    // Add PLT statistics
-    if (direction == FWD_LINK)
+    if (m_enableDefaultStatistics)
     {
-        m_satStatsHelperContainer->AddGlobalFwdAppPlt(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdAppPlt(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdAppPlt(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdAppPlt(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdAppPlt(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdAppPlt(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    }
-    else if (direction == RTN_LINK)
-    {
-        m_satStatsHelperContainer->AddGlobalRtnAppPlt(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnAppPlt(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnAppPlt(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnAppPlt(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnAppPlt(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnAppPlt(SatStatsHelper::OUTPUT_SCATTER_FILE);
-    }
+        // Add PLT statistics
+        if (direction == FWD_LINK)
+        {
+            m_satStatsHelperContainer->AddGlobalFwdAppPlt(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdAppPlt(SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdAppPlt(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdAppPlt(SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdAppPlt(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdAppPlt(SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
+        else if (direction == RTN_LINK)
+        {
+            m_satStatsHelperContainer->AddGlobalRtnAppPlt(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnAppPlt(SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnAppPlt(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnAppPlt(SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnAppPlt(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnAppPlt(SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
 
-    // Add throuhgput statistics
-    if (direction == FWD_LINK)
-    {
-        // Global scalar
-        m_satStatsHelperContainer->AddGlobalFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
+        // Add throuhgput statistics
+        if (direction == FWD_LINK)
+        {
+            // Global scalar
+            m_satStatsHelperContainer->AddGlobalFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Global scatter
-        m_satStatsHelperContainer->AddGlobalFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Global scatter
+            m_satStatsHelperContainer->AddGlobalFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per UT scalar
-        m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per UT scalar
+            m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per UT scatter
-        m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Per UT scatter
+            m_satStatsHelperContainer->AddPerUtFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per GW scalar
-        m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per GW scalar
+            m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per GW scatter
-        m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-    }
-    else if (direction == RTN_LINK)
-    {
-        // Global scalar
-        m_satStatsHelperContainer->AddGlobalRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per GW scatter
+            m_satStatsHelperContainer->AddPerGwFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
+        else if (direction == RTN_LINK)
+        {
+            // Global scalar
+            m_satStatsHelperContainer->AddGlobalRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Global scatter
-        m_satStatsHelperContainer->AddGlobalRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Global scatter
+            m_satStatsHelperContainer->AddGlobalRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per UT scalar
-        m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per UT scalar
+            m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per UT scatter
-        m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Per UT scatter
+            m_satStatsHelperContainer->AddPerUtRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per GW scalar
-        m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per GW scalar
+            m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per GW scatter
-        m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Per GW scatter
+            m_satStatsHelperContainer->AddPerGwRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
     }
 }
 
 void
+SatTrafficHelper::AddHttpTraffic(TrafficDirection_t direction,
+                                 NodeContainer gwUsers,
+                                 NodeContainer utUsers,
+                                 Time startTime,
+                                 Time stopTime,
+                                 Time startDelay,
+                                 double percentage)
+{
+    NS_LOG_FUNCTION(this << direction << startTime << stopTime << startDelay << percentage);
+
+    // Filter UT users to keep only a given percentage on which installing the application
+    Ptr<UniformRandomVariable> rng = CreateObject<UniformRandomVariable>();
+    NodeContainer utUsersUpdated;
+    for (uint32_t i = 0; i < utUsers.GetN(); ++i)
+    {
+        if (rng->GetValue(0.0, 1.0) < percentage)
+        {
+            utUsersUpdated.Add(utUsers.Get(i));
+        }
+    }
+
+    AddHttpTraffic(direction, gwUsers, utUsersUpdated, startTime, stopTime, startDelay);
+}
+
+void
 SatTrafficHelper::AddNrtvTraffic(TrafficDirection_t direction,
-                                 NodeContainer gws,
-                                 NodeContainer uts,
+                                 NodeContainer gwUsers,
+                                 NodeContainer utUsers,
                                  Time startTime,
                                  Time stopTime,
                                  Time startDelay)
 {
     NS_LOG_FUNCTION(this << direction << startTime << stopTime << startDelay);
 
-    if (gws.GetN() == 0)
+    if (gwUsers.GetN() == 0)
     {
-        NS_LOG_WARN("Gateway container is empty");
+        NS_LOG_WARN("Gateway users container is empty");
         return;
     }
-    if (uts.GetN() == 0)
+    if (utUsers.GetN() == 0)
     {
-        NS_LOG_WARN("UT container is empty");
+        NS_LOG_WARN("UT users container is empty");
         return;
     }
 
@@ -407,9 +891,9 @@ SatTrafficHelper::AddNrtvTraffic(TrafficDirection_t direction,
     NrtvHelper nrtvHelper(TypeId::LookupByName(socketFactory));
     if (direction == FWD_LINK)
     {
-        for (uint32_t j = 0; j < gws.GetN(); j++)
+        for (uint32_t j = 0; j < gwUsers.GetN(); j++)
         {
-            auto app = nrtvHelper.InstallUsingIpv4(gws.Get(j), uts).Get(1);
+            auto app = nrtvHelper.InstallUsingIpv4(gwUsers.Get(j), utUsers).Get(1);
             app->SetStartTime(startTime + (j + 1) * startDelay);
             nrtvHelper.GetServer().Start(startTime);
             nrtvHelper.GetServer().Stop(stopTime);
@@ -417,110 +901,150 @@ SatTrafficHelper::AddNrtvTraffic(TrafficDirection_t direction,
     }
     else if (direction == RTN_LINK)
     {
-        for (uint32_t i = 0; i < uts.GetN(); i++)
+        for (uint32_t i = 0; i < utUsers.GetN(); i++)
         {
-            auto app = nrtvHelper.InstallUsingIpv4(uts.Get(i), gws).Get(1);
+            auto app = nrtvHelper.InstallUsingIpv4(utUsers.Get(i), gwUsers).Get(1);
             app->SetStartTime(startTime + (i + 1) * startDelay);
             nrtvHelper.GetServer().Start(startTime);
             nrtvHelper.GetServer().Stop(stopTime);
         }
     }
 
-    // Add throuhgput statistics
-    if (direction == FWD_LINK)
+    if (m_enableDefaultStatistics)
     {
-        // Global scalar
-        m_satStatsHelperContainer->AddGlobalFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
+        // Add throuhgput statistics
+        if (direction == FWD_LINK)
+        {
+            // Global scalar
+            m_satStatsHelperContainer->AddGlobalFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Global scatter
-        m_satStatsHelperContainer->AddGlobalFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Global scatter
+            m_satStatsHelperContainer->AddGlobalFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per UT scalar
-        m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per UT scalar
+            m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per UT scatter
-        m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Per UT scatter
+            m_satStatsHelperContainer->AddPerUtFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per GW scalar
-        m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per GW scalar
+            m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per GW scatter
-        m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Per GW scatter
+            m_satStatsHelperContainer->AddPerGwFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
+        else if (direction == RTN_LINK)
+        {
+            // Global scalar
+            m_satStatsHelperContainer->AddGlobalRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Global scatter
+            m_satStatsHelperContainer->AddGlobalRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+            // Per UT scalar
+            m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Per UT scatter
+            m_satStatsHelperContainer->AddPerUtRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+            // Per GW scalar
+            m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Per GW scatter
+            m_satStatsHelperContainer->AddPerGwRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
     }
-    else if (direction == RTN_LINK)
+}
+
+void
+SatTrafficHelper::AddNrtvTraffic(TrafficDirection_t direction,
+                                 NodeContainer gwUsers,
+                                 NodeContainer utUsers,
+                                 Time startTime,
+                                 Time stopTime,
+                                 Time startDelay,
+                                 double percentage)
+{
+    NS_LOG_FUNCTION(this << direction << startTime << stopTime << startDelay << percentage);
+
+    // Filter UT users to keep only a given percentage on which installing the application
+    Ptr<UniformRandomVariable> rng = CreateObject<UniformRandomVariable>();
+    NodeContainer utUsersUpdated;
+    for (uint32_t i = 0; i < utUsers.GetN(); ++i)
     {
-        // Global scalar
-        m_satStatsHelperContainer->AddGlobalRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-        // Global scatter
-        m_satStatsHelperContainer->AddGlobalRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-        // Per UT scalar
-        m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-        // Per UT scatter
-        m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-        // Per GW scalar
-        m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-        // Per GW scatter
-        m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+        if (rng->GetValue(0.0, 1.0) < percentage)
+        {
+            utUsersUpdated.Add(utUsers.Get(i));
+        }
     }
+
+    AddNrtvTraffic(direction, gwUsers, utUsersUpdated, startTime, stopTime, startDelay);
 }
 
 void
 SatTrafficHelper::AddPoissonTraffic(TrafficDirection_t direction,
                                     Time onTime,
                                     Time offTimeExpMean,
-                                    std::string rate,
+                                    DataRate rate,
                                     uint32_t packetSize,
-                                    NodeContainer gws,
-                                    NodeContainer uts,
+                                    NodeContainer gwUsers,
+                                    NodeContainer utUsers,
                                     Time startTime,
                                     Time stopTime,
                                     Time startDelay)
@@ -528,14 +1052,14 @@ SatTrafficHelper::AddPoissonTraffic(TrafficDirection_t direction,
     NS_LOG_FUNCTION(this << direction << onTime << offTimeExpMean << rate << packetSize << startTime
                          << stopTime << startDelay);
 
-    if (gws.GetN() == 0)
+    if (gwUsers.GetN() == 0)
     {
-        NS_LOG_WARN("Gateway container is empty");
+        NS_LOG_WARN("Gateway users container is empty");
         return;
     }
-    if (uts.GetN() == 0)
+    if (utUsers.GetN() == 0)
     {
-        NS_LOG_WARN("UT container is empty");
+        NS_LOG_WARN("UT users container is empty");
         return;
     }
 
@@ -549,19 +1073,19 @@ SatTrafficHelper::AddPoissonTraffic(TrafficDirection_t direction,
     ApplicationContainer onOffContainer;
 
     // create CBR applications from GWs to UT users
-    for (uint32_t j = 0; j < gws.GetN(); j++)
+    for (uint32_t j = 0; j < gwUsers.GetN(); j++)
     {
-        for (uint32_t i = 0; i < uts.GetN(); i++)
+        for (uint32_t i = 0; i < utUsers.GetN(); i++)
         {
             if (direction == RTN_LINK)
             {
                 InetSocketAddress gwUserAddr =
-                    InetSocketAddress(m_satHelper->GetUserAddress(gws.Get(j)), port);
+                    InetSocketAddress(m_satHelper->GetUserAddress(gwUsers.Get(j)), port);
 
-                if (!HasSinkInstalled(gws.Get(j), port))
+                if (!HasSinkInstalled(gwUsers.Get(j), port))
                 {
                     sinkHelper.SetAttribute("Local", AddressValue(Address(gwUserAddr)));
-                    sinkContainer.Add(sinkHelper.Install(gws.Get(j)));
+                    sinkContainer.Add(sinkHelper.Install(gwUsers.Get(j)));
                 }
 
                 onOffHelper.SetAttribute("OnTime",
@@ -575,19 +1099,19 @@ SatTrafficHelper::AddPoissonTraffic(TrafficDirection_t direction,
                 onOffHelper.SetAttribute("PacketSize", UintegerValue(packetSize));
                 onOffHelper.SetAttribute("Remote", AddressValue(Address(gwUserAddr)));
 
-                auto app = onOffHelper.Install(uts.Get(i)).Get(0);
-                app->SetStartTime(startTime + (i + j * gws.GetN() + 1) * startDelay);
+                auto app = onOffHelper.Install(utUsers.Get(i)).Get(0);
+                app->SetStartTime(startTime + (i + j * gwUsers.GetN() + 1) * startDelay);
                 onOffContainer.Add(app);
             }
             else if (direction == FWD_LINK)
             {
                 InetSocketAddress utUserAddr =
-                    InetSocketAddress(m_satHelper->GetUserAddress(uts.Get(i)), port);
+                    InetSocketAddress(m_satHelper->GetUserAddress(utUsers.Get(i)), port);
 
-                if (!HasSinkInstalled(uts.Get(i), port))
+                if (!HasSinkInstalled(utUsers.Get(i), port))
                 {
                     sinkHelper.SetAttribute("Local", AddressValue(Address(utUserAddr)));
-                    sinkContainer.Add(sinkHelper.Install(uts.Get(i)));
+                    sinkContainer.Add(sinkHelper.Install(utUsers.Get(i)));
                 }
 
                 onOffHelper.SetAttribute("OnTime",
@@ -601,8 +1125,8 @@ SatTrafficHelper::AddPoissonTraffic(TrafficDirection_t direction,
                 onOffHelper.SetAttribute("PacketSize", UintegerValue(packetSize));
                 onOffHelper.SetAttribute("Remote", AddressValue(Address(utUserAddr)));
 
-                auto app = onOffHelper.Install(gws.Get(j)).Get(0);
-                app->SetStartTime(startTime + (i + j * gws.GetN() + 1) * startDelay);
+                auto app = onOffHelper.Install(gwUsers.Get(j)).Get(0);
+                app->SetStartTime(startTime + (i + j * gwUsers.GetN() + 1) * startDelay);
                 onOffContainer.Add(app);
             }
         }
@@ -610,112 +1134,166 @@ SatTrafficHelper::AddPoissonTraffic(TrafficDirection_t direction,
     sinkContainer.Start(startTime);
     sinkContainer.Stop(stopTime);
 
-    // Add throuhgput statistics
-    if (direction == FWD_LINK)
+    if (m_enableDefaultStatistics)
     {
-        // Global scalar
-        m_satStatsHelperContainer->AddGlobalFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
+        // Add throuhgput statistics
+        if (direction == FWD_LINK)
+        {
+            // Global scalar
+            m_satStatsHelperContainer->AddGlobalFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Global scatter
-        m_satStatsHelperContainer->AddGlobalFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Global scatter
+            m_satStatsHelperContainer->AddGlobalFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per UT scalar
-        m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per UT scalar
+            m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per UT scatter
-        m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Per UT scatter
+            m_satStatsHelperContainer->AddPerUtFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per GW scalar
-        m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per GW scalar
+            m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per GW scatter
-        m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Per GW scatter
+            m_satStatsHelperContainer->AddPerGwFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
+        else if (direction == RTN_LINK)
+        {
+            // Global scalar
+            m_satStatsHelperContainer->AddGlobalRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Global scatter
+            m_satStatsHelperContainer->AddGlobalRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+            // Per UT scalar
+            m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Per UT scatter
+            m_satStatsHelperContainer->AddPerUtRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+            // Per GW scalar
+            m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Per GW scatter
+            m_satStatsHelperContainer->AddPerGwRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
     }
-    else if (direction == RTN_LINK)
+}
+
+void
+SatTrafficHelper::AddPoissonTraffic(TrafficDirection_t direction,
+                                    Time onTime,
+                                    Time offTimeExpMean,
+                                    DataRate rate,
+                                    uint32_t packetSize,
+                                    NodeContainer gwUsers,
+                                    NodeContainer utUsers,
+                                    Time startTime,
+                                    Time stopTime,
+                                    Time startDelay,
+                                    double percentage)
+{
+    NS_LOG_FUNCTION(this << direction << onTime << offTimeExpMean << rate << packetSize << startTime
+                         << stopTime << startDelay << percentage);
+
+    // Filter UT users to keep only a given percentage on which installing the application
+    Ptr<UniformRandomVariable> rng = CreateObject<UniformRandomVariable>();
+    NodeContainer utUsersUpdated;
+    for (uint32_t i = 0; i < utUsers.GetN(); ++i)
     {
-        // Global scalar
-        m_satStatsHelperContainer->AddGlobalRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-        // Global scatter
-        m_satStatsHelperContainer->AddGlobalRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-        // Per UT scalar
-        m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-        // Per UT scatter
-        m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-        // Per GW scalar
-        m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-        // Per GW scatter
-        m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+        if (rng->GetValue(0.0, 1.0) < percentage)
+        {
+            utUsersUpdated.Add(utUsers.Get(i));
+        }
     }
+
+    AddPoissonTraffic(direction,
+                      onTime,
+                      offTimeExpMean,
+                      rate,
+                      packetSize,
+                      gwUsers,
+                      utUsersUpdated,
+                      startTime,
+                      stopTime,
+                      startDelay);
 }
 
 void
 SatTrafficHelper::AddVoipTraffic(TrafficDirection_t direction,
                                  VoipCodec_t codec,
-                                 NodeContainer gws,
-                                 NodeContainer uts,
+                                 NodeContainer gwUsers,
+                                 NodeContainer utUsers,
                                  Time startTime,
                                  Time stopTime,
                                  Time startDelay)
 {
     NS_LOG_FUNCTION(this << direction << codec << startTime << stopTime << startDelay);
 
-    if (gws.GetN() == 0)
+    if (gwUsers.GetN() == 0)
     {
-        NS_LOG_WARN("Gateway container is empty");
+        NS_LOG_WARN("Gateway users container is empty");
         return;
     }
-    if (uts.GetN() == 0)
+    if (utUsers.GetN() == 0)
     {
-        NS_LOG_WARN("UT container is empty");
+        NS_LOG_WARN("UT users container is empty");
         return;
     }
 
@@ -769,19 +1347,19 @@ SatTrafficHelper::AddVoipTraffic(TrafficDirection_t direction,
     ApplicationContainer onOffContainer;
 
     // create CBR applications from GWs to UT users
-    for (uint32_t j = 0; j < gws.GetN(); j++)
+    for (uint32_t j = 0; j < gwUsers.GetN(); j++)
     {
-        for (uint32_t i = 0; i < uts.GetN(); i++)
+        for (uint32_t i = 0; i < utUsers.GetN(); i++)
         {
             if (direction == RTN_LINK)
             {
                 InetSocketAddress gwUserAddr =
-                    InetSocketAddress(m_satHelper->GetUserAddress(gws.Get(j)), port);
+                    InetSocketAddress(m_satHelper->GetUserAddress(gwUsers.Get(j)), port);
 
-                if (!HasSinkInstalled(gws.Get(j), port))
+                if (!HasSinkInstalled(gwUsers.Get(j), port))
                 {
                     sinkHelper.SetAttribute("Local", AddressValue(Address(gwUserAddr)));
-                    sinkContainer.Add(sinkHelper.Install(gws.Get(j)));
+                    sinkContainer.Add(sinkHelper.Install(gwUsers.Get(j)));
                 }
 
                 onOffHelper.SetAttribute("OnTime",
@@ -794,19 +1372,19 @@ SatTrafficHelper::AddVoipTraffic(TrafficDirection_t direction,
                 onOffHelper.SetAttribute("PacketSize", UintegerValue(packetSize));
                 onOffHelper.SetAttribute("Remote", AddressValue(Address(gwUserAddr)));
 
-                auto app = onOffHelper.Install(uts.Get(i)).Get(0);
-                app->SetStartTime(startTime + (i + j * gws.GetN() + 1) * startDelay);
+                auto app = onOffHelper.Install(utUsers.Get(i)).Get(0);
+                app->SetStartTime(startTime + (i + j * gwUsers.GetN() + 1) * startDelay);
                 onOffContainer.Add(app);
             }
             else if (direction == FWD_LINK)
             {
                 InetSocketAddress utUserAddr =
-                    InetSocketAddress(m_satHelper->GetUserAddress(uts.Get(i)), port);
+                    InetSocketAddress(m_satHelper->GetUserAddress(utUsers.Get(i)), port);
 
-                if (!HasSinkInstalled(uts.Get(i), port))
+                if (!HasSinkInstalled(utUsers.Get(i), port))
                 {
                     sinkHelper.SetAttribute("Local", AddressValue(Address(utUserAddr)));
-                    sinkContainer.Add(sinkHelper.Install(uts.Get(i)));
+                    sinkContainer.Add(sinkHelper.Install(utUsers.Get(i)));
                 }
 
                 onOffHelper.SetAttribute("OnTime",
@@ -819,8 +1397,8 @@ SatTrafficHelper::AddVoipTraffic(TrafficDirection_t direction,
                 onOffHelper.SetAttribute("PacketSize", UintegerValue(packetSize));
                 onOffHelper.SetAttribute("Remote", AddressValue(Address(utUserAddr)));
 
-                auto app = onOffHelper.Install(gws.Get(j)).Get(0);
-                app->SetStartTime(startTime + (i + j * gws.GetN() + 1) * startDelay);
+                auto app = onOffHelper.Install(gwUsers.Get(j)).Get(0);
+                app->SetStartTime(startTime + (i + j * gwUsers.GetN() + 1) * startDelay);
                 onOffContainer.Add(app);
             }
         }
@@ -828,129 +1406,171 @@ SatTrafficHelper::AddVoipTraffic(TrafficDirection_t direction,
     sinkContainer.Start(startTime);
     sinkContainer.Stop(stopTime);
 
-    // Add jitter statistics
-    if (direction == FWD_LINK)
+    if (m_enableDefaultStatistics)
     {
-        // Global
-        m_satStatsHelperContainer->AddGlobalFwdAppJitter(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdAppJitter(SatStatsHelper::OUTPUT_SCATTER_FILE);
+        // Add jitter statistics
+        if (direction == FWD_LINK)
+        {
+            // Global
+            m_satStatsHelperContainer->AddGlobalFwdAppJitter(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdAppJitter(SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per UT
-        m_satStatsHelperContainer->AddPerUtFwdAppJitter(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdAppJitter(SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Per UT
+            m_satStatsHelperContainer->AddPerUtFwdAppJitter(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdAppJitter(SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per GW
-        m_satStatsHelperContainer->AddPerGwFwdAppJitter(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdAppJitter(SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Per GW
+            m_satStatsHelperContainer->AddPerGwFwdAppJitter(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdAppJitter(SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
+        else if (direction == RTN_LINK)
+        {
+            // Global
+            m_satStatsHelperContainer->AddGlobalRtnAppJitter(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnAppJitter(SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+            // Per UT
+            m_satStatsHelperContainer->AddPerUtRtnAppJitter(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnAppJitter(SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+            // Per GW
+            m_satStatsHelperContainer->AddPerGwRtnAppJitter(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnAppJitter(SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
+
+        // Add throuhgput statistics
+        if (direction == FWD_LINK)
+        {
+            // Global scalar
+            m_satStatsHelperContainer->AddGlobalFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Global scatter
+            m_satStatsHelperContainer->AddGlobalFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+            // Per UT scalar
+            m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Per UT scatter
+            m_satStatsHelperContainer->AddPerUtFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+            // Per GW scalar
+            m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Per GW scatter
+            m_satStatsHelperContainer->AddPerGwFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
+        else if (direction == RTN_LINK)
+        {
+            // Global scalar
+            m_satStatsHelperContainer->AddGlobalRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Global scatter
+            m_satStatsHelperContainer->AddGlobalRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+            // Per UT scalar
+            m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Per UT scatter
+            m_satStatsHelperContainer->AddPerUtRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+
+            // Per GW scalar
+            m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+
+            // Per GW scatter
+            m_satStatsHelperContainer->AddPerGwRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
     }
-    else if (direction == RTN_LINK)
+}
+
+void
+SatTrafficHelper::AddVoipTraffic(TrafficDirection_t direction,
+                                 VoipCodec_t codec,
+                                 NodeContainer gwUsers,
+                                 NodeContainer utUsers,
+                                 Time startTime,
+                                 Time stopTime,
+                                 Time startDelay,
+                                 double percentage)
+{
+    NS_LOG_FUNCTION(this << direction << codec << startTime << stopTime << startDelay
+                         << percentage);
+
+    // Filter UT users to keep only a given percentage on which installing the application
+    Ptr<UniformRandomVariable> rng = CreateObject<UniformRandomVariable>();
+    NodeContainer utUsersUpdated;
+    for (uint32_t i = 0; i < utUsers.GetN(); ++i)
     {
-        // Global
-        m_satStatsHelperContainer->AddGlobalRtnAppJitter(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnAppJitter(SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-        // Per UT
-        m_satStatsHelperContainer->AddPerUtRtnAppJitter(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnAppJitter(SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-        // Per GW
-        m_satStatsHelperContainer->AddPerGwRtnAppJitter(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnAppJitter(SatStatsHelper::OUTPUT_SCATTER_FILE);
+        if (rng->GetValue(0.0, 1.0) < percentage)
+        {
+            utUsersUpdated.Add(utUsers.Get(i));
+        }
     }
 
-    // Add throuhgput statistics
-    if (direction == FWD_LINK)
-    {
-        // Global scalar
-        m_satStatsHelperContainer->AddGlobalFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-        // Global scatter
-        m_satStatsHelperContainer->AddGlobalFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-        // Per UT scalar
-        m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-        // Per UT scatter
-        m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-        // Per GW scalar
-        m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-        // Per GW scatter
-        m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-    }
-    else if (direction == RTN_LINK)
-    {
-        // Global scalar
-        m_satStatsHelperContainer->AddGlobalRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-        // Global scatter
-        m_satStatsHelperContainer->AddGlobalRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-        // Per UT scalar
-        m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-        // Per UT scatter
-        m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-
-        // Per GW scalar
-        m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-
-        // Per GW scatter
-        m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-    }
+    AddVoipTraffic(direction, codec, gwUsers, utUsersUpdated, startTime, stopTime, startDelay);
 }
 
 void
 SatTrafficHelper::AddCustomTraffic(TrafficDirection_t direction,
                                    std::string interval,
                                    uint32_t packetSize,
-                                   NodeContainer gws,
-                                   NodeContainer uts,
+                                   NodeContainer gwUsers,
+                                   NodeContainer utUsers,
                                    Time startTime,
                                    Time stopTime,
                                    Time startDelay)
@@ -958,14 +1578,14 @@ SatTrafficHelper::AddCustomTraffic(TrafficDirection_t direction,
     NS_LOG_FUNCTION(this << direction << interval << packetSize << startTime << stopTime
                          << startDelay);
 
-    if (gws.GetN() == 0)
+    if (gwUsers.GetN() == 0)
     {
-        NS_LOG_WARN("Gateway container is empty");
+        NS_LOG_WARN("Gateway users container is empty");
         return;
     }
-    if (uts.GetN() == 0)
+    if (utUsers.GetN() == 0)
     {
-        NS_LOG_WARN("UT container is empty");
+        NS_LOG_WARN("UT users container is empty");
         return;
     }
 
@@ -981,46 +1601,46 @@ SatTrafficHelper::AddCustomTraffic(TrafficDirection_t direction,
     ApplicationContainer cbrContainer;
 
     // create CBR applications from GWs to UT users
-    for (uint32_t j = 0; j < gws.GetN(); j++)
+    for (uint32_t j = 0; j < gwUsers.GetN(); j++)
     {
-        for (uint32_t i = 0; i < uts.GetN(); i++)
+        for (uint32_t i = 0; i < utUsers.GetN(); i++)
         {
             if (direction == RTN_LINK)
             {
                 InetSocketAddress gwUserAddr =
-                    InetSocketAddress(m_satHelper->GetUserAddress(gws.Get(j)), port);
-                if (!HasSinkInstalled(gws.Get(j), port))
+                    InetSocketAddress(m_satHelper->GetUserAddress(gwUsers.Get(j)), port);
+                if (!HasSinkInstalled(gwUsers.Get(j), port))
                 {
                     sinkHelper.SetAttribute("Local", AddressValue(Address(gwUserAddr)));
-                    sinkContainer.Add(sinkHelper.Install(gws.Get(j)));
+                    sinkContainer.Add(sinkHelper.Install(gwUsers.Get(j)));
                 }
 
                 factory.Set("Interval", TimeValue(Time(interval)));
                 factory.Set("PacketSize", UintegerValue(packetSize));
                 factory.Set("Remote", AddressValue(Address(gwUserAddr)));
                 Ptr<CbrApplication> p_app = factory.Create<CbrApplication>();
-                uts.Get(i)->AddApplication(p_app);
+                utUsers.Get(i)->AddApplication(p_app);
                 auto app = ApplicationContainer(p_app).Get(0);
-                app->SetStartTime(startTime + (i + j * gws.GetN() + 1) * startDelay);
+                app->SetStartTime(startTime + (i + j * gwUsers.GetN() + 1) * startDelay);
                 cbrContainer.Add(app);
             }
             else if (direction == FWD_LINK)
             {
                 InetSocketAddress utUserAddr =
-                    InetSocketAddress(m_satHelper->GetUserAddress(uts.Get(i)), port);
-                if (!HasSinkInstalled(uts.Get(i), port))
+                    InetSocketAddress(m_satHelper->GetUserAddress(utUsers.Get(i)), port);
+                if (!HasSinkInstalled(utUsers.Get(i), port))
                 {
                     sinkHelper.SetAttribute("Local", AddressValue(Address(utUserAddr)));
-                    sinkContainer.Add(sinkHelper.Install(uts.Get(i)));
+                    sinkContainer.Add(sinkHelper.Install(utUsers.Get(i)));
                 }
 
                 factory.Set("Interval", TimeValue(Time(interval)));
                 factory.Set("PacketSize", UintegerValue(packetSize));
                 factory.Set("Remote", AddressValue(Address(utUserAddr)));
                 Ptr<CbrApplication> p_app = factory.Create<CbrApplication>();
-                gws.Get(j)->AddApplication(p_app);
+                gwUsers.Get(j)->AddApplication(p_app);
                 auto app = ApplicationContainer(p_app).Get(0);
-                app->SetStartTime(startTime + (i + j * gws.GetN() + 1) * startDelay);
+                app->SetStartTime(startTime + (i + j * gwUsers.GetN() + 1) * startDelay);
                 cbrContainer.Add(app);
             }
         }
@@ -1034,90 +1654,105 @@ SatTrafficHelper::AddCustomTraffic(TrafficDirection_t direction,
     m_last_custom_application.stop = stopTime;
     m_last_custom_application.created = true;
 
-    // Add throuhgput statistics
-    if (direction == FWD_LINK)
+    if (m_enableDefaultStatistics)
     {
-        // Global scalar
-        m_satStatsHelperContainer->AddGlobalFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
+        // Add throuhgput statistics
+        if (direction == FWD_LINK)
+        {
+            // Global scalar
+            m_satStatsHelperContainer->AddGlobalFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Global scatter
-        m_satStatsHelperContainer->AddGlobalFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Global scatter
+            m_satStatsHelperContainer->AddGlobalFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per UT scalar
-        m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per UT scalar
+            m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per UT scatter
-        m_satStatsHelperContainer->AddPerUtFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Per UT scatter
+            m_satStatsHelperContainer->AddPerUtFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per GW scalar
-        m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per GW scalar
+            m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per GW scatter
-        m_satStatsHelperContainer->AddPerGwFwdAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-    }
-    else if (direction == RTN_LINK)
-    {
-        // Global scalar
-        m_satStatsHelperContainer->AddGlobalRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per GW scatter
+            m_satStatsHelperContainer->AddPerGwFwdAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwFwdUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
+        else if (direction == RTN_LINK)
+        {
+            // Global scalar
+            m_satStatsHelperContainer->AddGlobalRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Global scatter
-        m_satStatsHelperContainer->AddGlobalRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Global scatter
+            m_satStatsHelperContainer->AddGlobalRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddGlobalRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per UT scalar
-        m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per UT scalar
+            m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per UT scatter
-        m_satStatsHelperContainer->AddPerUtRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Per UT scatter
+            m_satStatsHelperContainer->AddPerUtRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerUtRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
 
-        // Per GW scalar
-        m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCALAR_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            // Per GW scalar
+            m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCALAR_FILE);
 
-        // Per GW scatter
-        m_satStatsHelperContainer->AddPerGwRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
-        m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
-            SatStatsHelper::OUTPUT_SCATTER_FILE);
+            // Per GW scatter
+            m_satStatsHelperContainer->AddPerGwRtnAppThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnFeederMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+            m_satStatsHelperContainer->AddPerGwRtnUserMacThroughput(
+                SatStatsHelper::OUTPUT_SCATTER_FILE);
+        }
     }
 }
 

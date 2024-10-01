@@ -152,19 +152,27 @@ main(int argc, char* argv[])
 
     for (uint32_t i = 0; i < gwUsers.GetN(); i++)
     {
-        simulationHelper->SetGwUserId(i);
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::FWD_LINK,
-                                              Seconds(0.1),
-                                              Seconds(duration),
-                                              Seconds(0.001));
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::RTN_LINK,
-                                              Seconds(0.1),
-                                              Seconds(duration),
-                                              Seconds(0.001));
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::FWD_LINK,
+            SatTrafficHelper::UDP,
+            Time(interval),
+            packetSize,
+            Singleton<SatTopology>::Get()->GetGwUserNode(i),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(0.1),
+            Seconds(duration),
+            Seconds(0.001));
+
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            Time(interval),
+            packetSize,
+            Singleton<SatTopology>::Get()->GetGwUserNode(i),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(0.1),
+            Seconds(duration),
+            Seconds(0.001));
     }
 
     simulationHelper->EnableProgressLogs();

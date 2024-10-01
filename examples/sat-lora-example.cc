@@ -254,21 +254,21 @@ main(int argc, char* argv[])
 
     simulationHelper->CreateSatScenario();
 
-    Config::SetDefault("ns3::CbrApplication::Interval", StringValue(interval));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
+    simulationHelper->GetTrafficHelper()->AddLoraCbrTraffic(
+        loraInterval,
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        appStartTime,
+        simLength,
+        Seconds(1));
 
-    simulationHelper->InstallLoraTrafficModel(SimulationHelper::LORA_CBR,
-                                              loraInterval,
-                                              packetSize,
-                                              appStartTime,
-                                              simLength,
-                                              Seconds(1));
-
-    /*simulationHelper->InstallLoraTrafficModel (
-      SimulationHelper::PERIODIC,
-      loraInterval,
-      packetSize,
-      appStartTime, simLength, Seconds (1));*/
+    /*simulationHelper->GetTrafficHelper()->AddLoraPeriodicTraffic(loraInterval,
+                                                                 packetSize,
+                                                                 Singleton<SatTopology>::Get()->GetUtNodes(),
+                                                                 appStartTime,
+                                                                 simLength,
+                                                                 Seconds(1));*/
 
     // Outputs
     simulationHelper->EnableProgressLogs();

@@ -810,14 +810,16 @@ SatRegenerationTest3::DoRun(void)
 
     simulationHelper->CreateSatScenario();
 
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(MilliSeconds(1)));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(0.01),
-                                          Seconds(5),
-                                          Seconds(0.01));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(1),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(0.01),
+        Seconds(5),
+        Seconds(0.01));
 
     m_helper = simulationHelper->GetSatelliteHelper();
 
@@ -1243,22 +1245,27 @@ SatRegenerationTest5::DoRun(void)
         "RxLinkModcod",
         MakeCallback(&SatRegenerationTest5::OrbiterPhyUserModcodTraceCb, this));
 
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(MilliSeconds(20)));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(20),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(10),
+        Seconds(0.01));
 
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(1),
-                                          Seconds(10),
-                                          Seconds(0.01));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(1),
-                                          Seconds(10),
-                                          Seconds(0.01));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(20),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(10),
+        Seconds(0.01));
 
     simulationHelper->RunSimulation();
 
@@ -1466,28 +1473,27 @@ SatRegenerationTest6::DoRun(void)
             MakeCallback(&SatRegenerationTest6::OrbiterDevUtRxTraceCb, this));
     }
 
-    Time startTime = Seconds(1);
-    Time stopTime = Seconds(15);
-    Time startDelay = MilliSeconds(10);
-    Time interval = MilliSeconds(1000);
-    uint32_t packetSize = 512;
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        Seconds(1),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(15),
+        MilliSeconds(10));
 
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(interval));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(1),
-                                          Seconds(10),
-                                          Seconds(0.01));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(1),
-                                          Seconds(10),
-                                          Seconds(0.01));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        Seconds(1),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(15),
+        MilliSeconds(10));
 
     simulationHelper->RunSimulation();
 
@@ -1676,22 +1682,27 @@ SatRegenerationTest7::DoRun(void)
         "RxLinkModcod",
         MakeCallback(&SatRegenerationTest7::OrbiterPhyUserModcodTraceCb, this));
 
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(MilliSeconds(20)));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(20),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(10),
+        Seconds(0.01));
 
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(1),
-                                          Seconds(10),
-                                          Seconds(0.01));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(1),
-                                          Seconds(10),
-                                          Seconds(0.01));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(20),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(10),
+        Seconds(0.01));
 
     simulationHelper->RunSimulation();
 
@@ -1945,28 +1956,27 @@ SatRegenerationTest8::DoRun(void)
                                       MakeCallback(&SatRegenerationTest8::AddTraceEntry, this));
     }
 
-    Time startTime = Seconds(1);
-    Time stopTime = Seconds(15);
-    Time startDelay = MilliSeconds(10);
-    Time interval = MilliSeconds(100);
-    uint32_t packetSize = 512;
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(100),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(15),
+        MilliSeconds(10));
 
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(interval));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          startTime,
-                                          stopTime,
-                                          startDelay);
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          startTime,
-                                          stopTime,
-                                          startDelay);
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(100),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(15),
+        MilliSeconds(10));
 
     simulationHelper->RunSimulation();
 

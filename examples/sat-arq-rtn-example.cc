@@ -119,16 +119,17 @@ main(int argc, char* argv[])
     // Creating the reference system.
     simulationHelper->CreateSatScenario();
 
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(Time(interval)));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
-
     /// Create applicationa on UT users
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          appStartTime,
-                                          simLength,
-                                          Seconds(0.05));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        interval,
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        appStartTime,
+        simLength,
+        Seconds(0.001));
 
     NS_LOG_INFO("--- sat-arq-rtn-example ---");
     NS_LOG_INFO("  Packet size in bytes: " << packetSize);

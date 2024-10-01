@@ -235,17 +235,18 @@ main(int argc, char* argv[])
     /**
      * Set-up on-off traffic
      */
-    Config::SetDefault("ns3::OnOffApplication::OnTime",
-                       StringValue("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
-    Config::SetDefault("ns3::OnOffApplication::OffTime",
-                       StringValue("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::ONOFF,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          appStartTime,
-                                          Seconds(simLength),
-                                          MilliSeconds(50));
+    simulationHelper->GetTrafficHelper()->AddOnOffTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        dataRate,
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        "ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]",
+        "ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]",
+        appStartTime,
+        Seconds(simLength),
+        MilliSeconds(50));
 
     /**
      * Set-up statistics

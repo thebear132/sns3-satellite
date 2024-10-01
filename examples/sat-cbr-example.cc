@@ -162,17 +162,26 @@ main(int argc, char* argv[])
     }
     else
     {
-        Config::SetDefault("ns3::CbrApplication::Interval", StringValue(interval));
-        Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
+        /*simulationHelper->GetTrafficHelper()->AddCbrTraffic(SatTrafficHelper::FWD_LINK,
+                                                            SatTrafficHelper::UDP,
+                                                            Time(interval),
+                                                            packetSize,
+                                                            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+                                                            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+                                                            Seconds(1.0),
+                                                            Seconds(2.1),
+                                                            Seconds(0));*/
 
-        /*simulationHelper->InstallTrafficModel (
-          SimulationHelper::CBR, SimulationHelper::UDP, SimulationHelper::FWD_LINK,
-          Seconds (1.0), Seconds (2.1));*/
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::RTN_LINK,
-                                              Seconds(7.0),
-                                              Seconds(9.1));
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            Time(interval),
+            packetSize,
+            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(7.0),
+            Seconds(9.1),
+            Seconds(0));
     }
 
     NS_LOG_INFO("--- sat-cbr-example ---");

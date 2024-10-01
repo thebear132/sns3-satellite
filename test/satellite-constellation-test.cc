@@ -77,8 +77,6 @@ class SatConstellationTest1 : public TestCase
 
   private:
     virtual void DoRun(void);
-
-    Ptr<SatHelper> m_helper;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -127,7 +125,6 @@ SatConstellationTest1::DoRun(void)
     simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-no-isls");
 
     simulationHelper->CreateSatScenario();
-    m_helper = simulationHelper->GetSatelliteHelper();
 
     NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
@@ -242,8 +239,6 @@ class SatConstellationTest2 : public TestCase
 
     std::vector<std::string> Split(std::string s, char del);
     void TestFileValue(std::string path, uint32_t time, uint32_t expectedValue);
-
-    Ptr<SatHelper> m_helper;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -337,9 +332,6 @@ SatConstellationTest2::DoRun(void)
                        TimeValue(MilliSeconds(10)));
     Config::SetDefault("ns3::SatHelper::GwUsers", UintegerValue(3));
 
-    Config::SetDefault("ns3::CbrApplication::Interval", StringValue("10ms"));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
-
     Ptr<SimulationHelper> simulationHelper =
         CreateObject<SimulationHelper>("test-sat-constellation/test2");
 
@@ -350,18 +342,28 @@ SatConstellationTest2::DoRun(void)
     simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-no-isls");
 
     simulationHelper->CreateSatScenario();
-    m_helper = simulationHelper->GetSatelliteHelper();
 
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(1.0),
-                                          Seconds(29.0));
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(1.0),
-                                          Seconds(29.0));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(10),
+        512,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1.0),
+        Seconds(29.0),
+        Seconds(0));
+
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(10),
+        512,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1.0),
+        Seconds(29.0),
+        Seconds(0));
 
     Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
 
@@ -515,8 +517,6 @@ class SatConstellationTest3 : public TestCase
 
     std::vector<std::string> Split(std::string s, char del);
     void TestFileValue(std::string path, uint32_t time, uint32_t expectedValue);
-
-    Ptr<SatHelper> m_helper;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -610,9 +610,6 @@ SatConstellationTest3::DoRun(void)
                        TimeValue(MilliSeconds(10)));
     Config::SetDefault("ns3::SatHelper::GwUsers", UintegerValue(3));
 
-    Config::SetDefault("ns3::CbrApplication::Interval", StringValue("10ms"));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
-
     Ptr<SimulationHelper> simulationHelper =
         CreateObject<SimulationHelper>("test-sat-constellation/test3");
 
@@ -623,18 +620,28 @@ SatConstellationTest3::DoRun(void)
     simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-isls");
 
     simulationHelper->CreateSatScenario();
-    m_helper = simulationHelper->GetSatelliteHelper();
 
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(1.0),
-                                          Seconds(29.0));
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(1.0),
-                                          Seconds(29.0));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(10),
+        512,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1.0),
+        Seconds(29.0),
+        Seconds(0));
+
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(10),
+        512,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1.0),
+        Seconds(29.0),
+        Seconds(0));
 
     Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
 
@@ -781,8 +788,6 @@ class SatConstellationTest4 : public TestCase
 
   private:
     virtual void DoRun(void);
-
-    Ptr<SatHelper> m_helper;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -838,7 +843,6 @@ SatConstellationTest4::DoRun(void)
     simulationHelper->LoadScenario("constellation-telesat-351-sats");
 
     simulationHelper->CreateSatScenario();
-    m_helper = simulationHelper->GetSatelliteHelper();
 
     NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();

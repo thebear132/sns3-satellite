@@ -95,8 +95,6 @@ class SatHandoverTest1 : public TestCase
 
     std::vector<std::string> Split(std::string s, char del);
     void TestFileValue(std::string path, uint32_t time, double expectedValue);
-
-    Ptr<SatHelper> m_helper;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -213,14 +211,16 @@ SatHandoverTest1::DoRun(void)
                                  "/additional-input/utpositions/mobiles/scenario6";
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
 
-    Config::SetDefault("ns3::CbrApplication::Interval", StringValue("100ms"));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(1.0),
-                                          Seconds(25.0));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(100),
+        512,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(25),
+        Seconds(0));
 
     Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
 
@@ -431,8 +431,6 @@ class SatHandoverTest2 : public TestCase
   private:
     bool HasSinkInstalled(Ptr<Node> node, uint16_t port);
     virtual void DoRun(void);
-
-    Ptr<SatHelper> m_helper;
 };
 
 // Add some help text to this case to describe what it is intended to test

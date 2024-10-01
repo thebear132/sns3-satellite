@@ -165,124 +165,162 @@ main(int argc, char* argv[])
         }
         Simulator::Schedule(Seconds(0), &ChangeCno, utsPhysicalLayers);
 
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::RTN_LINK,
-                                              Seconds(0),
-                                              g_simulationTime,
-                                              MilliSeconds(50),
-                                              1.0);
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            superframeDuration,
+            512,
+            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(0),
+            g_simulationTime,
+            MilliSeconds(50));
     }
     else
     {
         // Configure our own kind of traffic
-        Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(40));
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::RTN_LINK,
-                                              Seconds(0),
-                                              g_simulationTime,
-                                              MilliSeconds(50),
-                                              1.0);
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            superframeDuration,
+            40,
+            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(0),
+            g_simulationTime,
+            MilliSeconds(50));
 
-        Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(25600));
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::RTN_LINK,
-                                              Seconds(0),
-                                              Seconds(10),
-                                              MilliSeconds(50),
-                                              0.3);
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            superframeDuration,
+            25600,
+            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(0),
+            Seconds(10),
+            MilliSeconds(50),
+            0.3);
 
-        Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(1000));
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::RTN_LINK,
-                                              Seconds(5),
-                                              Seconds(15),
-                                              MilliSeconds(50),
-                                              0.4);
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            superframeDuration,
+            1000,
+            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(5),
+            Seconds(15),
+            MilliSeconds(50),
+            0.4);
 
-        Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(1000));
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::RTN_LINK,
-                                              Seconds(10),
-                                              Seconds(20),
-                                              MilliSeconds(50),
-                                              0.5);
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            superframeDuration,
+            1000,
+            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(10),
+            Seconds(20),
+            MilliSeconds(50),
+            0.5);
 
-        Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(40000));
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::RTN_LINK,
-                                              Seconds(15),
-                                              Seconds(25),
-                                              MilliSeconds(50),
-                                              0.2);
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            superframeDuration,
+            40000,
+            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(15),
+            Seconds(25),
+            MilliSeconds(50),
+            0.2);
 
-        Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(1));
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::RTN_LINK,
-                                              Seconds(20),
-                                              Seconds(30),
-                                              MilliSeconds(50),
-                                              0.7);
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            superframeDuration,
+            1,
+            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(20),
+            Seconds(30),
+            MilliSeconds(50),
+            0.7);
 
-        Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(100));
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::RTN_LINK,
-                                              Seconds(25),
-                                              Seconds(35),
-                                              MilliSeconds(50),
-                                              0.45);
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            superframeDuration,
+            100,
+            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(25),
+            Seconds(35),
+            MilliSeconds(50),
+            0.45);
 
-        Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(3000));
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::RTN_LINK,
-                                              Seconds(30),
-                                              Seconds(40),
-                                              MilliSeconds(50),
-                                              0.55);
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            superframeDuration,
+            3000,
+            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(30),
+            Seconds(40),
+            MilliSeconds(50),
+            0.55);
 
-        Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(40000));
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::RTN_LINK,
-                                              Seconds(35),
-                                              Seconds(45),
-                                              MilliSeconds(50),
-                                              0.2);
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            superframeDuration,
+            40000,
+            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(35),
+            Seconds(45),
+            MilliSeconds(50),
+            0.2);
 
-        Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(30000));
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::RTN_LINK,
-                                              Seconds(40),
-                                              Seconds(50),
-                                              MilliSeconds(50),
-                                              0.3);
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            superframeDuration,
+            30000,
+            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(40),
+            Seconds(50),
+            MilliSeconds(50),
+            0.3);
 
-        Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(1500));
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::RTN_LINK,
-                                              Seconds(45),
-                                              Seconds(55),
-                                              MilliSeconds(50),
-                                              0.6);
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            superframeDuration,
+            1500,
+            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(45),
+            Seconds(55),
+            MilliSeconds(50),
+            0.6);
 
-        Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(800));
-        simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                              SimulationHelper::UDP,
-                                              SimulationHelper::RTN_LINK,
-                                              Seconds(50),
-                                              Seconds(60),
-                                              MilliSeconds(50),
-                                              0.9);
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            superframeDuration,
+            800,
+            Singleton<SatTopology>::Get()->GetGwUserNodes(),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            Seconds(50),
+            Seconds(60),
+            MilliSeconds(50),
+            0.9);
     }
 
     if (simulationConf->m_activateStatistics)

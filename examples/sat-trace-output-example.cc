@@ -135,22 +135,27 @@ main(int argc, char* argv[])
     // Creating the reference system.
     simulationHelper->CreateSatScenario(satScenario);
 
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(Time(interval)));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        Time(interval),
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(3.0),
+        Seconds(5.1),
+        Seconds(0));
 
-    /// Create application on GW user
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(3.0),
-                                          Seconds(5.1));
-
-    /// Create application on UT user
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(7.0),
-                                          Seconds(9.1));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        Time(interval),
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(7.0),
+        Seconds(9.1),
+        Seconds(0));
 
     NS_LOG_INFO("--- Trace-output-example ---");
     NS_LOG_INFO("  Scenario used: " << scenario);

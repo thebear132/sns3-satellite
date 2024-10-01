@@ -139,7 +139,8 @@ main(int argc, char* argv[])
     Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper();
 
     trafficHelper->AddCbrTraffic(SatTrafficHelper::FWD_LINK,
-                                 interval,
+                                 SatTrafficHelper::UDP,
+                                 Time(interval),
                                  packetSize,
                                  gwUsers,
                                  utUsers,
@@ -148,7 +149,8 @@ main(int argc, char* argv[])
                                  startDelay);
 
     trafficHelper->AddCbrTraffic(SatTrafficHelper::RTN_LINK,
-                                 interval,
+                                 SatTrafficHelper::UDP,
+                                 Time(interval),
                                  packetSize,
                                  gwUsers,
                                  utUsers,

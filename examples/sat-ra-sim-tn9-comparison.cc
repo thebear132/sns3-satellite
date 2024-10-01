@@ -72,7 +72,7 @@ main(int argc, char* argv[])
     Time appStartTime = Seconds(0.1);
 
     /// Set simulation output details
-    auto sh = CreateObject<SimulationHelper>("example-ra-sim-tn9-comparison");
+    auto simulationHelper = CreateObject<SimulationHelper>("example-ra-sim-tn9-comparison");
     // To read attributes from file
     std::string inputFileNameWithPath =
         Singleton<SatEnvVariables>::Get()->LocateDirectory("contrib/satellite/examples") +
@@ -83,7 +83,7 @@ main(int argc, char* argv[])
     cmd.AddValue("utsPerBeam", "Number of UTs per spot-beam", utsPerBeam);
     cmd.AddValue("numOfInstances", "Number of CRDSA packet instances", numOfInstances);
     cmd.AddValue("isNoisy", "If true, may print some logging messages", isNoisy);
-    sh->AddDefaultUiArguments(cmd, inputFileNameWithPath);
+    simulationHelper->AddDefaultUiArguments(cmd, inputFileNameWithPath);
     cmd.Parse(argc, argv);
 
     if (isNoisy)
@@ -171,27 +171,28 @@ main(int argc, char* argv[])
                        BooleanValue(false));
 
     // Creating the reference system.
-    sh->SetSimulationTime(simLength);
-    sh->SetUserCountPerUt(endUsersPerUt);
-    sh->SetUtCountPerBeam(utsPerBeam);
-    sh->SetBeamSet({beamId});
+    simulationHelper->SetSimulationTime(simLength);
+    simulationHelper->SetUserCountPerUt(endUsersPerUt);
+    simulationHelper->SetUtCountPerBeam(utsPerBeam);
+    simulationHelper->SetBeamSet({beamId});
 
-    sh->LoadScenario("geo-33E");
+    simulationHelper->LoadScenario("geo-33E");
 
-    Ptr<SatHelper> helper = sh->CreateSatScenario();
+    simulationHelper->CreateSatScenario();
 
     /**
      * Set-up CBR traffic
      */
-
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(Seconds(intervalInSeconds)));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
-    sh->InstallTrafficModel(SimulationHelper::CBR,
-                            SimulationHelper::UDP,
-                            SimulationHelper::RTN_LINK,
-                            appStartTime,
-                            Seconds(simLength + 1),
-                            Seconds(0.01));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        Seconds(intervalInSeconds),
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        appStartTime,
+        Seconds(simLength + 1),
+        Seconds(0.01));
 
     if (isNoisy)
     {
@@ -203,7 +204,7 @@ main(int argc, char* argv[])
     /**
      * Set-up statistics
      */
-    Ptr<SatStatsHelperContainer> s = sh->GetStatisticsContainer();
+    Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
 
     s->AddPerBeamRtnAppThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
     s->AddPerBeamRtnFeederDevThroughput(SatStatsHelper::OUTPUT_SCALAR_FILE);
@@ -275,7 +276,7 @@ main(int argc, char* argv[])
     /**
      * Run simulation
      */
-    sh->RunSimulation();
+    simulationHelper->RunSimulation();
 
     return 0;
 }
