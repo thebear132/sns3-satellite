@@ -129,7 +129,7 @@ main(int argc, char* argv[])
         SatTrafficHelper::UDP,
         Time(interval),
         packetSize,
-        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
         Singleton<SatTopology>::Get()->GetUtUserNodes(),
         appStartTime,
         simLength,

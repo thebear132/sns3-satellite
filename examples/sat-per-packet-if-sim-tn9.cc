@@ -200,7 +200,7 @@ main(int argc, char* argv[])
         SatTrafficHelper::UDP,
         dataRate,
         packetSize,
-        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
         Singleton<SatTopology>::Get()->GetUtUserNodes(),
         "ns3::ConstantRandomVariable[Constant=1000]",
         "ns3::ConstantRandomVariable[Constant=0]",

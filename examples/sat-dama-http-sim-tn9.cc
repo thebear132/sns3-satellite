@@ -176,7 +176,7 @@ main(int argc, char* argv[])
      */
     simulationHelper->GetTrafficHelper()->AddHttpTraffic(
         SatTrafficHelper::FWD_LINK,
-        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
         Singleton<SatTopology>::Get()->GetUtUserNodes(),
         MilliSeconds(3),
         Seconds(simLength),

@@ -79,7 +79,7 @@ main(int argc, char* argv[])
         SatTrafficHelper::UDP,
         MilliSeconds(5),
         128,
-        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
         Singleton<SatTopology>::Get()->GetUtUserNodes(),
         Seconds(1),
         simLength,

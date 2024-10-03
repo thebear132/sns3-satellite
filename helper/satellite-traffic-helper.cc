@@ -40,6 +40,258 @@ NS_LOG_COMPONENT_DEFINE("SatelliteTrafficHelper");
 namespace ns3
 {
 
+NS_OBJECT_ENSURE_REGISTERED(SatTrafficHelperConf);
+
+/**
+ * .SIM_ADD_TRAFFIC_MODEL_ATTRIBUTES macro helps defining specific attribute
+ * for traffic models in method GetTypeId.
+ *
+ * \param index Name of the traffic model which attributes are added to the configuration.
+ * \param value Attribute value
+ *
+ * \return TypeId
+ */
+#define SIM_ADD_TRAFFIC_MODEL_PROTOCOL_ATTRIBUTE(index, value)                                     \
+    AddAttribute("Traffic" TOSTRING(index) "Protocol",                                             \
+                 "Network protocol that this traffic model will use",                              \
+                 EnumValue(value),                                                                 \
+                 MakeEnumAccessor<SatTrafficHelperConf::TransportLayerProtocol_t>(                 \
+                     &SatTrafficHelperConf::SetTraffic##index##Protocol,                           \
+                     &SatTrafficHelperConf::GetTraffic##index##Protocol),                          \
+                 MakeEnumChecker(SatTrafficHelperConf::PROTOCOL_UDP,                               \
+                                 "UDP",                                                            \
+                                 SatTrafficHelperConf::PROTOCOL_TCP,                               \
+                                 "TCP",                                                            \
+                                 SatTrafficHelperConf::PROTOCOL_BOTH,                              \
+                                 "BOTH"))
+
+#define SIM_ADD_TRAFFIC_MODEL_DIRECTION_ATTRIBUTE(index, value)                                    \
+    AddAttribute("Traffic" TOSTRING(index) "Direction",                                            \
+                 "Satellite link direction that this traffic model will use",                      \
+                 EnumValue(value),                                                                 \
+                 MakeEnumAccessor<SatTrafficHelperConf::TrafficDirection_t>(                       \
+                     &SatTrafficHelperConf::SetTraffic##index##Direction,                          \
+                     &SatTrafficHelperConf::GetTraffic##index##Direction),                         \
+                 MakeEnumChecker(SatTrafficHelperConf::RTN_LINK,                                   \
+                                 "ReturnLink",                                                     \
+                                 SatTrafficHelperConf::FWD_LINK,                                   \
+                                 "ForwardLink",                                                    \
+                                 SatTrafficHelperConf::BOTH_LINK,                                  \
+                                 "BothLinks"))
+
+#define SIM_ADD_TRAFFIC_MODEL_INTERVAL_ATTRIBUTE(index, value)                                     \
+    AddAttribute("Traffic" TOSTRING(index) "Interval",                                             \
+                 "Interval between packets",                                                       \
+                 TimeValue(value),                                                                 \
+                 MakeTimeAccessor(&SatTrafficHelperConf::SetTraffic##index##Interval,              \
+                                  &SatTrafficHelperConf::GetTraffic##index##Interval),             \
+                 MakeTimeChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_DATA_RATE_ATTRIBUTE(index, value)                                    \
+    AddAttribute("Traffic" TOSTRING(index) "DataRate",                                             \
+                 "Data rate of traffic",                                                           \
+                 DataRateValue(value),                                                             \
+                 MakeDataRateAccessor(&SatTrafficHelperConf::SetTraffic##index##DataRate,          \
+                                      &SatTrafficHelperConf::GetTraffic##index##DataRate),         \
+                 MakeDataRateChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_PACKET_SIZE_ATTRIBUTE(index, value)                                  \
+    AddAttribute("Traffic" TOSTRING(index) "PacketSize",                                           \
+                 "Packet size in bytes",                                                           \
+                 UintegerValue(value),                                                             \
+                 MakeUintegerAccessor(&SatTrafficHelperConf::SetTraffic##index##PacketSize,        \
+                                      &SatTrafficHelperConf::GetTraffic##index##PacketSize),       \
+                 MakeUintegerChecker<uint32_t>())
+
+#define SIM_ADD_TRAFFIC_MODEL_ON_TIME_PATTERN_ATTRIBUTE(index, value)                              \
+    AddAttribute("Traffic" TOSTRING(index) "OnTimePattern",                                        \
+                 "On time patter for on/off traffic",                                              \
+                 StringValue(value),                                                               \
+                 MakeStringAccessor(&SatTrafficHelperConf::SetTraffic##index##OnTimePattern,       \
+                                    &SatTrafficHelperConf::GetTraffic##index##OnTimePattern),      \
+                 MakeStringChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_OFF_TIME_PATTERN_ATTRIBUTE(index, value)                             \
+    AddAttribute("Traffic" TOSTRING(index) "OffTimePattern",                                       \
+                 "Off time patter for on/off traffic",                                             \
+                 StringValue(value),                                                               \
+                 MakeStringAccessor(&SatTrafficHelperConf::SetTraffic##index##OffTimePattern,      \
+                                    &SatTrafficHelperConf::GetTraffic##index##OffTimePattern),     \
+                 MakeStringChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_ON_TIME_ATTRIBUTE(index, value)                                      \
+    AddAttribute("Traffic" TOSTRING(index) "OnTime",                                               \
+                 "On time value for Poisson traffic",                                              \
+                 TimeValue(value),                                                                 \
+                 MakeTimeAccessor(&SatTrafficHelperConf::SetTraffic##index##OnTime,                \
+                                  &SatTrafficHelperConf::GetTraffic##index##OnTime),               \
+                 MakeTimeChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_OFF_TIME_ATTRIBUTE(index, value)                                     \
+    AddAttribute("Traffic" TOSTRING(index) "OffTime",                                              \
+                 "Off time value for Poisson traffic",                                             \
+                 TimeValue(value),                                                                 \
+                 MakeTimeAccessor(&SatTrafficHelperConf::SetTraffic##index##OffTime,               \
+                                  &SatTrafficHelperConf::GetTraffic##index##OffTime),              \
+                 MakeTimeChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_CODEC_ATTRIBUTE(index, value)                                        \
+    AddAttribute("Traffic" TOSTRING(index) "Codec",                                                \
+                 "Codec used for VoIP traffic",                                                    \
+                 EnumValue(value),                                                                 \
+                 MakeEnumAccessor<SatTrafficHelper::VoipCodec_t>(                                  \
+                     &SatTrafficHelperConf::SetTraffic##index##Codec,                              \
+                     &SatTrafficHelperConf::GetTraffic##index##Codec),                             \
+                 MakeEnumChecker(SatTrafficHelper::G_711_1,                                        \
+                                 "G_711_1",                                                        \
+                                 SatTrafficHelper::G_711_2,                                        \
+                                 "G_711_2",                                                        \
+                                 SatTrafficHelper::G_723_1,                                        \
+                                 "G_723_1",                                                        \
+                                 SatTrafficHelper::G_729_2,                                        \
+                                 "G_729_2",                                                        \
+                                 SatTrafficHelper::G_729_3,                                        \
+                                 "G_729_3"))
+
+#define SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(index, value)                                   \
+    AddAttribute("Traffic" TOSTRING(index) "StartTime",                                            \
+                 "Time into the simulation when this traffic model will be started on each user",  \
+                 TimeValue(value),                                                                 \
+                 MakeTimeAccessor(&SatTrafficHelperConf::SetTraffic##index##StartTime,             \
+                                  &SatTrafficHelperConf::GetTraffic##index##StartTime),            \
+                 MakeTimeChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(index, value)                                    \
+    AddAttribute("Traffic" TOSTRING(index) "StopTime",                                             \
+                 "Time into the simulation when this traffic model will be stopped "               \
+                 "on each user. 0 means endless traffic generation.",                              \
+                 TimeValue(value),                                                                 \
+                 MakeTimeAccessor(&SatTrafficHelperConf::SetTraffic##index##StopTime,              \
+                                  &SatTrafficHelperConf::GetTraffic##index##StopTime),             \
+                 MakeTimeChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(index, value)                                  \
+    AddAttribute("Traffic" TOSTRING(index) "StartDelay",                                           \
+                 "Cummulative delay for each user before starting this traffic model",             \
+                 TimeValue(value),                                                                 \
+                 MakeTimeAccessor(&SatTrafficHelperConf::SetTraffic##index##StartDelay,            \
+                                  &SatTrafficHelperConf::GetTraffic##index##StartDelay),           \
+                 MakeTimeChecker())
+
+#define SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(index, value)                                   \
+    AddAttribute("Traffic" TOSTRING(index) "Percentage",                                           \
+                 "Percentage of final users that will use this traffic model",                     \
+                 DoubleValue(value),                                                               \
+                 MakeDoubleAccessor(&SatTrafficHelperConf::SetTraffic##index##Percentage,          \
+                                    &SatTrafficHelperConf::GetTraffic##index##Percentage),         \
+                 MakeDoubleChecker<double>(0, 1))
+
+TypeId
+SatTrafficHelperConf::GetTypeId(void)
+{
+    static TypeId tid =
+        TypeId("ns3::SatTrafficHelperConf")
+            .SetParent<Object>()
+            .AddConstructor<SatTrafficHelperConf>()
+            .SIM_ADD_TRAFFIC_MODEL_INTERVAL_ATTRIBUTE(LoraPeriodic, Seconds(1))
+            .SIM_ADD_TRAFFIC_MODEL_PACKET_SIZE_ATTRIBUTE(LoraPeriodic, 512)
+            .SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(LoraPeriodic, Seconds(0.1))
+            .SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(LoraPeriodic, Seconds(0))
+            .SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(LoraPeriodic, MilliSeconds(10))
+            .SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(LoraPeriodic, 0)
+
+            .SIM_ADD_TRAFFIC_MODEL_INTERVAL_ATTRIBUTE(LoraCbr, Seconds(1))
+            .SIM_ADD_TRAFFIC_MODEL_PACKET_SIZE_ATTRIBUTE(LoraCbr, 512)
+            .SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(LoraCbr, Seconds(0.1))
+            .SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(LoraCbr, Seconds(0))
+            .SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(LoraCbr, MilliSeconds(10))
+            .SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(LoraCbr, 0)
+
+            .SIM_ADD_TRAFFIC_MODEL_PROTOCOL_ATTRIBUTE(Cbr, SatTrafficHelperConf::PROTOCOL_UDP)
+            .SIM_ADD_TRAFFIC_MODEL_DIRECTION_ATTRIBUTE(Cbr, SatTrafficHelperConf::RTN_LINK)
+            .SIM_ADD_TRAFFIC_MODEL_INTERVAL_ATTRIBUTE(Cbr, Seconds(1))
+            .SIM_ADD_TRAFFIC_MODEL_PACKET_SIZE_ATTRIBUTE(Cbr, 512)
+            .SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(Cbr, Seconds(0.1))
+            .SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(Cbr, Seconds(0))
+            .SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(Cbr, MilliSeconds(10))
+            .SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(Cbr, 1)
+
+            .SIM_ADD_TRAFFIC_MODEL_PROTOCOL_ATTRIBUTE(OnOff, SatTrafficHelperConf::PROTOCOL_UDP)
+            .SIM_ADD_TRAFFIC_MODEL_DIRECTION_ATTRIBUTE(OnOff, SatTrafficHelperConf::RTN_LINK)
+            .SIM_ADD_TRAFFIC_MODEL_DATA_RATE_ATTRIBUTE(OnOff, DataRate("500kb/s"))
+            .SIM_ADD_TRAFFIC_MODEL_PACKET_SIZE_ATTRIBUTE(OnOff, 512)
+            .SIM_ADD_TRAFFIC_MODEL_ON_TIME_PATTERN_ATTRIBUTE(
+                OnOff,
+                "ns3::ConstantRandomVariable[Constant=1000]")
+            .SIM_ADD_TRAFFIC_MODEL_OFF_TIME_PATTERN_ATTRIBUTE(
+                OnOff,
+                "ns3::ConstantRandomVariable[Constant=0]")
+            .SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(OnOff, Seconds(0.1))
+            .SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(OnOff, Seconds(0))
+            .SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(OnOff, MilliSeconds(10))
+            .SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(OnOff, 0)
+
+            .SIM_ADD_TRAFFIC_MODEL_DIRECTION_ATTRIBUTE(Http, SatTrafficHelperConf::RTN_LINK)
+            .SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(Http, Seconds(0.1))
+            .SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(Http, Seconds(0))
+            .SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(Http, MilliSeconds(10))
+            .SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(Http, 0)
+
+            .SIM_ADD_TRAFFIC_MODEL_DIRECTION_ATTRIBUTE(Nrtv, SatTrafficHelperConf::RTN_LINK)
+            .SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(Nrtv, Seconds(0.1))
+            .SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(Nrtv, Seconds(0))
+            .SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(Nrtv, MilliSeconds(10))
+            .SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(Nrtv, 0)
+
+            .SIM_ADD_TRAFFIC_MODEL_DIRECTION_ATTRIBUTE(Poisson, SatTrafficHelperConf::RTN_LINK)
+            .SIM_ADD_TRAFFIC_MODEL_ON_TIME_ATTRIBUTE(Poisson, Seconds(1))
+            .SIM_ADD_TRAFFIC_MODEL_OFF_TIME_ATTRIBUTE(Poisson, MilliSeconds(100))
+            .SIM_ADD_TRAFFIC_MODEL_DATA_RATE_ATTRIBUTE(Poisson, DataRate("500kb/s"))
+            .SIM_ADD_TRAFFIC_MODEL_PACKET_SIZE_ATTRIBUTE(Poisson, 512)
+            .SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(Poisson, Seconds(0.1))
+            .SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(Poisson, Seconds(0))
+            .SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(Poisson, MilliSeconds(10))
+            .SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(Poisson, 0)
+
+            .SIM_ADD_TRAFFIC_MODEL_DIRECTION_ATTRIBUTE(Voip, SatTrafficHelperConf::RTN_LINK)
+            .SIM_ADD_TRAFFIC_MODEL_CODEC_ATTRIBUTE(Voip, SatTrafficHelper::VoipCodec_t::G_711_1)
+            .SIM_ADD_TRAFFIC_MODEL_START_TIME_ATTRIBUTE(Voip, Seconds(0.1))
+            .SIM_ADD_TRAFFIC_MODEL_STOP_TIME_ATTRIBUTE(Voip, Seconds(0))
+            .SIM_ADD_TRAFFIC_MODEL_START_DELAY_ATTRIBUTE(Voip, MilliSeconds(10))
+            .SIM_ADD_TRAFFIC_MODEL_PERCENTAGE_ATTRIBUTE(Voip, 0);
+
+    return tid;
+}
+
+TypeId
+SatTrafficHelperConf::GetInstanceTypeId(void) const
+{
+    NS_LOG_FUNCTION(this);
+
+    return GetTypeId();
+}
+
+SatTrafficHelperConf::SatTrafficHelperConf()
+    : m_simTime(Seconds(0)),
+      m_trafficHelper(nullptr)
+{
+    NS_LOG_FUNCTION(this);
+
+    NS_FATAL_ERROR("Default constructor not in use");
+}
+
+SatTrafficHelperConf::SatTrafficHelperConf(Ptr<SatTrafficHelper> trafficHelper, Time simTime)
+    : m_simTime(simTime),
+      m_trafficHelper(trafficHelper)
+{
+    NS_LOG_FUNCTION(this << simTime << trafficHelper);
+}
+
+SatTrafficHelperConf::~SatTrafficHelperConf()
+{
+    NS_LOG_FUNCTION(this);
+}
+
 NS_OBJECT_ENSURE_REGISTERED(SatTrafficHelper);
 
 TypeId
@@ -1814,6 +2066,238 @@ SatTrafficHelper::HasSinkInstalled(Ptr<Node> node, uint16_t port)
         }
     }
     return false;
+}
+
+void
+SatTrafficHelperConf::InstallTrafficModels()
+{
+    NS_LOG_FUNCTION(this);
+
+    NS_ASSERT_MSG(m_trafficHelper != nullptr, "Traffic helper must be defined");
+
+    for (const std::pair<const std::string, SatTrafficHelperConf::TrafficConfiguration_t>&
+             trafficModel : m_trafficModel)
+    {
+        SatTrafficHelper::TrafficType_t modelName;
+        if (trafficModel.first == "LoraCbr")
+        {
+            modelName = SatTrafficHelper::LORA_PERIODIC;
+        }
+        else if (trafficModel.first == "LoraPeriodic")
+        {
+            modelName = SatTrafficHelper::LORA_CBR;
+        }
+        else if (trafficModel.first == "Cbr")
+        {
+            modelName = SatTrafficHelper::CBR;
+        }
+        else if (trafficModel.first == "OnOff")
+        {
+            modelName = SatTrafficHelper::ONOFF;
+        }
+        else if (trafficModel.first == "Http")
+        {
+            modelName = SatTrafficHelper::HTTP;
+        }
+        else if (trafficModel.first == "Nrtv")
+        {
+            modelName = SatTrafficHelper::NRTV;
+        }
+        else if (trafficModel.first == "Poisson")
+        {
+            modelName = SatTrafficHelper::POISSON;
+        }
+        else if (trafficModel.first == "Voip")
+        {
+            modelName = SatTrafficHelper::VOIP;
+        }
+        else
+        {
+            NS_FATAL_ERROR("Unknown traffic model has been configured: " << trafficModel.first);
+        }
+
+        std::vector<SatTrafficHelper::TransportLayerProtocol_t> protocols;
+        switch (trafficModel.second.m_protocol)
+        {
+        case SatTrafficHelperConf::PROTOCOL_UDP: {
+            protocols.push_back(SatTrafficHelper::UDP);
+            break;
+        }
+        case SatTrafficHelperConf::PROTOCOL_TCP: {
+            protocols.push_back(SatTrafficHelper::TCP);
+            break;
+        }
+        case SatTrafficHelperConf::PROTOCOL_BOTH: {
+            protocols.push_back(SatTrafficHelper::TCP);
+            protocols.push_back(SatTrafficHelper::UDP);
+            break;
+        }
+        default: {
+            NS_FATAL_ERROR("Unknown traffic protocol");
+        }
+        }
+
+        std::vector<SatTrafficHelper::TrafficDirection_t> directions;
+        switch (trafficModel.second.m_direction)
+        {
+        case SatTrafficHelperConf::RTN_LINK: {
+            directions.push_back(SatTrafficHelper::RTN_LINK);
+            break;
+        }
+        case SatTrafficHelperConf::FWD_LINK: {
+            directions.push_back(SatTrafficHelper::FWD_LINK);
+            break;
+        }
+        case SatTrafficHelperConf::BOTH_LINK: {
+            directions.push_back(SatTrafficHelper::FWD_LINK);
+            directions.push_back(SatTrafficHelper::RTN_LINK);
+            break;
+        }
+        default: {
+            NS_FATAL_ERROR("Unknown traffic protocol");
+        }
+        }
+
+        if (trafficModel.second.m_percentage > 0.0)
+        {
+            SatTrafficHelperConf::TrafficConfiguration_t conf = trafficModel.second;
+            Time startTime = conf.m_startTime;
+            if (startTime > m_simTime)
+            {
+                NS_FATAL_ERROR("Traffic model "
+                               << trafficModel.first
+                               << " configured to start after the simulation ended");
+            }
+
+            Time stopTime = conf.m_stopTime;
+            if (stopTime == Seconds(0))
+            {
+                stopTime = m_simTime + Seconds(1);
+            }
+            if (stopTime < startTime)
+            {
+                NS_FATAL_ERROR("Traffic model " << trafficModel.first
+                                                << " configured to stop before it is started");
+            }
+
+            NodeContainer gws = Singleton<SatTopology>::Get()->GetGwUserNodes();
+            NodeContainer uts;
+            if (modelName == SatTrafficHelper::LORA_PERIODIC)
+            {
+                uts = Singleton<SatTopology>::Get()->GetUtNodes();
+            }
+            else
+            {
+                uts = Singleton<SatTopology>::Get()->GetUtUserNodes();
+            }
+
+            for (SatTrafficHelper::TransportLayerProtocol_t& protocol : protocols)
+            {
+                for (SatTrafficHelper::TrafficDirection_t& direction : directions)
+                {
+                    switch (modelName)
+                    {
+                    case SatTrafficHelper::LORA_PERIODIC: {
+                        m_trafficHelper->AddLoraPeriodicTraffic(conf.m_interval,
+                                                                conf.m_packetSize,
+                                                                uts,
+                                                                startTime,
+                                                                stopTime,
+                                                                conf.m_startDelay,
+                                                                conf.m_percentage);
+                        break;
+                    }
+                    case SatTrafficHelper::LORA_CBR: {
+                        m_trafficHelper->AddLoraCbrTraffic(conf.m_interval,
+                                                           conf.m_packetSize,
+                                                           gws,
+                                                           uts,
+                                                           startTime,
+                                                           stopTime,
+                                                           conf.m_startDelay,
+                                                           conf.m_percentage);
+                        break;
+                    }
+                    case SatTrafficHelper::CBR: {
+                        m_trafficHelper->AddCbrTraffic(direction,
+                                                       protocol,
+                                                       conf.m_interval,
+                                                       conf.m_packetSize,
+                                                       gws,
+                                                       uts,
+                                                       startTime,
+                                                       stopTime,
+                                                       conf.m_startDelay,
+                                                       conf.m_percentage);
+                        break;
+                    }
+                    case SatTrafficHelper::ONOFF: {
+                        m_trafficHelper->AddOnOffTraffic(direction,
+                                                         protocol,
+                                                         conf.m_dataRate,
+                                                         conf.m_packetSize,
+                                                         gws,
+                                                         uts,
+                                                         conf.m_onTimePattern,
+                                                         conf.m_offTimePattern,
+                                                         startTime,
+                                                         stopTime,
+                                                         conf.m_startDelay,
+                                                         conf.m_percentage);
+                        break;
+                    }
+                    case SatTrafficHelper::HTTP: {
+                        m_trafficHelper->AddHttpTraffic(direction,
+                                                        gws,
+                                                        uts,
+                                                        startTime,
+                                                        stopTime,
+                                                        conf.m_startDelay,
+                                                        conf.m_percentage);
+                        break;
+                    }
+                    case SatTrafficHelper::NRTV: {
+                        m_trafficHelper->AddNrtvTraffic(direction,
+                                                        gws,
+                                                        uts,
+                                                        startTime,
+                                                        stopTime,
+                                                        conf.m_startDelay,
+                                                        conf.m_percentage);
+                        break;
+                    }
+                    case SatTrafficHelper::POISSON: {
+                        m_trafficHelper->AddPoissonTraffic(direction,
+                                                           conf.m_onTime,
+                                                           conf.m_offTime,
+                                                           conf.m_dataRate,
+                                                           conf.m_packetSize,
+                                                           gws,
+                                                           uts,
+                                                           startTime,
+                                                           stopTime,
+                                                           conf.m_startDelay,
+                                                           conf.m_percentage);
+                        break;
+                    }
+                    case SatTrafficHelper::VOIP: {
+                        m_trafficHelper->AddVoipTraffic(direction,
+                                                        conf.m_codec,
+                                                        gws,
+                                                        uts,
+                                                        startTime,
+                                                        stopTime,
+                                                        conf.m_startDelay,
+                                                        conf.m_percentage);
+                        break;
+                    }
+                    default:
+                        NS_FATAL_ERROR("Unknown traffic model has been configured: " << modelName);
+                    }
+                }
+            }
+        }
+    }
 }
 
 } // namespace ns3
