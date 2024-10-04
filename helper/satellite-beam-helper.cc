@@ -1462,11 +1462,14 @@ SatBeamHelper::CreateBeamInfo() const
 
     oss << std::endl << " -- Satellite positions --" << std::endl;
 
-    Ptr<SatMobilityModel> model =
-        Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetObject<SatMobilityModel>();
-    GeoCoordinate pos = model->GetGeoPosition();
-    oss << "latitude=" << pos.GetLatitude() << ", longitude=" << pos.GetLongitude()
-        << ", altitude=" << pos.GetAltitude() << std::endl;
+    NodeContainer orbiters = Singleton<SatTopology>::Get()->GetOrbiterNodes();
+    for (NodeContainer::Iterator it = orbiters.Begin(); it != orbiters.End(); it++)
+    {
+        Ptr<SatMobilityModel> model = (*it)->GetObject<SatMobilityModel>();
+        GeoCoordinate pos = model->GetGeoPosition();
+        oss << "latitude=" << pos.GetLatitude() << ", longitude=" << pos.GetLongitude()
+            << ", altitude=" << pos.GetAltitude() << std::endl;
+    }
 
     return oss.str();
 }

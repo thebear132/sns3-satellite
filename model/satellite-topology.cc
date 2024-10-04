@@ -813,7 +813,8 @@ SatTopology::PrintTopology(std::ostream& os) const
 
     os << "Satellites" << std::endl;
     Ptr<Node> orbiter;
-    for(NodeContainer::Iterator itOrbiter = m_orbiters.Begin(); itOrbiter != m_orbiters.End(); itOrbiter++)
+    for (NodeContainer::Iterator itOrbiter = m_orbiters.Begin(); itOrbiter != m_orbiters.End();
+         itOrbiter++)
     {
         orbiter = *itOrbiter;
         const OrbiterLayers_s layers = m_orbiterLayers.at(orbiter);
@@ -824,30 +825,35 @@ SatTopology::PrintTopology(std::ostream& os) const
         os << "    Devices to ground stations " << std::endl;
 
         os << "      " << layers.m_netDevice->GetAddress() << std::endl;
-        for(std::pair<std::pair<uint32_t, uint32_t>, Ptr<SatOrbiterFeederMac>> feederMac : layers.m_feederMac)
+        for (std::pair<std::pair<uint32_t, uint32_t>, Ptr<SatOrbiterFeederMac>> feederMac :
+             layers.m_feederMac)
         {
-             os << "        Feeder at " << feederMac.second->GetAddress() << ", beam " << feederMac.first.second << std::endl;
+            os << "        Feeder at " << feederMac.second->GetAddress() << ", beam "
+               << feederMac.first.second << std::endl;
         }
 
         os << "      Feeder connected to" << std::endl;
         std::set<Mac48Address> gwConnected = layers.m_netDevice->GetGwConnected();
-        for (std::set<Mac48Address>::iterator it = gwConnected.begin(); it != gwConnected.end(); it++)
+        for (std::set<Mac48Address>::iterator it = gwConnected.begin(); it != gwConnected.end();
+             it++)
         {
             os << "        " << *it << std::endl;
         }
 
-        for(std::pair<uint32_t, Ptr<SatOrbiterUserMac>> userMac : layers.m_userMac)
+        for (std::pair<uint32_t, Ptr<SatOrbiterUserMac>> userMac : layers.m_userMac)
         {
-             os << "        User at " << userMac.second->GetAddress() << ", beam " << userMac.first << std::endl;
+            os << "        User at " << userMac.second->GetAddress() << ", beam " << userMac.first
+               << std::endl;
         }
 
         os << "      User connected to" << std::endl;
         std::set<Mac48Address> utConnected = layers.m_netDevice->GetUtConnected();
-        for (std::set<Mac48Address>::iterator it = utConnected.begin(); it != utConnected.end(); it++)
+        for (std::set<Mac48Address>::iterator it = utConnected.begin(); it != utConnected.end();
+             it++)
         {
             os << "        " << *it << std::endl;
         }
-   
+
         os << "    ISLs " << std::endl;
         for (uint32_t j = 0; j < orbiter->GetNDevices(); j++)
         {
@@ -875,7 +881,8 @@ SatTopology::PrintTopology(std::ostream& os) const
         {
             uint32_t satId = mac.first.first;
             uint32_t beamId = mac.first.second;
-            os << "    " << mac.second->GetAddress() << ", sat: " << satId << ", beam: " << beamId << std::endl;
+            os << "    " << mac.second->GetAddress() << ", sat: " << satId << ", beam: " << beamId
+               << std::endl;
         }
     }
 
@@ -893,8 +900,10 @@ SatTopology::PrintTopology(std::ostream& os) const
         uint32_t utSatId = utLayers.m_satId;
         uint32_t utBeamId = utLayers.m_beamId;
         uint32_t gwSatId = gwLayers.m_satId;
-        os << "    " << utLayers.m_mac->GetAddress() << ", sat: " << utSatId << ", beam: " << utBeamId;
-        os << ". Linked to GW " << gwLayers.m_mac.at(std::make_pair(gwSatId, utBeamId))->GetAddress() << std::endl;
+        os << "    " << utLayers.m_mac->GetAddress() << ", sat: " << utSatId
+           << ", beam: " << utBeamId;
+        os << ". Linked to GW "
+           << gwLayers.m_mac.at(std::make_pair(gwSatId, utBeamId))->GetAddress() << std::endl;
     }
 
     os << "GW users" << std::endl;
