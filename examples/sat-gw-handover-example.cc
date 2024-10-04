@@ -77,9 +77,9 @@ main(int argc, char* argv[])
 
     simulationHelper->LoadScenario("constellation-leo-2-satellites");
 
-    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE);
+    simulationHelper->CreateSatScenario(SatHelper::NONE);
 
-    helper->PrintTopology(std::cout);
+    Singleton<SatTopology>::Get()->PrintTopology(std::cout);
 
     simulationHelper->GetTrafficHelper()->AddCbrTraffic(
         SatTrafficHelper::FWD_LINK,

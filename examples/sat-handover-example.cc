@@ -75,9 +75,9 @@ main(int argc, char* argv[])
 
     std::string mobileUtFolder = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
                                  "/additional-input/utpositions/mobiles/scenario6";
-    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
+    simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
 
-    helper->PrintTopology(std::cout);
+    Singleton<SatTopology>::Get()->PrintTopology(std::cout);
 
     simulationHelper->GetTrafficHelper()->AddCbrTraffic(
         SatTrafficHelper::FWD_LINK,

@@ -289,12 +289,6 @@ class SatHelper : public Object
         return m_satConstellationEnabled;
     }
 
-    /**
-     * Print all the satellite topology
-     * \param os output stream in which the data should be printed
-     */
-    void PrintTopology(std::ostream& os) const;
-
   private:
     static const uint16_t MIN_ADDRESS_PREFIX_LENGTH = 1;
     static const uint16_t MAX_ADDRESS_PREFIX_LENGTH = 31;

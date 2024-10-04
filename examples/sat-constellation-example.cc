@@ -117,9 +117,9 @@ main(int argc, char* argv[])
 
     LogComponentEnable("sat-constellation-example", LOG_LEVEL_INFO);
 
-    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario();
+    simulationHelper->CreateSatScenario();
 
-    helper->PrintTopology(std::cout);
+    Singleton<SatTopology>::Get()->PrintTopology(std::cout);
     Singleton<SatIdMapper>::Get()->ShowIslMap();
 
     Config::SetDefault("ns3::CbrApplication::Interval", StringValue(interval));

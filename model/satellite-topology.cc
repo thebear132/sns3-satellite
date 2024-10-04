@@ -803,4 +803,116 @@ SatTopology::GetOrbiterUserPhy(Ptr<Node> orbiter, uint32_t beamId) const
     return layers.m_userPhy.at(beamId);
 }
 
+void
+SatTopology::PrintTopology(std::ostream& os) const
+{
+    NS_LOG_FUNCTION(this);
+
+    os << "Satellite topology" << std::endl;
+    os << "==================" << std::endl;
+
+    os << "Satellites" << std::endl;
+    Ptr<Node> orbiter;
+    for(NodeContainer::Iterator itOrbiter = m_orbiters.Begin(); itOrbiter != m_orbiters.End(); itOrbiter++)
+    {
+        orbiter = *itOrbiter;
+        const OrbiterLayers_s layers = m_orbiterLayers.at(orbiter);
+
+        os << "  SAT: ID = " << layers.m_satId;
+        os << ", at " << GeoCoordinate(orbiter->GetObject<SatMobilityModel>()->GetPosition())
+           << std::endl;
+        os << "    Devices to ground stations " << std::endl;
+
+        os << "      " << layers.m_netDevice->GetAddress() << std::endl;
+        for(std::pair<std::pair<uint32_t, uint32_t>, Ptr<SatOrbiterFeederMac>> feederMac : layers.m_feederMac)
+        {
+             os << "        Feeder at " << feederMac.second->GetAddress() << ", beam " << feederMac.first.second << std::endl;
+        }
+
+        os << "      Feeder connected to" << std::endl;
+        std::set<Mac48Address> gwConnected = layers.m_netDevice->GetGwConnected();
+        for (std::set<Mac48Address>::iterator it = gwConnected.begin(); it != gwConnected.end(); it++)
+        {
+            os << "        " << *it << std::endl;
+        }
+
+        for(std::pair<uint32_t, Ptr<SatOrbiterUserMac>> userMac : layers.m_userMac)
+        {
+             os << "        User at " << userMac.second->GetAddress() << ", beam " << userMac.first << std::endl;
+        }
+
+        os << "      User connected to" << std::endl;
+        std::set<Mac48Address> utConnected = layers.m_netDevice->GetUtConnected();
+        for (std::set<Mac48Address>::iterator it = utConnected.begin(); it != utConnected.end(); it++)
+        {
+            os << "        " << *it << std::endl;
+        }
+   
+        os << "    ISLs " << std::endl;
+        for (uint32_t j = 0; j < orbiter->GetNDevices(); j++)
+        {
+            Ptr<PointToPointIslNetDevice> islNetDevice =
+                DynamicCast<PointToPointIslNetDevice>(orbiter->GetDevice(j));
+            if (islNetDevice)
+            {
+                os << "      " << islNetDevice->GetAddress() << " to SAT "
+                   << islNetDevice->GetDestinationNode()->GetId() << std::endl;
+            }
+        }
+    }
+
+    os << "GWs" << std::endl;
+    Ptr<Node> gwNode;
+    for (NodeContainer::Iterator itGw = m_gws.Begin(); itGw != m_gws.End(); itGw++)
+    {
+        gwNode = *itGw;
+        const GwLayers_s layers = m_gwLayers.at(gwNode);
+        os << "  GW: ID = " << gwNode->GetId();
+        os << ", at " << GeoCoordinate(gwNode->GetObject<SatMobilityModel>()->GetPosition())
+           << std::endl;
+        os << "  Devices " << std::endl;
+        for (std::pair<std::pair<uint32_t, uint32_t>, Ptr<SatGwMac>> mac : layers.m_mac)
+        {
+            uint32_t satId = mac.first.first;
+            uint32_t beamId = mac.first.second;
+            os << "    " << mac.second->GetAddress() << ", sat: " << satId << ", beam: " << beamId << std::endl;
+        }
+    }
+
+    os << "UTs" << std::endl;
+    Ptr<Node> utNode;
+    for (NodeContainer::Iterator itUt = m_uts.Begin(); itUt != m_uts.End(); itUt++)
+    {
+        utNode = *itUt;
+        const UtLayers_s utLayers = m_utLayers.at(utNode);
+        os << "  UT: ID = " << utNode->GetId();
+        os << ", at " << GeoCoordinate(utNode->GetObject<SatMobilityModel>()->GetPosition())
+           << std::endl;
+        os << "  Devices " << std::endl;
+        const GwLayers_s gwLayers = m_gwLayers.at(m_utToGwMap.at(utNode));
+        uint32_t utSatId = utLayers.m_satId;
+        uint32_t utBeamId = utLayers.m_beamId;
+        uint32_t gwSatId = gwLayers.m_satId;
+        os << "    " << utLayers.m_mac->GetAddress() << ", sat: " << utSatId << ", beam: " << utBeamId;
+        os << ". Linked to GW " << gwLayers.m_mac.at(std::make_pair(gwSatId, utBeamId))->GetAddress() << std::endl;
+    }
+
+    os << "GW users" << std::endl;
+    for (NodeContainer::Iterator it = m_gwUsers.Begin(); it != m_gwUsers.End(); it++)
+    {
+        Ptr<Node> gwUserNode = *it;
+        os << "  GW user: ID = " << gwUserNode->GetId() << std::endl;
+    }
+
+    os << "UT users" << std::endl;
+    for (NodeContainer::Iterator it = m_utUsers.Begin(); it != m_utUsers.End(); it++)
+    {
+        Ptr<Node> utUserNode = *it;
+        os << "  GW user: ID = " << utUserNode->GetId() << std::endl;
+    }
+
+    os << "==================" << std::endl;
+    os << std::endl;
+}
+
 } // namespace ns3

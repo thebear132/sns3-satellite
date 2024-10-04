@@ -636,17 +636,18 @@ class SatTopology : public Object
     Ptr<SatOrbiterUserPhy> GetOrbiterUserPhy(Ptr<Node> orbiter, uint32_t beamId) const;
 
     /**
-     * \brief Function for printing out the topology
-     */
-    void PrintTopology() const;
-
-    /**
      * \brief Function for enabling the map prints
      */
     void EnableMapPrint(bool enableMapPrint)
     {
         m_enableMapPrint = enableMapPrint;
     }
+
+    /**
+     * Print all the satellite topology
+     * \param os output stream in which the data should be printed
+     */
+    void PrintTopology(std::ostream& os) const;
 
   private:
     std::map<uint32_t, Ptr<Node>> m_gwIds;                 // List of GW nodes
