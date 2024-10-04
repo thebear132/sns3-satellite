@@ -599,7 +599,7 @@ SatBeamHelper::Install(NodeContainer ut,
     // for this position, and set the antenna patterns to the feeder PHY objects via
     // AttachChannels method.
     GeoCoordinate gwPos = gwNode->GetObject<SatMobilityModel>()->GetGeoPosition();
-    uint32_t feederSatId = GetClosestSat(gwPos);
+    uint32_t feederSatId = Singleton<SatTopology>::Get()->GetClosestSat(gwPos);
     uint32_t feederBeamId = m_antennaGainPatterns->GetBestBeamId(feederSatId, gwPos, true);
     if (feederBeamId == 0)
     {
@@ -1218,30 +1218,6 @@ SatBeamHelper::EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBas
     m_orbiterHelper->EnableCreationTraces(stream, cb);
     m_gwHelper->EnableCreationTraces(stream, cb);
     m_utHelper->EnableCreationTraces(stream, cb);
-}
-
-uint32_t
-SatBeamHelper::GetClosestSat(GeoCoordinate position)
-{
-    NS_LOG_FUNCTION(this);
-
-    double distanceMin = std::numeric_limits<double>::max();
-    uint32_t indexDistanceMin = 0;
-
-    for (uint32_t i = 0; i < Singleton<SatTopology>::Get()->GetNOrbiterNodes(); i++)
-    {
-        GeoCoordinate satPos = Singleton<SatTopology>::Get()
-                                   ->GetOrbiterNode(i)
-                                   ->GetObject<SatMobilityModel>()
-                                   ->GetGeoPosition();
-        double distance = CalculateDistance(position.ToVector(), satPos.ToVector());
-        if (distance < distanceMin)
-        {
-            distanceMin = distance;
-            indexDistanceMin = i;
-        }
-    }
-    return indexDistanceMin;
 }
 
 void

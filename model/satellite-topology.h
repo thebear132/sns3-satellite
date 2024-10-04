@@ -649,6 +649,13 @@ class SatTopology : public Object
      */
     void PrintTopology(std::ostream& os) const;
 
+    /**
+     * Get closest satellite to a ground station
+     * \param position The position of the ground station
+     * \return The ID of the closest satellite
+     */
+    uint32_t GetClosestSat(GeoCoordinate position);
+
   private:
     std::map<uint32_t, Ptr<Node>> m_gwIds;                 // List of GW nodes
     NodeContainer m_gws;                                   // List of GW nodes

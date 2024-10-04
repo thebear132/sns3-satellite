@@ -169,13 +169,6 @@ class SatHelper : public Object
     void SetBeamRoutingConstellations();
 
     /**
-     * Get closest satellite to a ground station
-     * \param position The position of the ground station
-     * \return The ID of the closest satellite
-     */
-    uint32_t GetClosestSat(GeoCoordinate position);
-
-    /**
      * \param  node pointer to user node.
      *
      * \return address of the user.

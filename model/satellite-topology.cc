@@ -924,4 +924,25 @@ SatTopology::PrintTopology(std::ostream& os) const
     os << std::endl;
 }
 
+uint32_t
+SatTopology::GetClosestSat(GeoCoordinate position)
+{
+    NS_LOG_FUNCTION(this << position);
+
+    double distanceMin = std::numeric_limits<double>::max();
+    uint32_t indexDistanceMin = 0;
+
+    for (uint32_t i = 0; i < m_orbiters.GetN(); i++)
+    {
+        GeoCoordinate satPos = m_orbiters.Get(i)->GetObject<SatMobilityModel>()->GetGeoPosition();
+        double distance = CalculateDistance(position.ToVector(), satPos.ToVector());
+        if (distance < distanceMin)
+        {
+            distanceMin = distance;
+            indexDistanceMin = i;
+        }
+    }
+    return indexDistanceMin;
+}
+
 } // namespace ns3

@@ -298,13 +298,6 @@ class SatBeamHelper : public Object
     void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase& cb);
 
     /**
-     * Get closest satellite to a ground station
-     * \param position The position of the ground station
-     * \return The ID of the closest satellite
-     */
-    uint32_t GetClosestSat(GeoCoordinate position);
-
-    /**
      * \return info of created beams as std::string with GW info..
      */
     std::string GetBeamInfo() const;

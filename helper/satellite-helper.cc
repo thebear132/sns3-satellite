@@ -417,14 +417,6 @@ SatHelper::EnableDetailedCreationTraces()
     m_beamHelper->EnableCreationTraces(m_creationTraceStream, creationCb);
 }
 
-uint32_t
-SatHelper::GetClosestSat(GeoCoordinate position)
-{
-    NS_LOG_FUNCTION(this);
-
-    return m_beamHelper->GetClosestSat(position);
-}
-
 Ipv4Address
 SatHelper::GetUserAddress(Ptr<Node> node)
 {
@@ -645,7 +637,7 @@ SatHelper::LoadConstellationScenario(BeamUserInfoMap_t& info,
     {
         GeoCoordinate position = m_satConf->GetUtPosition(i + 1);
 
-        uint32_t satId = m_beamHelper->GetClosestSat(position);
+        uint32_t satId = Singleton<SatTopology>::Get()->GetClosestSat(position);
 
         uint32_t bestBeamId = m_antennaGainPatterns->GetBestBeamId(satId, position, true);
 
@@ -666,7 +658,7 @@ SatHelper::LoadConstellationScenario(BeamUserInfoMap_t& info,
     for (uint32_t i = 0; i < m_satConf->GetGwCount(); i++)
     {
         GeoCoordinate position = m_satConf->GetGwPosition(i + 1);
-        uint32_t satId = m_beamHelper->GetClosestSat(position);
+        uint32_t satId = Singleton<SatTopology>::Get()->GetClosestSat(position);
 
         m_gwSats[i] = satId;
     }
@@ -1021,8 +1013,8 @@ SatHelper::GetGwAddressInSingleUt(uint32_t utId)
 
     std::vector<uint32_t> rtnConf = m_satConf->GetBeamConfiguration(utBeamId, SatEnums::LD_RETURN);
     Ptr<Node> gw = m_beamHelper->GetGwNode(rtnConf[SatConf::GW_ID_INDEX]);
-    uint32_t gwSatId =
-        GetClosestSat(GeoCoordinate(gw->GetObject<SatMobilityModel>()->GetPosition()));
+    uint32_t gwSatId = Singleton<SatTopology>::Get()->GetClosestSat(
+        GeoCoordinate(gw->GetObject<SatMobilityModel>()->GetPosition()));
 
     // Get feeder MAC used on sat on GW side, and corresponding beam ID used for downlink (can
     // be different than UT beam ID)
@@ -1154,7 +1146,7 @@ SatHelper::LoadMobileUtFromFile(const std::string& filename)
     GeoCoordinate initialPosition =
         Singleton<SatPositionInputTraceContainer>::Get()->GetPosition(filename,
                                                                       GeoCoordinate::SPHERE);
-    uint32_t satId = m_beamHelper->GetClosestSat(initialPosition);
+    uint32_t satId = Singleton<SatTopology>::Get()->GetClosestSat(initialPosition);
 
     // Create Node, Mobility and aggregate them
     Ptr<SatTracedMobilityModel> mobility =
@@ -1224,8 +1216,8 @@ SatHelper::SetGwMobility(NodeContainer gwNodes)
 
         if (m_satConstellationEnabled)
         {
-            uint32_t gwSatId =
-                GetClosestSat(GeoCoordinate(gwNode->GetObject<SatMobilityModel>()->GetPosition()));
+            uint32_t gwSatId = Singleton<SatTopology>::Get()->GetClosestSat(
+                GeoCoordinate(gwNode->GetObject<SatMobilityModel>()->GetPosition()));
 
             InstallMobilityObserver(gwSatId, NodeContainer(gwNode));
         }
