@@ -76,11 +76,11 @@ class SatTopology : public Object
     {
         uint32_t m_satId;
         Ptr<SatOrbiterNetDevice> m_netDevice;
-        std::map<std::pair<uint32_t, uint32_t>, Ptr<SatOrbiterFeederLlc>> m_feederLlc;
+        std::map<uint32_t, Ptr<SatOrbiterFeederLlc>> m_feederLlc;
         std::map<uint32_t, Ptr<SatOrbiterUserLlc>> m_userLlc;
-        std::map<std::pair<uint32_t, uint32_t>, Ptr<SatOrbiterFeederMac>> m_feederMac;
+        std::map<uint32_t, Ptr<SatOrbiterFeederMac>> m_feederMac;
         std::map<uint32_t, Ptr<SatOrbiterUserMac>> m_userMac;
-        std::map<std::pair<uint32_t, uint32_t>, Ptr<SatOrbiterFeederPhy>> m_feederPhy;
+        std::map<uint32_t, Ptr<SatOrbiterFeederPhy>> m_feederPhy;
         std::map<uint32_t, Ptr<SatOrbiterUserPhy>> m_userPhy;
     } OrbiterLayers_s;
 
@@ -169,6 +169,59 @@ class SatTopology : public Object
      * \param ut The UT to consider
      */
     void DisconnectGwFromUt(Ptr<Node> ut);
+
+    /**
+     * Get GW connected to a given UT. UT must already have an associated GW
+     *
+     * \param ut The UT to consider
+     *
+     * \return The associated GW
+     */
+    Ptr<Node> GetGwFromUt(Ptr<Node> ut) const;
+
+    /**
+     * Connect a GW to a Beam. Beam must not have an associated GW yet
+     *
+     * \param beamId The beam ID to consider
+     * \param gw The GW connected to this beam
+     */
+    void ConnectGwToBeam(uint32_t beamId, Ptr<Node> gw);
+
+    /**
+     * Get GW connected to a given beam ID. Beam must already have an associated GW
+     *
+     * \param beamId The beam ID to consider
+     *
+     * \return The associated GW
+     */
+    Ptr<Node> GetGwFromBeam(uint32_t beamId) const;
+
+    /**
+     * Create an association between a feeder MAC layer, and the entity really used
+     *
+     * \param mac The Feeder MAC to pair
+     * \param usedMac The Feeder MAC that is really linked to a GW
+     */
+    void AddOrbiterFeederMacPair(Ptr<SatOrbiterFeederMac> mac, Ptr<SatOrbiterFeederMac> usedMac);
+
+    /**
+     * Get feeder MAC really used to connect to a GW
+     *
+     * \param mac The Feeder MAC wanted
+     *
+     * \return The Feeder MAC that is really linked to a GW
+     */
+    Ptr<SatOrbiterFeederMac> GetOrbiterFeederMacUsed(Ptr<SatOrbiterFeederMac> mac) const;
+
+    /**
+     * Set the value of GW address for a UT.
+     * This method is called when using constellations, and can be called via callbacks after
+     * handovers
+     *
+     * \param utId ID of UT to
+     * \return MAC address of GW
+     */
+    Mac48Address GetGwAddressInUt(uint32_t utId);
 
     /**
      * Get the list of GW nodes
@@ -312,6 +365,15 @@ class SatTopology : public Object
      * \return The UT user node
      */
     Ptr<Node> GetUtUserNode(uint32_t nodeId) const;
+
+    /**
+     * Get the wanted node from its node ID
+     *
+     * \param nodeId ID of the node needed
+     *
+     * \return The node
+     */
+    Ptr<Node> GetNodeFromId(uint32_t nodeId) const;
 
     /**
      * Add GW layers for given node, associated to chosen satellite and beam
@@ -522,7 +584,6 @@ class SatTopology : public Object
      */
     void AddOrbiterFeederLayers(Ptr<Node> orbiter,
                                 uint32_t satId,
-                                uint32_t utSatId,
                                 uint32_t utBeamId,
                                 Ptr<SatOrbiterNetDevice> netDevice,
                                 Ptr<SatOrbiterFeederLlc> llc,
@@ -570,14 +631,11 @@ class SatTopology : public Object
      * Get SatOrbiterFeederLlc instance of an orbiter serving wanted beam ID
      *
      * \param orbiter Orbiter node to consider
-     * \param utSatId UT satellite ID served by this feeder LLC layer
      * \param utBeamId UT Beam ID served by this feeder LLC layer
      *
      * \return SatOrbiterFeederLlc instance of an orbiter
      */
-    Ptr<SatOrbiterFeederLlc> GetOrbiterFeederLlc(Ptr<Node> orbiter,
-                                                 uint32_t utSatId,
-                                                 uint32_t utBeamId) const;
+    Ptr<SatOrbiterFeederLlc> GetOrbiterFeederLlc(Ptr<Node> orbiter, uint32_t utBeamId) const;
 
     /**
      * Get SatOrbiterUserLlc instance of an orbiter serving wanted beam ID
@@ -593,14 +651,11 @@ class SatTopology : public Object
      * Get SatOrbiterFeederMac instance of an orbiter serving wanted beam ID
      *
      * \param orbiter Orbiter node to consider
-     * \param utSatId UT satellite ID served by this feeder MAC layer
      * \param utBeamId UT Beam ID served by this feeder MAC layer
      *
      * \return SatOrbiterFeederMac instance of an orbiter
      */
-    Ptr<SatOrbiterFeederMac> GetOrbiterFeederMac(Ptr<Node> orbiter,
-                                                 uint32_t utSatId,
-                                                 uint32_t utBeamId) const;
+    Ptr<SatOrbiterFeederMac> GetOrbiterFeederMac(Ptr<Node> orbiter, uint32_t utBeamId) const;
 
     /**
      * Get SatOrbiterUserMac instance of an orbiter serving wanted beam ID
@@ -616,14 +671,11 @@ class SatTopology : public Object
      * Get SatOrbiterFeederPhy instance of an orbiter serving wanted beam ID
      *
      * \param orbiter Orbiter node to consider
-     * \param utSatId UT satellite ID served by this feeder PHY layer
      * \param utBeamId UT Beam ID served by this feeder PHY layer
      *
      * \return SatOrbiterFeederPhy instance of an orbiter
      */
-    Ptr<SatOrbiterFeederPhy> GetOrbiterFeederPhy(Ptr<Node> orbiter,
-                                                 uint32_t utSatId,
-                                                 uint32_t utBeamId) const;
+    Ptr<SatOrbiterFeederPhy> GetOrbiterFeederPhy(Ptr<Node> orbiter, uint32_t utBeamId) const;
 
     /**
      * Get SatOrbiterUserPhy instance of an orbiter serving wanted beam ID
@@ -670,7 +722,10 @@ class SatTopology : public Object
     std::map<Ptr<Node>, OrbiterLayers_s>
         m_orbiterLayers; // Map giving protocol layers for all orbiters
 
-    std::map<Ptr<Node>, Ptr<Node>> m_utToGwMap; // Map of GW connected for each UT
+    std::map<Ptr<Node>, Ptr<Node>> m_utToGwMap;  // Map of GW connected for each UT
+    std::map<uint32_t, Ptr<Node>> m_beamToGwMap; // Map of GW connected for each satellite beam
+    std::map<Ptr<SatOrbiterFeederMac>, Ptr<SatOrbiterFeederMac>>
+        m_orbiterFeederMacMap; // Map giving which Feeder Mac is really used
 
     bool m_enableMapPrint; // Is map printing enabled or not
 };

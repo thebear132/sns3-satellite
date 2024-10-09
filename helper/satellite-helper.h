@@ -154,16 +154,6 @@ class SatHelper : public Object
     void SetGwAddressInUts();
 
     /**
-     * Set the value of GW address for a single UT.
-     * This method is called when using constellations, and can be called via callbacks after
-     * handovers
-     *
-     * \param utId ID of UT to
-     * \return MAC address of GW
-     */
-    Mac48Address GetGwAddressInSingleUt(uint32_t utId);
-
-    /**
      * Populate the routes, when using constellations.
      */
     void SetBeamRoutingConstellations();

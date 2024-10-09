@@ -207,17 +207,6 @@ class SatUtMac : public SatMac
     void SetUpdateGwAddressCallback(SatUtMac::UpdateGwAddressCallback cb);
 
     /**
-     * Callback to get the GW address in this UT MAC
-     */
-    typedef Callback<Mac48Address, uint32_t> GetGwAddressInUtCallback;
-
-    /**
-     * \brief Set GW address in UT MAC callback
-     * \param cb Callback to get the GW address in this UT MAC
-     */
-    void SetGetGwAddressInUtCallback(SatUtMac::GetGwAddressInUtCallback cb);
-
-    /**
      * Get Tx time for the next possible superframe.
      * \param superFrameSeqId Superframe sequence id
      * \return Time Time to transmit
@@ -831,11 +820,6 @@ class SatUtMac : public SatMac
      * Callback for sending a logon message
      */
     SatUtMac::UpdateGwAddressCallback m_updateGwAddressCallback;
-
-    /**
-     * Callback to get the GW address in this UT MAC
-     */
-    SatUtMac::GetGwAddressInUtCallback m_getGwAddressInUtCallback;
 
     /**
      * Callback to update addresses in statistics helpers

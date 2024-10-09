@@ -440,11 +440,15 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatOrbiterNetDevice> dev,
         {
             // MAC already exists for this GW ID, reusing it, and disabling the other
             dev->AddFeederMac(fMac, m_gwMacMap[std::make_pair(satId, gwId)], userBeamId);
+            Singleton<SatTopology>::Get()->AddOrbiterFeederMacPair(
+                fMac,
+                m_gwMacMap[std::make_pair(satId, gwId)]);
         }
         else
         {
             // First MAC for this GW ID, storing it to the map
             dev->AddFeederMac(fMac, fMac, userBeamId);
+            Singleton<SatTopology>::Get()->AddOrbiterFeederMacPair(fMac, fMac);
             m_gwMacMap[std::make_pair(satId, gwId)] = fMac;
             startScheduler = true;
         }
@@ -473,11 +477,15 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatOrbiterNetDevice> dev,
         {
             // MAC already exists for this GW ID, reusing it, and disabling the other
             dev->AddFeederMac(fMac, m_gwMacMap[std::make_pair(satId, gwId)], userBeamId);
+            Singleton<SatTopology>::Get()->AddOrbiterFeederMacPair(
+                fMac,
+                m_gwMacMap[std::make_pair(satId, gwId)]);
         }
         else
         {
             // First MAC for this GW ID, storing it to the map
             dev->AddFeederMac(fMac, fMac, userBeamId);
+            Singleton<SatTopology>::Get()->AddOrbiterFeederMacPair(fMac, fMac);
             m_gwMacMap[std::make_pair(satId, gwId)] = fMac;
             startScheduler = true;
         }
@@ -566,7 +574,6 @@ SatOrbiterHelper::AttachChannelsFeeder(Ptr<SatOrbiterNetDevice> dev,
 
     Singleton<SatTopology>::Get()->AddOrbiterFeederLayers(dev->GetNode(),
                                                           dev->GetNode()->GetId(),
-                                                          satId,
                                                           userBeamId,
                                                           dev,
                                                           fLlc,

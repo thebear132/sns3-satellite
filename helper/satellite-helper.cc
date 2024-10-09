@@ -699,11 +699,15 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
         SetGwMobility(gwNodes);
 
+        std::set<uint32_t> beams;
+
         // Create beams explicitly required for this scenario
         for (BeamUserInfoMap_t::iterator info = beamInfos.begin(); info != beamInfos.end(); info++)
         {
             uint32_t satId = info->first.first;
             uint32_t beamId = info->first.second;
+
+            beams.insert(beamId);
 
             // create UTs of the beam, set mobility to them
             std::vector<std::pair<GeoCoordinate, uint32_t>> positionsAndGroupId =
@@ -863,6 +867,16 @@ SatHelper::DoCreateScenario(BeamUserInfoMap_t& beamInfos, uint32_t gwUsers)
 
         m_userHelper->InstallGw(gwUsers);
 
+        for (uint32_t beamId : beams)
+        {
+            std::vector<uint32_t> fwdConf =
+                m_satConf->GetBeamConfiguration(beamId, SatEnums::LD_FORWARD);
+            Ptr<Node> gwNode = gwNodes.Get(
+                m_satConf->GetBeamConfiguration(beamId, SatEnums::LD_RETURN)[SatConf::GW_ID_INDEX] -
+                1);
+            Singleton<SatTopology>::Get()->ConnectGwToBeam(beamId, gwNode);
+        }
+
         if (m_satConstellationEnabled)
         {
             m_beamHelper->InstallIsls();
@@ -957,102 +971,9 @@ SatHelper::SetGwAddressInUts()
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
     {
         ut = *it;
-        Mac48Address gwAddress = GetGwAddressInSingleUt(ut->GetId());
-
-        Ptr<SatUtMac> satUtMac;
-        for (uint32_t ndId = 0; ndId < ut->GetNDevices(); ndId++)
-        {
-            Ptr<SatNetDevice> utNd = DynamicCast<SatNetDevice>(ut->GetDevice(ndId));
-            if (utNd)
-            {
-                satUtMac = DynamicCast<SatUtMac>(utNd->GetMac());
-                break;
-            }
-        }
-
-        satUtMac->SetGwAddress(gwAddress);
-        satUtMac->SetGetGwAddressInUtCallback(
-            MakeCallback(&SatHelper::GetGwAddressInSingleUt, this));
+        Mac48Address gwAddress = Singleton<SatTopology>::Get()->GetGwAddressInUt(ut->GetId());
+        Singleton<SatTopology>::Get()->GetUtMac(ut)->SetGwAddress(gwAddress);
     }
-}
-
-Mac48Address
-SatHelper::GetGwAddressInSingleUt(uint32_t utId)
-{
-    NS_LOG_FUNCTION(this << utId);
-
-    // Get UT, GW attached to this UT, satellite linked to this GW and beam ID used by the
-    // satellite connected to the UT
-    Ptr<Node> ut;
-    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
-    for (uint32_t i = 0; i < uts.GetN(); i++)
-    {
-        if (uts.Get(i)->GetId() == utId)
-        {
-            ut = Singleton<SatTopology>::Get()->GetUtNode(i);
-            break;
-        }
-    }
-    NS_ASSERT_MSG(ut != nullptr, "Cannot find UT with ID of " << utId);
-
-    Ptr<SatUtMac> satUtMac;
-    uint32_t utBeamId = 0;
-    uint32_t utSatNetDeviceCount = 0;
-    for (uint32_t ndId = 0; ndId < ut->GetNDevices(); ndId++)
-    {
-        Ptr<SatNetDevice> utNd = DynamicCast<SatNetDevice>(ut->GetDevice(ndId));
-        if (utNd)
-        {
-            utSatNetDeviceCount++;
-            satUtMac = DynamicCast<SatUtMac>(utNd->GetMac());
-            utBeamId = satUtMac->GetBeamId();
-        }
-    }
-    NS_ASSERT_MSG(utSatNetDeviceCount == 1, "UT must have exactly one SatNetDevice");
-    NS_ASSERT_MSG(satUtMac != nullptr, "UT must have a SatUtMac for beam");
-
-    std::vector<uint32_t> rtnConf = m_satConf->GetBeamConfiguration(utBeamId, SatEnums::LD_RETURN);
-    Ptr<Node> gw = m_beamHelper->GetGwNode(rtnConf[SatConf::GW_ID_INDEX]);
-    uint32_t gwSatId = Singleton<SatTopology>::Get()->GetClosestSat(
-        GeoCoordinate(gw->GetObject<SatMobilityModel>()->GetPosition()));
-
-    // Get feeder MAC used on sat on GW side, and corresponding beam ID used for downlink (can
-    // be different than UT beam ID)
-    uint32_t usedBeamId = 0;
-    uint32_t gwSatOrbiterNetDeviceCount = 0;
-    for (uint32_t ndId = 0;
-         ndId < Singleton<SatTopology>::Get()->GetOrbiterNode(gwSatId)->GetNDevices();
-         ndId++)
-    {
-        Ptr<SatOrbiterNetDevice> gwNd = DynamicCast<SatOrbiterNetDevice>(
-            Singleton<SatTopology>::Get()->GetOrbiterNode(gwSatId)->GetDevice(ndId));
-        if (gwNd)
-        {
-            gwSatOrbiterNetDeviceCount++;
-            usedBeamId = gwNd->GetFeederMac(utBeamId)->GetBeamId();
-        }
-    }
-    NS_ASSERT_MSG(gwSatOrbiterNetDeviceCount == 1, "SAT must have exactly one SatOrbiterNetDevice");
-    NS_ASSERT_MSG(usedBeamId != 0, "Incorrect beam ID");
-
-    // Get GW MAC for usedBeamId, and corresponding MAC address
-    Mac48Address gwAddress;
-    uint32_t gwSatNetDeviceCount = 0;
-    for (uint32_t ndId = 0; ndId < gw->GetNDevices(); ndId++)
-    {
-        Ptr<SatNetDevice> gwNd = DynamicCast<SatNetDevice>(gw->GetDevice(ndId));
-        if (gwNd && gwNd->GetMac()->GetBeamId() == usedBeamId &&
-            gwNd->GetMac()->GetSatId() == gwSatId)
-        {
-            gwSatNetDeviceCount++;
-            gwAddress = Mac48Address::ConvertFrom(gwNd->GetAddress());
-        }
-    }
-    NS_ASSERT_MSG(gwSatNetDeviceCount == 1,
-                  "GW must have exactly one SatNetDevice for beam "
-                      << usedBeamId << " and satellite " << gwSatId);
-
-    return gwAddress;
 }
 
 void

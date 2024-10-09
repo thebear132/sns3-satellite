@@ -288,14 +288,6 @@ SatUtMac::SetUpdateGwAddressCallback(SatUtMac::UpdateGwAddressCallback cb)
 }
 
 void
-SatUtMac::SetGetGwAddressInUtCallback(SatUtMac::GetGwAddressInUtCallback cb)
-{
-    NS_LOG_FUNCTION(this << &cb);
-
-    m_getGwAddressInUtCallback = cb;
-}
-
-void
 SatUtMac::SetSatelliteAddress(Address satelliteAddress)
 {
     m_satelliteAddress = satelliteAddress;
@@ -1980,7 +1972,14 @@ SatUtMac::DoFrameStart()
             SetSatelliteAddress(satAddress48);
         }
 
-        Mac48Address gwAddress = m_getGwAddressInUtCallback(m_nodeInfo->GetNodeId());
+        Ptr<SatTopology> satTopology = Singleton<SatTopology>::Get();
+
+        satTopology->UpdateUtSatAndBeam(m_node, m_satId, m_beamId);
+        Ptr<Node> gwNode = satTopology->GetGwFromBeam(m_beamId);
+        satTopology->UpdateGwConnectedToUt(m_node, gwNode);
+
+        Mac48Address gwAddress =
+            Singleton<SatTopology>::Get()->GetGwAddressInUt(m_nodeInfo->GetNodeId());
         SetGwAddress(gwAddress);
         m_routingUpdateCallback(m_nodeInfo->GetMacAddress(), m_gwAddress);
 
@@ -1993,7 +1992,7 @@ SatUtMac::DoFrameStart()
         SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
         satIdMapper->UpdateMacToSatId(m_nodeInfo->GetMacAddress(), m_satId);
         satIdMapper->UpdateMacToBeamId(m_nodeInfo->GetMacAddress(), m_beamId);
-        Singleton<SatTopology>::Get()->UpdateUtSatAndBeam(m_node, m_satId, m_beamId);
+        satTopology->UpdateUtSatAndBeam(m_node, m_satId, m_beamId);
         m_updateIslCallback();
 
         if (!m_updateAddressAndIdentifierCallback.IsNull())
