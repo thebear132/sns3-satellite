@@ -118,7 +118,7 @@ main(int argc, char* argv[])
     simulationHelper->LoadScenario("geo-33E");
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario();
+    simulationHelper->CreateSatScenario();
 
     // set callback traces where we want results out
     Config::Connect("/NodeList/*/DeviceList/*/SatPhy/PhyRx/RxCarrierList/*/LinkBudgetTrace",

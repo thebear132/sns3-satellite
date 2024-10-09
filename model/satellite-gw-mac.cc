@@ -415,10 +415,10 @@ SatGwMac::StartTransmission(uint32_t carrierId)
                 Singleton<SatTopology>::Get()->GetOrbiterNode(m_feederSatId)->GetDevice(0));
             Mac48Address satFeederAddress = orbiterNetDevice->GetSatelliteFeederAddress(m_beamId);
             SetSatelliteAddress(satFeederAddress);
-            if (m_gwLlcSetSatelliteAddress.IsNull() == false)
-            {
-                m_gwLlcSetSatelliteAddress(satFeederAddress);
-            }
+
+            Ptr<SatGwLlc> gwLlc =
+                Singleton<SatTopology>::Get()->GetGwLlc(m_node, m_satId, m_beamId);
+            gwLlc->SetSatelliteAddress(satFeederAddress);
 
             Singleton<SatTopology>::Get()->UpdateGwSatAndBeam(m_node,
                                                               m_feederSatId,
@@ -901,13 +901,6 @@ SatGwMac::SetBeamCallback(SatGwMac::PhyBeamCallback cb)
 {
     NS_LOG_FUNCTION(this << &cb);
     m_beamCallback = cb;
-}
-
-void
-SatGwMac::SetGwLlcSetSatelliteAddress(SatGwMac::GwLlcSetSatelliteAddress cb)
-{
-    NS_LOG_FUNCTION(this << &cb);
-    m_gwLlcSetSatelliteAddress = cb;
 }
 
 void

@@ -1989,7 +1989,7 @@ SatUtMac::DoFrameStart()
         srcScheduler->DisconnectUt(m_nodeInfo->GetMacAddress());
         dstScheduler->ConnectUt(m_nodeInfo->GetMacAddress());
 
-        SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
+        Ptr<SatIdMapper> satIdMapper = Singleton<SatIdMapper>::Get();
         satIdMapper->UpdateMacToSatId(m_nodeInfo->GetMacAddress(), m_satId);
         satIdMapper->UpdateMacToBeamId(m_nodeInfo->GetMacAddress(), m_beamId);
         satTopology->UpdateUtSatAndBeam(m_node, m_satId, m_beamId);
@@ -2039,6 +2039,12 @@ SatUtMac::DoFrameStart()
                     m_satId = m_handoverModule->GetAskedSatId();
                     m_beamId = m_handoverModule->GetAskedBeamId();
 
+                    Ptr<SatTopology> satTopology = Singleton<SatTopology>::Get();
+
+                    satTopology->UpdateUtSatAndBeam(m_node, m_satId, m_beamId);
+                    Ptr<Node> gwNode = satTopology->GetGwFromBeam(m_beamId);
+                    satTopology->UpdateGwConnectedToUt(m_node, gwNode);
+
                     Address satAddress =
                         m_beamSchedulerCallback(m_satId, m_beamId)->GetSatAddress();
                     Mac48Address satAddress48 = Mac48Address::ConvertFrom(satAddress);
@@ -2061,9 +2067,10 @@ SatUtMac::DoFrameStart()
                     srcScheduler->DisconnectUt(m_nodeInfo->GetMacAddress());
                     dstScheduler->ConnectUt(m_nodeInfo->GetMacAddress());
 
-                    SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
+                    Ptr<SatIdMapper> satIdMapper = Singleton<SatIdMapper>::Get();
                     satIdMapper->UpdateMacToSatId(m_nodeInfo->GetMacAddress(), m_satId);
                     satIdMapper->UpdateMacToBeamId(m_nodeInfo->GetMacAddress(), m_beamId);
+                    satTopology->UpdateUtSatAndBeam(m_node, m_satId, m_beamId);
                     m_updateIslCallback();
 
                     if (!m_updateAddressAndIdentifierCallback.IsNull())

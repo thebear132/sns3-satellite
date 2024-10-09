@@ -820,7 +820,6 @@ SatBeamHelper::InstallFeeder(Ptr<SatOrbiterNetDevice> orbiterNetDevice,
         Ptr<SatGwMac> gwMac = DynamicCast<SatGwMac>(DynamicCast<SatNetDevice>(gwNd)->GetMac());
         Ptr<SatGwLlc> gwLlc = DynamicCast<SatGwLlc>(DynamicCast<SatNetDevice>(gwNd)->GetLlc());
         Mac48Address satFeederAddress = orbiterNetDevice->GetSatelliteFeederAddress(beamId);
-        gwMac->SetGwLlcSetSatelliteAddress(MakeCallback(&SatGwLlc::SetSatelliteAddress, gwLlc));
         gwLlc->SetSatelliteAddress(satFeederAddress);
     }
 

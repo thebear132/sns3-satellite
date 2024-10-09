@@ -193,7 +193,7 @@ main(int argc, char* argv[])
     simulationHelper->LoadScenario("geo-33E");
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario();
+    simulationHelper->CreateSatScenario();
 
     simulationHelper->GetTrafficHelper()->AddOnOffTraffic(
         SatTrafficHelper::RTN_LINK,
@@ -211,7 +211,7 @@ main(int argc, char* argv[])
     /**
      * Set-up statistics
      */
-    Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer>(helper);
+    Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
 
     s->AddGlobalFwdCompositeSinr(SatStatsHelper::OUTPUT_CDF_FILE);
     s->AddGlobalRtnCompositeSinr(SatStatsHelper::OUTPUT_CDF_FILE);

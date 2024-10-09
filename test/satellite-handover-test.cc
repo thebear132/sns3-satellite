@@ -209,7 +209,7 @@ SatHandoverTest1::DoRun(void)
 
     std::string mobileUtFolder = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
                                  "/additional-input/utpositions/mobiles/scenario6";
-    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
+    simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
 
     simulationHelper->GetTrafficHelper()->AddCbrTraffic(
         SatTrafficHelper::FWD_LINK,

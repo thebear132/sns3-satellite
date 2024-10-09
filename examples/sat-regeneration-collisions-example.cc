@@ -269,7 +269,7 @@ main(int argc, char* argv[])
     simulationHelper->SetUtCountPerBeam(50);
     simulationHelper->SetBeamSet({1});
 
-    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario();
+    simulationHelper->CreateSatScenario();
 
     simulationHelper->GetTrafficHelper()->AddCbrTraffic(
         SatTrafficHelper::RTN_LINK,

@@ -62,7 +62,7 @@ main(int argc, char* argv[])
 
     simulationHelper->LoadScenario("geo-33E");
 
-    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario();
+    simulationHelper->CreateSatScenario();
 
     // ----------------------------------
     // ----- CREATE CBR APPLICATION -----

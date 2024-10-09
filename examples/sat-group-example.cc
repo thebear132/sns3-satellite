@@ -221,7 +221,7 @@ main(int argc, char* argv[])
     simulationHelper->LoadScenario("geo-33E");
 
     // Create reference system
-    Ptr<SatHelper> satHelper = simulationHelper->CreateSatScenario();
+    simulationHelper->CreateSatScenario();
 
     // Create groups
     NodeContainer utNodes = Singleton<SatTopology>::Get()->GetUtNodes();

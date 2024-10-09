@@ -102,7 +102,7 @@ main(int argc, char* argv[])
     simulationHelper->LoadScenario("geo-33E");
 
     // Creating the reference system.
-    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(satScenario);
+    simulationHelper->CreateSatScenario(satScenario);
 
     // --- Create applications according to given user parameters
 

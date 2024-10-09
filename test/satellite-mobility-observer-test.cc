@@ -24,7 +24,6 @@
  * \brief Test cases to unit test Satellite Mobility Observer model.
  */
 
-#include "../helper/satellite-helper.h"
 #include "../model/satellite-constant-position-mobility-model.h"
 #include "../model/satellite-mobility-observer.h"
 #include "../model/satellite-propagation-delay-model.h"
