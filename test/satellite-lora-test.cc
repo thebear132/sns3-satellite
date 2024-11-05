@@ -25,14 +25,13 @@
  */
 
 // Include a header file from your module to test.
-#include "../model/satellite-mobility-model.h"
-#include "../model/satellite-position-allocator.h"
-#include "../utils/satellite-env-variables.h"
-
 #include "ns3/boolean.h"
 #include "ns3/config.h"
 #include "ns3/log.h"
 #include "ns3/mobility-helper.h"
+#include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-mobility-model.h"
+#include "ns3/satellite-position-allocator.h"
 #include "ns3/simulator.h"
 #include "ns3/singleton.h"
 #include "ns3/string.h"
@@ -48,6 +47,7 @@
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-lora-conf.h>
 #include <ns3/satellite-lorawan-net-device.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/uinteger.h>
 
 #include <iostream>
@@ -161,6 +161,7 @@ SatLoraFirstWindowTestCase::DoRun(void)
     Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue(false));
 
     Config::SetDefault("ns3::SatMac::EnableStatisticsTags", BooleanValue(true));
+    Config::SetDefault("ns3::SatHelper::PacketTraceEnabled", BooleanValue(true));
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
@@ -168,7 +169,7 @@ SatLoraFirstWindowTestCase::DoRun(void)
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
-    Ptr<Node> utNode = helper->UtNodes().Get(0);
+    Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(0);
     Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
 
     app->SetInterval(Seconds(10));
@@ -180,8 +181,8 @@ SatLoraFirstWindowTestCase::DoRun(void)
     app->SetNode(utNode);
     utNode->AddApplication(app);
 
-    m_gwAddress = helper->GwNodes().Get(0)->GetDevice(1)->GetAddress();
-    m_edAddress = helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
+    m_gwAddress = Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1)->GetAddress();
+    m_edAddress = Singleton<SatTopology>::Get()->GetUtNode(0)->GetDevice(2)->GetAddress();
 
     Config::Connect("/NodeList/*/DeviceList/*/SatMac/Rx",
                     MakeCallback(&SatLoraFirstWindowTestCase::MacTraceCb, this));
@@ -316,6 +317,7 @@ SatLoraSecondWindowTestCase::DoRun(void)
     Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::EnableSIC", BooleanValue(false));
 
     Config::SetDefault("ns3::SatMac::EnableStatisticsTags", BooleanValue(true));
+    Config::SetDefault("ns3::SatHelper::PacketTraceEnabled", BooleanValue(true));
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
@@ -323,7 +325,7 @@ SatLoraSecondWindowTestCase::DoRun(void)
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
-    Ptr<Node> utNode = helper->UtNodes().Get(0);
+    Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(0);
     Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
 
     app->SetInterval(Seconds(10));
@@ -335,8 +337,8 @@ SatLoraSecondWindowTestCase::DoRun(void)
     app->SetNode(utNode);
     utNode->AddApplication(app);
 
-    m_gwAddress = helper->GwNodes().Get(0)->GetDevice(1)->GetAddress();
-    m_edAddress = helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
+    m_gwAddress = Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1)->GetAddress();
+    m_edAddress = Singleton<SatTopology>::Get()->GetUtNode(0)->GetDevice(2)->GetAddress();
 
     Config::Connect("/NodeList/*/DeviceList/*/SatMac/Rx",
                     MakeCallback(&SatLoraSecondWindowTestCase::MacTraceCb, this));
@@ -490,6 +492,7 @@ SatLoraOutOfWindowWindowTestCase::DoRun(void)
 
     Config::SetDefault("ns3::SatMac::EnableStatisticsTags", BooleanValue(true));
     Config::SetDefault("ns3::SatPhy::EnableStatisticsTags", BooleanValue(true));
+    Config::SetDefault("ns3::SatHelper::PacketTraceEnabled", BooleanValue(true));
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
@@ -497,7 +500,7 @@ SatLoraOutOfWindowWindowTestCase::DoRun(void)
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
-    Ptr<Node> utNode = helper->UtNodes().Get(0);
+    Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(0);
     Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
 
     app->SetInterval(Seconds(10));
@@ -509,8 +512,8 @@ SatLoraOutOfWindowWindowTestCase::DoRun(void)
     app->SetNode(utNode);
     utNode->AddApplication(app);
 
-    m_gwAddress = helper->GwNodes().Get(0)->GetDevice(1)->GetAddress();
-    m_edAddress = helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
+    m_gwAddress = Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1)->GetAddress();
+    m_edAddress = utNode->GetDevice(2)->GetAddress();
 
     Config::Connect("/NodeList/*/DeviceList/*/SatMac/Rx",
                     MakeCallback(&SatLoraOutOfWindowWindowTestCase::MacTraceCb, this));
@@ -649,6 +652,7 @@ SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun(void)
 
     Config::SetDefault("ns3::SatMac::EnableStatisticsTags", BooleanValue(true));
     Config::SetDefault("ns3::SatPhy::EnableStatisticsTags", BooleanValue(true));
+    Config::SetDefault("ns3::SatHelper::PacketTraceEnabled", BooleanValue(true));
 
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
@@ -656,7 +660,7 @@ SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun(void)
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // >>> Start of actual test using Simple scenario >>>
-    Ptr<Node> utNode = helper->UtNodes().Get(0);
+    Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(0);
     Ptr<LoraPeriodicSender> app = Create<LoraPeriodicSender>();
 
     app->SetInterval(Seconds(10));
@@ -668,8 +672,8 @@ SatLoraOutOfWindowWindowNoRetransmissionTestCase::DoRun(void)
     app->SetNode(utNode);
     utNode->AddApplication(app);
 
-    m_gwAddress = helper->GwNodes().Get(0)->GetDevice(1)->GetAddress();
-    m_edAddress = helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
+    m_gwAddress = Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1)->GetAddress();
+    m_edAddress = utNode->GetDevice(2)->GetAddress();
 
     Config::Connect(
         "/NodeList/*/DeviceList/*/SatMac/Rx",
@@ -796,13 +800,15 @@ SatLoraCbrTestCase::DoRun(void)
     Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(24));
 
     Config::SetDefault("ns3::SatMac::EnableStatisticsTags", BooleanValue(true));
+    Config::SetDefault("ns3::SatHelper::PacketTraceEnabled", BooleanValue(true));
+
     // Creating the reference system.
     Ptr<SatHelper> helper = CreateObject<SatHelper>(
         Singleton<SatEnvVariables>::Get()->LocateDataDirectory() + "/scenarios/geo-33E-lora");
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-    NodeContainer utUsers = helper->GetUtUsers();
-    NodeContainer gwUsers = helper->GetGwUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
     InetSocketAddress gwUserAddr = InetSocketAddress(helper->GetUserAddress(gwUsers.Get(0)), 9);
 
     PacketSinkHelper sinkHelper("ns3::UdpSocketFactory", Address());
@@ -822,8 +828,8 @@ SatLoraCbrTestCase::DoRun(void)
     sinkContainer.Start(Seconds(1));
     sinkContainer.Stop(Seconds(20));
 
-    m_gwAddress = helper->GwNodes().Get(0)->GetDevice(1)->GetAddress();
-    m_edAddress = helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
+    m_gwAddress = Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1)->GetAddress();
+    m_edAddress = Singleton<SatTopology>::Get()->GetUtNode(0)->GetDevice(2)->GetAddress();
 
     Ptr<PacketSink> receiver = DynamicCast<PacketSink>(sinkContainer.Get(0));
 

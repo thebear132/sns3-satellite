@@ -32,9 +32,10 @@
 #include <ns3/satellite-beam-helper.h>
 #include <ns3/satellite-const-variables.h>
 #include <ns3/satellite-env-variables.h>
-#include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-orbiter-net-device.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/satellite-user-helper.h>
 #include <ns3/singleton.h>
 #include <ns3/string.h>
@@ -334,7 +335,7 @@ SatStatsHelper::CreateCollectorPerIdentifier(CollectorMap& collectorMap) const
     }
 
     case SatStatsHelper::IDENTIFIER_GW: {
-        NodeContainer gws = m_satHelper->GetBeamHelper()->GetGwNodes();
+        NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
         for (NodeContainer::Iterator it = gws.Begin(); it != gws.End(); ++it)
         {
             const uint32_t gwId = GetGwId(*it);
@@ -380,7 +381,7 @@ SatStatsHelper::CreateCollectorPerIdentifier(CollectorMap& collectorMap) const
     }
 
     case SatStatsHelper::IDENTIFIER_UT: {
-        NodeContainer uts = m_satHelper->GetBeamHelper()->GetUtNodes();
+        NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
         for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
         {
             const uint32_t utId = GetUtId(*it);
@@ -394,7 +395,7 @@ SatStatsHelper::CreateCollectorPerIdentifier(CollectorMap& collectorMap) const
     }
 
     case SatStatsHelper::IDENTIFIER_UT_USER: {
-        NodeContainer utUsers = m_satHelper->GetUtUsers();
+        NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
         for (NodeContainer::Iterator it = utUsers.Begin(); it != utUsers.End(); ++it)
         {
             const uint32_t utUserId = GetUtUserId(*it);
@@ -420,7 +421,7 @@ SatStatsHelper::CreateCollectorPerIdentifier(CollectorMap& collectorMap) const
     }
 
     case SatStatsHelper::IDENTIFIER_SAT: {
-        NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+        NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
         for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
         {
@@ -435,15 +436,15 @@ SatStatsHelper::CreateCollectorPerIdentifier(CollectorMap& collectorMap) const
     }
 
     case SatStatsHelper::IDENTIFIER_ISL: {
-        NodeContainer sats = GetSatHelper()->GetBeamHelper()->GetGeoSatNodes();
+        NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
 
         for (NodeContainer::Iterator it = sats.Begin(); it != sats.End(); ++it)
         {
-            Ptr<SatGeoNetDevice> satGeoNetDevice =
-                DynamicCast<SatGeoNetDevice>(GetSatSatGeoNetDevice(*it));
+            Ptr<SatOrbiterNetDevice> satOrbiterNetDevice =
+                DynamicCast<SatOrbiterNetDevice>(GetSatSatOrbiterNetDevice(*it));
             const uint32_t satSrcId = GetSatId(*it);
             std::vector<Ptr<PointToPointIslNetDevice>> islNetDevices =
-                satGeoNetDevice->GetIslsNetDevices();
+                satOrbiterNetDevice->GetIslsNetDevices();
             for (std::vector<Ptr<PointToPointIslNetDevice>>::iterator itIsl = islNetDevices.begin();
                  itIsl != islNetDevices.end();
                  itIsl++)
@@ -668,7 +669,7 @@ SatStatsHelper::GetIdentifierForUtUser(Ptr<Node> utUserNode) const
         break;
 
     case SatStatsHelper::IDENTIFIER_GW: {
-        Ptr<Node> utNode = m_satHelper->GetUserHelper()->GetUtNode(utUserNode);
+        Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(utUserNode);
 
         if (utNode == nullptr)
         {
@@ -702,7 +703,7 @@ SatStatsHelper::GetIdentifierForUtUser(Ptr<Node> utUserNode) const
     }
 
     case SatStatsHelper::IDENTIFIER_SAT: {
-        Ptr<Node> utNode = m_satHelper->GetUserHelper()->GetUtNode(utUserNode);
+        Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(utUserNode);
 
         const SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
         const Address utMac = satIdMapper->GetUtMacWithNode(utNode);
@@ -719,7 +720,7 @@ SatStatsHelper::GetIdentifierForUtUser(Ptr<Node> utUserNode) const
     }
 
     case SatStatsHelper::IDENTIFIER_BEAM: {
-        Ptr<Node> utNode = m_satHelper->GetUserHelper()->GetUtNode(utUserNode);
+        Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(utUserNode);
 
         if (utNode == nullptr)
         {
@@ -749,7 +750,7 @@ SatStatsHelper::GetIdentifierForUtUser(Ptr<Node> utUserNode) const
     }
 
     case SatStatsHelper::IDENTIFIER_GROUP: {
-        Ptr<Node> utNode = m_satHelper->GetUserHelper()->GetUtNode(utUserNode);
+        Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(utUserNode);
 
         if (utNode == nullptr)
         {
@@ -772,7 +773,7 @@ SatStatsHelper::GetIdentifierForUtUser(Ptr<Node> utUserNode) const
     }
 
     case SatStatsHelper::IDENTIFIER_UT: {
-        Ptr<Node> utNode = m_satHelper->GetUserHelper()->GetUtNode(utUserNode);
+        Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(utUserNode);
 
         if (utNode == nullptr)
         {
@@ -1059,12 +1060,12 @@ SatStatsHelper::GetUtSatNetDevice(Ptr<Node> utNode)
 }
 
 Ptr<NetDevice> // static
-SatStatsHelper::GetSatSatGeoNetDevice(Ptr<Node> satNode)
+SatStatsHelper::GetSatSatOrbiterNetDevice(Ptr<Node> satNode)
 {
     NS_ASSERT(satNode->GetNDevices() > 0);
     Ptr<NetDevice> dev = satNode->GetDevice(0);
 
-    if (dev->GetObject<SatGeoNetDevice>() == nullptr)
+    if (dev->GetObject<SatOrbiterNetDevice>() == nullptr)
     {
         NS_FATAL_ERROR("Node " << satNode->GetId() << " is not a valid SAT");
     }

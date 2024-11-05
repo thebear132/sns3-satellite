@@ -114,24 +114,13 @@ main(int argc, char* argv[])
     bool traceFrameInfo = false;
     bool traceMergeInfo = false;
 
-    UintegerValue packetSize(128); // in bytes
-    TimeValue interval(MicroSeconds(50));
-    DataRateValue dataRate(DataRate(16000));
+    uint32_t packetSize(128); // in bytes
+    Time interval(MicroSeconds(50));
+    DataRate dataRate(DataRate(16000));
 
     /// Set simulation output details
     auto simulationHelper = CreateObject<SimulationHelper>("example-fwd-system-test");
     Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
-
-    // set default values for traffic model apps here
-    // attributes can be overridden by command line arguments when needed
-    Config::SetDefault("ns3::CbrApplication::PacketSize", packetSize);
-    Config::SetDefault("ns3::CbrApplication::Interval", interval);
-    Config::SetDefault("ns3::OnOffApplication::PacketSize", packetSize);
-    Config::SetDefault("ns3::OnOffApplication::DataRate", dataRate);
-    Config::SetDefault("ns3::OnOffApplication::OnTime",
-                       StringValue("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
-    Config::SetDefault("ns3::OnOffApplication::OffTime",
-                       StringValue("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
 
     Config::SetDefault("ns3::SatBbFrameConf::BbFrameHighOccupancyThreshold", DoubleValue(0.9));
     Config::SetDefault("ns3::SatBbFrameConf::BbFrameLowOccupancyThreshold", DoubleValue(0.8));
@@ -158,8 +147,6 @@ main(int argc, char* argv[])
     {
         NS_FATAL_ERROR("Invalid traffic model, use either 'cbr' or 'onoff'");
     }
-    SimulationHelper::TrafficModel_t model =
-        trafficModel == "cbr" ? SimulationHelper::CBR : SimulationHelper::ONOFF;
 
     simulationHelper->SetUtCountPerBeam(gwEndUsers);
     simulationHelper->SetUserCountPerUt(1);
@@ -223,19 +210,41 @@ main(int argc, char* argv[])
     /**
      * Set-up CBR or OnOff traffic with sink receivers
      */
-    simulationHelper->InstallTrafficModel(model,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          senderAppStartTime,
-                                          Seconds(simLength),
-                                          MicroSeconds(20));
+    if (trafficModel == "cbr")
+    {
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::FWD_LINK,
+            SatTrafficHelper::UDP,
+            interval,
+            packetSize,
+            NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            senderAppStartTime,
+            Seconds(simLength),
+            MicroSeconds(20));
+    }
+    else
+    {
+        simulationHelper->GetTrafficHelper()->AddOnOffTraffic(
+            SatTrafficHelper::FWD_LINK,
+            SatTrafficHelper::UDP,
+            dataRate,
+            packetSize,
+            NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            "ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]",
+            "ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]",
+            senderAppStartTime,
+            Seconds(simLength),
+            MicroSeconds(20));
+    }
 
     simulationHelper->EnableProgressLogs();
 
     NS_LOG_INFO("--- sat-fwd-sys-test ---");
-    NS_LOG_INFO("  Packet size: " << packetSize.Get());
-    NS_LOG_INFO("  Interval (CBR): " << interval.Get().GetSeconds());
-    NS_LOG_INFO("  Data rate (OnOff): " << dataRate.Get());
+    NS_LOG_INFO("  Packet size: " << packetSize);
+    NS_LOG_INFO("  Interval (CBR): " << interval.GetSeconds());
+    NS_LOG_INFO("  Data rate (OnOff): " << dataRate);
     NS_LOG_INFO("  Simulation length: " << simLength);
     NS_LOG_INFO("  Number of GW end users: " << gwEndUsers);
     NS_LOG_INFO("  ");

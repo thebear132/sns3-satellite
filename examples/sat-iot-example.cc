@@ -172,18 +172,19 @@ main(int argc, char* argv[])
     trafficHelper->AddPoissonTraffic(SatTrafficHelper::RTN_LINK,
                                      Seconds(1),
                                      Seconds(0.1),
-                                     "200kb/s",
+                                     DataRate("200kb/s"),
                                      300,
-                                     satHelper->GetGwUsers(),
-                                     satHelper->GetUtUsers(),
+                                     NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+                                     Singleton<SatTopology>::Get()->GetUtUserNodes(),
                                      appStartTime,
                                      simLength,
                                      Seconds(0.001)); // 200kb/s == 100kBaud
     trafficHelper->AddCbrTraffic(SatTrafficHelper::RTN_LINK,
-                                 "8.5ms",
+                                 SatTrafficHelper::UDP,
+                                 MilliSeconds(8.5),
                                  300,
-                                 satHelper->GetGwUsers(),
-                                 satHelper->GetUtUsers(),
+                                 NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+                                 Singleton<SatTopology>::Get()->GetUtUserNodes(),
                                  appStartTime,
                                  simLength,
                                  Seconds(0.001)); // 280kb/s == 140kBaud
@@ -193,12 +194,12 @@ main(int argc, char* argv[])
     /*
     Ptr<SatCnoHelper> satCnoHelper = simulationHelper->GetCnoHelper ();
     satCnoHelper->UseTracesForDefault (false);
-    for (uint32_t i = 0; i < satHelper->GetBeamHelper ()->GetUtNodes ().GetN (); i++)
+    for (uint32_t i = 0; i < Singleton<SatTopology>::Get()->GetNUtNodes(); i++)
       {
-        satCnoHelper->SetUtNodeCnoFile (satHelper->GetBeamHelper ()->GetUtNodes ().Get (i),
+        satCnoHelper->SetUtNodeCnoFile (Singleton<SatTopology>::Get()->GetUtNode(i),
     SatEnums::FORWARD_USER_CH, "path_to_cno_file"); // For input trace file
         // or
-        satCnoHelper->SetGwNodeCno (satHelper->GetBeamHelper ()->GetUtNodes ().Get (i),
+        satCnoHelper->SetGwNodeCno (Singleton<SatTopology>::Get()->GetUtNode(i),
     SatEnums::FORWARD_USER_CH, 1e10); // For constant value
       }
     */

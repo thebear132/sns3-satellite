@@ -137,19 +137,27 @@ main(int argc, char* argv[])
                     MakeCallback(&LinkBudgetTraceCb));
 
     // Install CBR traffic model
-    Config::SetDefault("ns3::CbrApplication::Interval", StringValue("0.1s"));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(0.1),
-                                          Seconds(0.25));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(100),
+        512,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(0.1),
+        Seconds(0.25),
+        Seconds(0));
 
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(0.1),
-                                          Seconds(0.25));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(100),
+        512,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(0.1),
+        Seconds(0.25),
+        Seconds(0));
 
     NS_LOG_INFO("--- List Position External Fading Example ---");
     NS_LOG_INFO("UT info (Beam ID, UT ID, Latitude, Longitude, Altitude + addresses");

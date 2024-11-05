@@ -35,6 +35,7 @@
 #include "ns3/satellite-env-variables.h"
 #include "ns3/satellite-gw-mac.h"
 #include "ns3/satellite-helper.h"
+#include "ns3/satellite-topology.h"
 #include "ns3/satellite-ut-mac-state.h"
 #include "ns3/satellite-ut-mac.h"
 #include "ns3/simulator.h"
@@ -141,7 +142,7 @@ SatNcrTest1::DoRun(void)
                                        "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-    NodeContainer gwUsers = m_helper->GetGwUsers();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
 
     // Create the Cbr application to send UDP datagrams of size
     // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 100ms)
@@ -149,7 +150,7 @@ SatNcrTest1::DoRun(void)
     CbrHelper cbr("ns3::UdpSocketFactory",
                   Address(InetSocketAddress(m_helper->GetUserAddress(gwUsers.Get(0)), port)));
     cbr.SetAttribute("Interval", StringValue("100ms"));
-    ApplicationContainer utApps = cbr.Install(m_helper->GetUtUsers());
+    ApplicationContainer utApps = cbr.Install(Singleton<SatTopology>::Get()->GetUtUserNodes());
     utApps.Start(Seconds(1.0));
     utApps.Stop(Seconds(59.0));
 
@@ -213,7 +214,8 @@ SatNcrTest1::GetData(Ptr<CbrApplication> sender, Ptr<PacketSink> receiver)
     m_totalReceived.push_back(receiver->GetTotalRx());
     m_states.push_back(
         DynamicCast<SatUtMac>(
-            DynamicCast<SatNetDevice>(m_helper->UtNodes().Get(0)->GetDevice(2))->GetMac())
+            DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetUtNode(0)->GetDevice(2))
+                ->GetMac())
             ->GetRcstState());
 
     Simulator::Schedule(Seconds(1), &SatNcrTest1::GetData, this, sender, receiver);
@@ -321,7 +323,7 @@ SatNcrTest2::DoRun(void)
                                        "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-    NodeContainer gwUsers = m_helper->GetGwUsers();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
 
     // Create the Cbr application to send UDP datagrams of size
     // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 100ms)
@@ -329,7 +331,7 @@ SatNcrTest2::DoRun(void)
     CbrHelper cbr("ns3::UdpSocketFactory",
                   Address(InetSocketAddress(m_helper->GetUserAddress(gwUsers.Get(0)), port)));
     cbr.SetAttribute("Interval", StringValue("100ms"));
-    ApplicationContainer utApps = cbr.Install(m_helper->GetUtUsers());
+    ApplicationContainer utApps = cbr.Install(Singleton<SatTopology>::Get()->GetUtUserNodes());
     utApps.Start(Seconds(1.0));
     utApps.Stop(Seconds(59.0));
 
@@ -419,7 +421,8 @@ SatNcrTest2::GetData(Ptr<CbrApplication> sender, Ptr<PacketSink> receiver)
     m_totalReceived.push_back(receiver->GetTotalRx());
     m_states.push_back(
         DynamicCast<SatUtMac>(
-            DynamicCast<SatNetDevice>(m_helper->UtNodes().Get(0)->GetDevice(2))->GetMac())
+            DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetUtNode(0)->GetDevice(2))
+                ->GetMac())
             ->GetRcstState());
 
     Simulator::Schedule(Seconds(1), &SatNcrTest2::GetData, this, sender, receiver);
@@ -431,13 +434,15 @@ SatNcrTest2::ChangeTxStatus(bool enable)
     if (enable)
     {
         DynamicCast<SatGwMac>(
-            DynamicCast<SatNetDevice>(m_helper->GwNodes().Get(0)->GetDevice(1))->GetMac())
+            DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1))
+                ->GetMac())
             ->SetAttribute("NcrBroadcastPeriod", TimeValue(MilliSeconds(100)));
     }
     else
     {
         DynamicCast<SatGwMac>(
-            DynamicCast<SatNetDevice>(m_helper->GwNodes().Get(0)->GetDevice(1))->GetMac())
+            DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1))
+                ->GetMac())
             ->SetAttribute("NcrBroadcastPeriod", TimeValue(Seconds(9)));
     }
 }
@@ -551,7 +556,7 @@ SatNcrTest3::DoRun(void)
                                        "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-    NodeContainer gwUsers = m_helper->GetGwUsers();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
 
     // Create the Cbr application to send UDP datagrams of size
     // 512 bytes at a rate of 500 Kb/s (defaults), one packet send (interval 100ms)
@@ -559,7 +564,7 @@ SatNcrTest3::DoRun(void)
     CbrHelper cbr("ns3::UdpSocketFactory",
                   Address(InetSocketAddress(m_helper->GetUserAddress(gwUsers.Get(0)), port)));
     cbr.SetAttribute("Interval", StringValue("100ms"));
-    ApplicationContainer utApps = cbr.Install(m_helper->GetUtUsers());
+    ApplicationContainer utApps = cbr.Install(Singleton<SatTopology>::Get()->GetUtUserNodes());
     utApps.Start(Seconds(1.0));
     utApps.Stop(Seconds(119.0));
 
@@ -677,7 +682,8 @@ SatNcrTest3::GetData(Ptr<CbrApplication> sender, Ptr<PacketSink> receiver)
     m_totalReceived.push_back(receiver->GetTotalRx());
     m_states.push_back(
         DynamicCast<SatUtMac>(
-            DynamicCast<SatNetDevice>(m_helper->UtNodes().Get(0)->GetDevice(2))->GetMac())
+            DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetUtNode(0)->GetDevice(2))
+                ->GetMac())
             ->GetRcstState());
 
     Simulator::Schedule(Seconds(1), &SatNcrTest3::GetData, this, sender, receiver);
@@ -689,13 +695,15 @@ SatNcrTest3::ChangeTxStatus(bool enable)
     if (enable)
     {
         DynamicCast<SatGwMac>(
-            DynamicCast<SatNetDevice>(m_helper->GwNodes().Get(0)->GetDevice(1))->GetMac())
+            DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1))
+                ->GetMac())
             ->SetAttribute("NcrBroadcastPeriod", TimeValue(MilliSeconds(100)));
     }
     else
     {
         DynamicCast<SatGwMac>(
-            DynamicCast<SatNetDevice>(m_helper->GwNodes().Get(0)->GetDevice(1))->GetMac())
+            DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1))
+                ->GetMac())
             ->SetAttribute("NcrBroadcastPeriod", TimeValue(Seconds(30)));
     }
 }

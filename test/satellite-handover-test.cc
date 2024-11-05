@@ -33,15 +33,16 @@
 #include "ns3/packet-sink-helper.h"
 #include "ns3/packet-sink.h"
 #include "ns3/satellite-env-variables.h"
-#include "ns3/satellite-geo-feeder-phy.h"
-#include "ns3/satellite-geo-net-device.h"
-#include "ns3/satellite-geo-user-phy.h"
 #include "ns3/satellite-gw-mac.h"
 #include "ns3/satellite-helper.h"
 #include "ns3/satellite-id-mapper.h"
 #include "ns3/satellite-isl-arbiter-unicast.h"
 #include "ns3/satellite-isl-arbiter.h"
+#include "ns3/satellite-orbiter-feeder-phy.h"
+#include "ns3/satellite-orbiter-net-device.h"
+#include "ns3/satellite-orbiter-user-phy.h"
 #include "ns3/satellite-phy-rx-carrier.h"
+#include "ns3/satellite-topology.h"
 #include "ns3/satellite-ut-mac-state.h"
 #include "ns3/simulation-helper.h"
 #include "ns3/simulator.h"
@@ -94,8 +95,6 @@ class SatHandoverTest1 : public TestCase
 
     std::vector<std::string> Split(std::string s, char del);
     void TestFileValue(std::string path, uint32_t time, double expectedValue);
-
-    Ptr<SatHelper> m_helper;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -183,13 +182,14 @@ SatHandoverTest1::DoRun(void)
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_NETWORK));
 
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
 
     Config::SetDefault("ns3::SatHelper::HandoversEnabled", BooleanValue(true));
     Config::SetDefault("ns3::SatHandoverModule::NumberClosestSats", UintegerValue(2));
 
     Config::SetDefault("ns3::SatGwMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
-    Config::SetDefault("ns3::SatGeoMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
+    Config::SetDefault("ns3::SatOrbiterMac::DisableSchedulingIfNoDeviceConnected",
+                       BooleanValue(true));
 
     /// Set simulation output details
     Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
@@ -209,16 +209,18 @@ SatHandoverTest1::DoRun(void)
 
     std::string mobileUtFolder = Singleton<SatEnvVariables>::Get()->LocateDataDirectory() +
                                  "/additional-input/utpositions/mobiles/scenario6";
-    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
+    simulationHelper->CreateSatScenario(SatHelper::NONE, mobileUtFolder);
 
-    Config::SetDefault("ns3::CbrApplication::Interval", StringValue("100ms"));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(1.0),
-                                          Seconds(25.0));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(100),
+        512,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(25),
+        Seconds(0));
 
     Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
 
@@ -429,8 +431,6 @@ class SatHandoverTest2 : public TestCase
   private:
     bool HasSinkInstalled(Ptr<Node> node, uint16_t port);
     virtual void DoRun(void);
-
-    Ptr<SatHelper> m_helper;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -483,13 +483,14 @@ SatHandoverTest2::DoRun(void)
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_NETWORK));
 
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
 
     Config::SetDefault("ns3::SatHelper::HandoversEnabled", BooleanValue(true));
     Config::SetDefault("ns3::SatHandoverModule::NumberClosestSats", UintegerValue(2));
 
     Config::SetDefault("ns3::SatGwMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
-    Config::SetDefault("ns3::SatGeoMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
+    Config::SetDefault("ns3::SatOrbiterMac::DisableSchedulingIfNoDeviceConnected",
+                       BooleanValue(true));
 
     /// Set simulation output details
     Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
@@ -514,8 +515,8 @@ SatHandoverTest2::DoRun(void)
 
     Ptr<SatHelper> helper = simulationHelper->CreateSatScenario(SatHelper::NONE);
 
-    NodeContainer utUsers = helper->GetUtUsers();
-    NodeContainer gwUsers = helper->GetGwUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
 
     Config::SetDefault("ns3::CbrApplication::Interval", StringValue("100ms"));
     Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));

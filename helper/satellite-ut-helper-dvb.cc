@@ -45,6 +45,7 @@
 #include <ns3/satellite-request-manager.h>
 #include <ns3/satellite-return-link-encapsulator-arq.h>
 #include <ns3/satellite-return-link-encapsulator.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/satellite-typedefs.h>
 #include <ns3/satellite-ut-llc.h>
 #include <ns3/satellite-ut-mac.h>
@@ -422,6 +423,8 @@ SatUtHelperDvb::Install(Ptr<Node> n,
         mac->SetBeamSchedulerCallback(MakeCallback(&SatNcc::GetBeamScheduler, ncc));
         mac->SetUpdateGwAddressCallback(MakeCallback(&SatRequestManager::SetGwAddress, rm));
     }
+
+    Singleton<SatTopology>::Get()->AddUtLayers(n, satId, beamId, 0, dev, llc, mac, phy);
 
     return dev;
 }

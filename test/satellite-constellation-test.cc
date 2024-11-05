@@ -26,28 +26,29 @@
  * In this module implements the Constellation Test Cases.
  */
 
-#include "ns3/cbr-application.h"
-#include "ns3/cbr-helper.h"
-#include "ns3/config.h"
-#include "ns3/log.h"
-#include "ns3/packet-sink-helper.h"
-#include "ns3/packet-sink.h"
-#include "ns3/satellite-env-variables.h"
-#include "ns3/satellite-geo-feeder-phy.h"
-#include "ns3/satellite-geo-net-device.h"
-#include "ns3/satellite-geo-user-phy.h"
-#include "ns3/satellite-gw-mac.h"
-#include "ns3/satellite-helper.h"
-#include "ns3/satellite-id-mapper.h"
-#include "ns3/satellite-isl-arbiter-unicast.h"
-#include "ns3/satellite-isl-arbiter.h"
-#include "ns3/satellite-phy-rx-carrier.h"
-#include "ns3/satellite-ut-mac-state.h"
-#include "ns3/simulation-helper.h"
-#include "ns3/simulator.h"
-#include "ns3/singleton.h"
-#include "ns3/string.h"
-#include "ns3/test.h"
+#include <ns3/cbr-application.h>
+#include <ns3/cbr-helper.h>
+#include <ns3/config.h>
+#include <ns3/log.h>
+#include <ns3/packet-sink-helper.h>
+#include <ns3/packet-sink.h>
+#include <ns3/satellite-env-variables.h>
+#include <ns3/satellite-gw-mac.h>
+#include <ns3/satellite-helper.h>
+#include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-isl-arbiter-unicast.h>
+#include <ns3/satellite-isl-arbiter.h>
+#include <ns3/satellite-orbiter-feeder-phy.h>
+#include <ns3/satellite-orbiter-net-device.h>
+#include <ns3/satellite-orbiter-user-phy.h>
+#include <ns3/satellite-phy-rx-carrier.h>
+#include <ns3/satellite-topology.h>
+#include <ns3/satellite-ut-mac-state.h>
+#include <ns3/simulation-helper.h>
+#include <ns3/simulator.h>
+#include <ns3/singleton.h>
+#include <ns3/string.h>
+#include <ns3/test.h>
 
 #include <fstream>
 #include <iostream>
@@ -76,8 +77,6 @@ class SatConstellationTest1 : public TestCase
 
   private:
     virtual void DoRun(void);
-
-    Ptr<SatHelper> m_helper;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -126,20 +125,19 @@ SatConstellationTest1::DoRun(void)
     simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-no-isls");
 
     simulationHelper->CreateSatScenario();
-    m_helper = simulationHelper->GetSatelliteHelper();
 
-    NodeContainer sats = m_helper->GeoSatNodes();
-    NodeContainer gws = m_helper->GwNodes();
-    NodeContainer uts = m_helper->UtNodes();
-    NodeContainer gwUsers = m_helper->GetGwUsers();
-    NodeContainer utUsers = m_helper->GetUtUsers();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
 
     uint32_t countNetDevices = 0;
     for (uint32_t i = 0; i < sats.GetN(); i++)
     {
         for (uint32_t j = 0; j < sats.Get(i)->GetNDevices(); j++)
         {
-            if (DynamicCast<SatGeoNetDevice>(sats.Get(i)->GetDevice(j)) != nullptr)
+            if (DynamicCast<SatOrbiterNetDevice>(sats.Get(i)->GetDevice(j)) != nullptr)
             {
                 countNetDevices += 1;
             }
@@ -147,7 +145,9 @@ SatConstellationTest1::DoRun(void)
     }
 
     NS_TEST_ASSERT_MSG_EQ(sats.GetN(), 2, "Topology must contain 2 satellites");
-    NS_TEST_ASSERT_MSG_EQ(countNetDevices, 2, "Topology must contain 2 satellite Geo Net Devices");
+    NS_TEST_ASSERT_MSG_EQ(countNetDevices,
+                          2,
+                          "Topology must contain 2 satellite Orbiter Net Devices");
     NS_TEST_ASSERT_MSG_EQ(gws.GetN(), 2, "Topology must contain 2 GWs");
     NS_TEST_ASSERT_MSG_EQ(uts.GetN(), 3, "Topology must contain 3 UTs");
     NS_TEST_ASSERT_MSG_EQ(gwUsers.GetN(), 3, "Topology must contain 3 GW users");
@@ -239,8 +239,6 @@ class SatConstellationTest2 : public TestCase
 
     std::vector<std::string> Split(std::string s, char del);
     void TestFileValue(std::string path, uint32_t time, uint32_t expectedValue);
-
-    Ptr<SatHelper> m_helper;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -334,9 +332,6 @@ SatConstellationTest2::DoRun(void)
                        TimeValue(MilliSeconds(10)));
     Config::SetDefault("ns3::SatHelper::GwUsers", UintegerValue(3));
 
-    Config::SetDefault("ns3::CbrApplication::Interval", StringValue("10ms"));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
-
     Ptr<SimulationHelper> simulationHelper =
         CreateObject<SimulationHelper>("test-sat-constellation/test2");
 
@@ -347,18 +342,28 @@ SatConstellationTest2::DoRun(void)
     simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-no-isls");
 
     simulationHelper->CreateSatScenario();
-    m_helper = simulationHelper->GetSatelliteHelper();
 
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(1.0),
-                                          Seconds(29.0));
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(1.0),
-                                          Seconds(29.0));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(10),
+        512,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1.0),
+        Seconds(29.0),
+        Seconds(0));
+
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(10),
+        512,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1.0),
+        Seconds(29.0),
+        Seconds(0));
 
     Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
 
@@ -512,8 +517,6 @@ class SatConstellationTest3 : public TestCase
 
     std::vector<std::string> Split(std::string s, char del);
     void TestFileValue(std::string path, uint32_t time, uint32_t expectedValue);
-
-    Ptr<SatHelper> m_helper;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -607,9 +610,6 @@ SatConstellationTest3::DoRun(void)
                        TimeValue(MilliSeconds(10)));
     Config::SetDefault("ns3::SatHelper::GwUsers", UintegerValue(3));
 
-    Config::SetDefault("ns3::CbrApplication::Interval", StringValue("10ms"));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
-
     Ptr<SimulationHelper> simulationHelper =
         CreateObject<SimulationHelper>("test-sat-constellation/test3");
 
@@ -620,18 +620,28 @@ SatConstellationTest3::DoRun(void)
     simulationHelper->LoadScenario("constellation-eutelsat-geo-2-sats-isls");
 
     simulationHelper->CreateSatScenario();
-    m_helper = simulationHelper->GetSatelliteHelper();
 
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(1.0),
-                                          Seconds(29.0));
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(1.0),
-                                          Seconds(29.0));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(10),
+        512,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1.0),
+        Seconds(29.0),
+        Seconds(0));
+
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(10),
+        512,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1.0),
+        Seconds(29.0),
+        Seconds(0));
 
     Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
 
@@ -778,8 +788,6 @@ class SatConstellationTest4 : public TestCase
 
   private:
     virtual void DoRun(void);
-
-    Ptr<SatHelper> m_helper;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -817,7 +825,7 @@ SatConstellationTest4::DoRun(void)
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionEachRequest", BooleanValue(false));
     Config::SetDefault("ns3::SatSGP4MobilityModel::UpdatePositionPeriod",
                        TimeValue(MilliSeconds(10)));
-    Config::SetDefault("ns3::SatGeoHelper::IslArbiterType", EnumValue(SatEnums::UNICAST));
+    Config::SetDefault("ns3::SatOrbiterHelper::IslArbiterType", EnumValue(SatEnums::UNICAST));
     Config::SetDefault("ns3::SatHelper::GwUsers", UintegerValue(3));
 
     /// When using 72 beams, we need a 72*nbSats network addresses for beams, so we take margin
@@ -835,13 +843,12 @@ SatConstellationTest4::DoRun(void)
     simulationHelper->LoadScenario("constellation-telesat-351-sats");
 
     simulationHelper->CreateSatScenario();
-    m_helper = simulationHelper->GetSatelliteHelper();
 
-    NodeContainer sats = m_helper->GeoSatNodes();
-    NodeContainer gws = m_helper->GwNodes();
-    NodeContainer uts = m_helper->UtNodes();
-    NodeContainer gwUsers = m_helper->GetGwUsers();
-    NodeContainer utUsers = m_helper->GetUtUsers();
+    NodeContainer sats = Singleton<SatTopology>::Get()->GetOrbiterNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
 
     uint32_t countNetDevices = 0;
     uint32_t countIslNetDevice = 0;
@@ -849,10 +856,10 @@ SatConstellationTest4::DoRun(void)
     {
         for (uint32_t j = 0; j < sats.Get(i)->GetNDevices(); j++)
         {
-            if (DynamicCast<SatGeoNetDevice>(sats.Get(i)->GetDevice(j)) != nullptr)
+            if (DynamicCast<SatOrbiterNetDevice>(sats.Get(i)->GetDevice(j)) != nullptr)
             {
                 countNetDevices += 1;
-                countIslNetDevice += DynamicCast<SatGeoNetDevice>(sats.Get(i)->GetDevice(j))
+                countIslNetDevice += DynamicCast<SatOrbiterNetDevice>(sats.Get(i)->GetDevice(j))
                                          ->GetIslsNetDevices()
                                          .size();
             }
@@ -862,7 +869,7 @@ SatConstellationTest4::DoRun(void)
     NS_TEST_ASSERT_MSG_EQ(sats.GetN(), 351, "Topology must contain 351 satellites");
     NS_TEST_ASSERT_MSG_EQ(countNetDevices,
                           351,
-                          "Topology must contain 351 satellite Geo Net Devices");
+                          "Topology must contain 351 satellite Orbiter Net Devices");
     NS_TEST_ASSERT_MSG_EQ(countIslNetDevice,
                           1404,
                           "Topology must contain 1404 (351*4) satellite ISL Net Devices");
@@ -874,7 +881,7 @@ SatConstellationTest4::DoRun(void)
     for (uint32_t i = 0; i < sats.GetN(); i++)
     {
         Ptr<SatIslArbiter> arbiter =
-            DynamicCast<SatGeoNetDevice>(sats.Get(i)->GetDevice(0))->GetArbiter();
+            DynamicCast<SatOrbiterNetDevice>(sats.Get(i)->GetDevice(0))->GetArbiter();
         Ptr<SatIslArbiterUnicast> arbiterUnicast = DynamicCast<SatIslArbiterUnicast>(arbiter);
         NS_TEST_ASSERT_MSG_NE(arbiterUnicast,
                               nullptr,

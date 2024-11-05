@@ -154,26 +154,9 @@ class SatHelper : public Object
     void SetGwAddressInUts();
 
     /**
-     * Set the value of GW address for a single UT.
-     * This method is called when using constellations, and can be called via callbacks after
-     * handovers
-     *
-     * \param utId ID of UT to
-     * \return MAC address of GW
-     */
-    Mac48Address GetGwAddressInSingleUt(uint32_t utId);
-
-    /**
      * Populate the routes, when using constellations.
      */
     void SetBeamRoutingConstellations();
-
-    /**
-     * Get closest satellite to a ground station
-     * \param position The position of the ground station
-     * \return The ID of the closest satellite
-     */
-    uint32_t GetClosestSat(GeoCoordinate position);
 
     /**
      * \param  node pointer to user node.
@@ -181,28 +164,6 @@ class SatHelper : public Object
      * \return address of the user.
      */
     Ipv4Address GetUserAddress(Ptr<Node> node);
-
-    /**
-     * \return container having UT users
-     */
-    NodeContainer GetUtUsers() const;
-
-    /**
-     * \param utNode Pointer to UT node, which user nodes are requested.
-     * \return A container having UT specific user nodes in satellite network.
-     */
-    NodeContainer GetUtUsers(Ptr<Node> utNode) const;
-
-    /**
-     * \param utNodes Container to UT nodes, which user nodes are requested.
-     * \return A container having UT specific user nodes in satellite network.
-     */
-    NodeContainer GetUtUsers(NodeContainer utNodes) const;
-
-    /**
-     * \return container having GW users.
-     */
-    NodeContainer GetGwUsers() const;
 
     /**
      * \return pointer to beam helper.
@@ -293,21 +254,6 @@ class SatHelper : public Object
                                  Ipv4Address sourceAddress,
                                  Ipv4Address groupAddress);
 
-    inline NodeContainer GwNodes()
-    {
-        return m_beamHelper->GetGwNodes();
-    }
-
-    inline NodeContainer UtNodes()
-    {
-        return m_beamHelper->GetUtNodes();
-    }
-
-    inline NodeContainer GeoSatNodes()
-    {
-        return m_beamHelper->GetGeoSatNodes();
-    }
-
     /**
      * Dispose of this class instance
      */
@@ -325,12 +271,6 @@ class SatHelper : public Object
     {
         return m_satConstellationEnabled;
     }
-
-    /**
-     * Print all the satellite topology
-     * \param os output stream in which the data should be printed
-     */
-    void PrintTopology(std::ostream& os) const;
 
   private:
     static const uint16_t MIN_ADDRESS_PREFIX_LENGTH = 1;
@@ -350,7 +290,7 @@ class SatHelper : public Object
     std::string m_rtnConfFileName;
     std::string m_fwdConfFileName;
     std::string m_gwPosFileName;
-    std::string m_geoPosFileName;
+    std::string m_satPosFileName;
     std::string m_utPosFileName;
     std::string m_waveformConfDirectoryName;
 
@@ -378,11 +318,6 @@ class SatHelper : public Object
      * Group helper
      */
     Ptr<SatGroupHelper> m_groupHelper;
-
-    /**
-     * Gateway container
-     */
-    NodeContainer m_gwUser;
 
     /**
      * Configuration for satellite network.
@@ -593,11 +528,11 @@ class SatHelper : public Object
     void SetGwMobility(NodeContainer gwNodes);
 
     /**
-     * Sets mobility to created Sat Geo node.
+     * Sets mobility to created Sat node.
      *
-     * \param node node pointer of Geo Satellite to set mobility
+     * \param node node pointer of Satellite to set mobility
      */
-    void SetGeoSatMobility(Ptr<Node> node);
+    void SetSatMobility(Ptr<Node> node);
 
     /**
      * Sets SGP4 mobility to created Sat node.

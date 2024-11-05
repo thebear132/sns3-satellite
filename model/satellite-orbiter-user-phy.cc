@@ -19,7 +19,7 @@
  *         Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#include "satellite-geo-user-phy.h"
+#include "satellite-orbiter-user-phy.h"
 
 #include "satellite-address-tag.h"
 #include "satellite-channel-estimation-error-container.h"
@@ -42,20 +42,20 @@
 
 #include <limits>
 
-NS_LOG_COMPONENT_DEFINE("SatGeoUserPhy");
+NS_LOG_COMPONENT_DEFINE("SatOrbiterUserPhy");
 
 namespace ns3
 {
 
-NS_OBJECT_ENSURE_REGISTERED(SatGeoUserPhy);
+NS_OBJECT_ENSURE_REGISTERED(SatOrbiterUserPhy);
 
 TypeId
-SatGeoUserPhy::GetTypeId(void)
+SatOrbiterUserPhy::GetTypeId(void)
 {
     static TypeId tid =
-        TypeId("ns3::SatGeoUserPhy")
+        TypeId("ns3::SatOrbiterUserPhy")
             .SetParent<SatPhy>()
-            .AddConstructor<SatGeoUserPhy>()
+            .AddConstructor<SatOrbiterUserPhy>()
             .AddAttribute("PhyRx",
                           "The PhyRx layer attached to this phy.",
                           PointerValue(),
@@ -67,7 +67,7 @@ SatGeoUserPhy::GetTypeId(void)
                           MakePointerAccessor(&SatPhy::GetPhyTx, &SatPhy::SetPhyTx),
                           MakePointerChecker<SatPhyTx>())
             .AddAttribute("RxTemperatureDbk",
-                          "RX noise temperature in Geo User in dBK.",
+                          "RX noise temperature in orbiter User in dBK.",
                           DoubleValue(28.4),
                           MakeDoubleAccessor(&SatPhy::GetRxNoiseTemperatureDbk,
                                              &SatPhy::SetRxNoiseTemperatureDbk),
@@ -126,38 +126,38 @@ SatGeoUserPhy::GetTypeId(void)
             .AddAttribute("OtherSysIfCOverIDb",
                           "Other system interference, C over I in dB.",
                           DoubleValue(27.5),
-                          MakeDoubleAccessor(&SatGeoUserPhy::m_otherSysInterferenceCOverIDb),
+                          MakeDoubleAccessor(&SatOrbiterUserPhy::m_otherSysInterferenceCOverIDb),
                           MakeDoubleChecker<double>())
             .AddAttribute("AciIfCOverIDb",
                           "Adjacent channel interference, C over I in dB.",
                           DoubleValue(17.0),
-                          MakeDoubleAccessor(&SatGeoUserPhy::m_aciInterferenceCOverIDb),
+                          MakeDoubleAccessor(&SatOrbiterUserPhy::m_aciInterferenceCOverIDb),
                           MakeDoubleChecker<double>())
             .AddAttribute("QueueSize",
                           "Maximum size of FIFO m_queue in bytes.",
                           UintegerValue(100000),
-                          MakeUintegerAccessor(&SatGeoUserPhy::m_queueSizeMax),
+                          MakeUintegerAccessor(&SatOrbiterUserPhy::m_queueSizeMax),
                           MakeUintegerChecker<uint32_t>())
             .AddTraceSource("QueueSizeBytes",
                             "Send number of bytes in FIFO return feeder queue",
-                            MakeTraceSourceAccessor(&SatGeoUserPhy::m_queueSizeBytesTrace),
+                            MakeTraceSourceAccessor(&SatOrbiterUserPhy::m_queueSizeBytesTrace),
                             "ns3::SatStatsRtnFeederQueueHelper::QueueSizeCallback")
             .AddTraceSource("QueueSizePackets",
                             "Send number of packets in FIFO return feeder queue",
-                            MakeTraceSourceAccessor(&SatGeoUserPhy::m_queueSizePacketsTrace),
+                            MakeTraceSourceAccessor(&SatOrbiterUserPhy::m_queueSizePacketsTrace),
                             "ns3::SatStatsRtnFeederQueueHelper::QueueSizeCallback");
     return tid;
 }
 
 TypeId
-SatGeoUserPhy::GetInstanceTypeId(void) const
+SatOrbiterUserPhy::GetInstanceTypeId(void) const
 {
     NS_LOG_FUNCTION(this);
 
     return GetTypeId();
 }
 
-SatGeoUserPhy::SatGeoUserPhy(void)
+SatOrbiterUserPhy::SatOrbiterUserPhy(void)
     : m_aciInterferenceCOverIDb(17.0),
       m_otherSysInterferenceCOverIDb(27.5),
       m_aciInterferenceCOverI(SatUtils::DbToLinear(m_aciInterferenceCOverIDb)),
@@ -166,15 +166,15 @@ SatGeoUserPhy::SatGeoUserPhy(void)
       m_queueSizePackets(0)
 {
     NS_LOG_FUNCTION(this);
-    NS_FATAL_ERROR("SatGeoUserPhy default constructor is not allowed to use");
+    NS_FATAL_ERROR("SatOrbiterUserPhy default constructor is not allowed to use");
 }
 
-SatGeoUserPhy::SatGeoUserPhy(SatPhy::CreateParam_t& params,
-                             Ptr<SatLinkResults> linkResults,
-                             SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
-                             Ptr<SatSuperframeConf> superFrameConf,
-                             SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                             SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+SatOrbiterUserPhy::SatOrbiterUserPhy(SatPhy::CreateParam_t& params,
+                                     Ptr<SatLinkResults> linkResults,
+                                     SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
+                                     Ptr<SatSuperframeConf> superFrameConf,
+                                     SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                                     SatEnums::RegenerationMode_t returnLinkRegenerationMode)
     : SatPhy(params),
       m_queueSizeBytes(0),
       m_queueSizePackets(0)
@@ -228,32 +228,32 @@ SatGeoUserPhy::SatGeoUserPhy(SatPhy::CreateParam_t& params,
     }
 
     carrierConf->SetAdditionalInterferenceCb(
-        MakeCallback(&SatGeoUserPhy::GetAdditionalInterference, this));
+        MakeCallback(&SatOrbiterUserPhy::GetAdditionalInterference, this));
 
     SatPhy::ConfigureRxCarriers(carrierConf, superFrameConf);
 }
 
-SatGeoUserPhy::~SatGeoUserPhy()
+SatOrbiterUserPhy::~SatOrbiterUserPhy()
 {
     NS_LOG_FUNCTION(this);
 }
 
 void
-SatGeoUserPhy::DoDispose()
+SatOrbiterUserPhy::DoDispose()
 {
     NS_LOG_FUNCTION(this);
     Object::DoDispose();
 }
 
 void
-SatGeoUserPhy::DoInitialize()
+SatOrbiterUserPhy::DoInitialize()
 {
     NS_LOG_FUNCTION(this);
     Object::DoInitialize();
 }
 
 void
-SatGeoUserPhy::SendPduWithParams(Ptr<SatSignalParameters> txParams)
+SatOrbiterUserPhy::SendPduWithParams(Ptr<SatSignalParameters> txParams)
 {
     NS_LOG_FUNCTION(this << txParams);
     NS_LOG_INFO(this << " sending a packet with carrierId: " << txParams->m_carrierId
@@ -322,7 +322,7 @@ SatGeoUserPhy::SendPduWithParams(Ptr<SatSignalParameters> txParams)
 }
 
 void
-SatGeoUserPhy::SendFromQueue()
+SatOrbiterUserPhy::SendFromQueue()
 {
     if (m_queue.empty())
     {
@@ -351,13 +351,13 @@ SatGeoUserPhy::SendFromQueue()
                   SatEnums::LD_RETURN,
                   SatUtils::GetPacketInfo(txParams->m_packetsInBurst));
 
-    Simulator::Schedule(txParams->m_duration + NanoSeconds(1), &SatGeoUserPhy::EndTx, this);
+    Simulator::Schedule(txParams->m_duration + NanoSeconds(1), &SatOrbiterUserPhy::EndTx, this);
 
     m_phyTx->StartTx(txParams);
 }
 
 void
-SatGeoUserPhy::EndTx()
+SatOrbiterUserPhy::EndTx()
 {
     m_isSending = false;
     if (!m_queue.empty())
@@ -367,7 +367,7 @@ SatGeoUserPhy::EndTx()
 }
 
 void
-SatGeoUserPhy::RxTraces(SatPhy::PacketContainer_t packets)
+SatOrbiterUserPhy::RxTraces(SatPhy::PacketContainer_t packets)
 {
     NS_LOG_FUNCTION(this);
 
@@ -417,7 +417,7 @@ SatGeoUserPhy::RxTraces(SatPhy::PacketContainer_t packets)
 }
 
 void
-SatGeoUserPhy::Receive(Ptr<SatSignalParameters> rxParams, bool phyError)
+SatOrbiterUserPhy::Receive(Ptr<SatSignalParameters> rxParams, bool phyError)
 {
     NS_LOG_FUNCTION(this << rxParams);
 
@@ -501,7 +501,7 @@ SatGeoUserPhy::Receive(Ptr<SatSignalParameters> rxParams, bool phyError)
 }
 
 double
-SatGeoUserPhy::GetAdditionalInterference()
+SatOrbiterUserPhy::GetAdditionalInterference()
 {
     NS_LOG_FUNCTION(this);
 
@@ -509,19 +509,19 @@ SatGeoUserPhy::GetAdditionalInterference()
 }
 
 SatEnums::SatLinkDir_t
-SatGeoUserPhy::GetSatLinkTxDir()
+SatOrbiterUserPhy::GetSatLinkTxDir()
 {
     return SatEnums::LD_FORWARD;
 }
 
 SatEnums::SatLinkDir_t
-SatGeoUserPhy::GetSatLinkRxDir()
+SatOrbiterUserPhy::GetSatLinkRxDir()
 {
     return SatEnums::LD_RETURN;
 }
 
 Address
-SatGeoUserPhy::GetE2EDestinationAddress(SatPhy::PacketContainer_t packets)
+SatOrbiterUserPhy::GetE2EDestinationAddress(SatPhy::PacketContainer_t packets)
 {
     SatSignalParameters::PacketsInBurst_t::iterator it1;
     for (it1 = packets.begin(); it1 != packets.end(); ++it1)
@@ -537,7 +537,7 @@ SatGeoUserPhy::GetE2EDestinationAddress(SatPhy::PacketContainer_t packets)
 }
 
 void
-SatGeoUserPhy::SetSendControlMsgToFeederCallback(SendControlMsgToFeederCallback cb)
+SatOrbiterUserPhy::SetSendControlMsgToFeederCallback(SendControlMsgToFeederCallback cb)
 {
     m_txCtrlFeederCallback = cb;
 }

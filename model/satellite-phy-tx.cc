@@ -123,7 +123,7 @@ SatPhyTx::GetAntennaGain(Ptr<MobilityModel> mobility)
     double gain_W(m_maxAntennaGain);
 
     // Get the transmit antenna gain at the receiver position.
-    // E.g. GEO satellite transmits to the UT receiver.
+    // E.g. Satellite transmits to the UT receiver.
     if (m_antennaGainPattern)
     {
         Ptr<SatMobilityModel> m = DynamicCast<SatMobilityModel>(mobility);

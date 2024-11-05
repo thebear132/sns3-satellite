@@ -128,15 +128,16 @@ main(int argc, char* argv[])
     /**
      * Set-up CBR traffic
      */
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(Seconds(intervalSeconds)));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          appStartTime,
-                                          Seconds(simLength),
-                                          MilliSeconds(50));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        Seconds(intervalSeconds),
+        packetSize,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        appStartTime,
+        Seconds(simLength),
+        MilliSeconds(50));
     /**
      * Set-up statistics
      */

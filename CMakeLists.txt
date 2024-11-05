@@ -71,15 +71,6 @@ set(source_files
     model/satellite-fwd-link-scheduler-time-slicing.cc
     model/satellite-generic-stream-encapsulator-arq.cc
     model/satellite-generic-stream-encapsulator.cc
-    model/satellite-geo-feeder-llc.cc
-    model/satellite-geo-feeder-mac.cc
-    model/satellite-geo-feeder-phy.cc
-    model/satellite-geo-llc.cc
-    model/satellite-geo-mac.cc
-    model/satellite-geo-net-device.cc
-    model/satellite-geo-user-llc.cc
-    model/satellite-geo-user-mac.cc
-    model/satellite-geo-user-phy.cc
     model/satellite-ground-station-address-tag.cc
     model/satellite-gse-header.cc
     model/satellite-gw-llc.cc
@@ -115,6 +106,15 @@ set(source_files
     model/satellite-net-device.cc
     model/satellite-node-info.cc
     model/satellite-on-off-application.cc
+    model/satellite-orbiter-feeder-llc.cc
+    model/satellite-orbiter-feeder-mac.cc
+    model/satellite-orbiter-feeder-phy.cc
+    model/satellite-orbiter-llc.cc
+    model/satellite-orbiter-mac.cc
+    model/satellite-orbiter-net-device.cc
+    model/satellite-orbiter-user-llc.cc
+    model/satellite-orbiter-user-mac.cc
+    model/satellite-orbiter-user-phy.cc
     model/satellite-packet-classifier.cc
     model/satellite-packet-trace.cc
     model/satellite-perfect-interference-elimination.cc
@@ -164,6 +164,7 @@ set(source_files
     model/satellite-superframe-sequence.cc
     model/satellite-tbtp-container.cc
     model/satellite-time-tag.cc
+    model/satellite-topology.cc
     model/satellite-traced-interference.cc
     model/satellite-traced-mobility-model.cc
     model/satellite-uplink-info-tag.cc
@@ -188,7 +189,6 @@ set(source_files
     helper/satellite-beam-user-info.cc
     helper/satellite-cno-helper.cc
     helper/satellite-conf.cc
-    helper/satellite-geo-helper.cc
     helper/satellite-group-helper.cc
     helper/satellite-gw-helper.cc
     helper/satellite-gw-helper-dvb.cc
@@ -197,6 +197,7 @@ set(source_files
     helper/satellite-isl-arbiter-unicast-helper.cc
     helper/satellite-lora-conf.cc
     helper/satellite-on-off-helper.cc
+    helper/satellite-orbiter-helper.cc
     helper/satellite-point-to-point-isl-helper.cc
     helper/satellite-traffic-helper.cc
     helper/satellite-user-helper.cc
@@ -316,15 +317,6 @@ set(header_files
     model/satellite-fwd-link-scheduler-time-slicing.h
     model/satellite-generic-stream-encapsulator-arq.h
     model/satellite-generic-stream-encapsulator.h
-    model/satellite-geo-feeder-llc.h
-    model/satellite-geo-feeder-mac.h
-    model/satellite-geo-feeder-phy.h
-    model/satellite-geo-llc.h
-    model/satellite-geo-mac.h
-    model/satellite-geo-net-device.h
-    model/satellite-geo-user-llc.h
-    model/satellite-geo-user-mac.h
-    model/satellite-geo-user-phy.h
     model/satellite-ground-station-address-tag.h
     model/satellite-gse-header.h
     model/satellite-gw-llc.h
@@ -360,6 +352,15 @@ set(header_files
     model/satellite-net-device.h
     model/satellite-node-info.h
     model/satellite-on-off-application.h
+    model/satellite-orbiter-feeder-llc.h
+    model/satellite-orbiter-feeder-mac.h
+    model/satellite-orbiter-feeder-phy.h
+    model/satellite-orbiter-llc.h
+    model/satellite-orbiter-mac.h
+    model/satellite-orbiter-net-device.h
+    model/satellite-orbiter-user-llc.h
+    model/satellite-orbiter-user-mac.h
+    model/satellite-orbiter-user-phy.h
     model/satellite-packet-classifier.h
     model/satellite-packet-trace.h
     model/satellite-perfect-interference-elimination.h
@@ -409,6 +410,7 @@ set(header_files
     model/satellite-superframe-sequence.h
     model/satellite-tbtp-container.h
     model/satellite-time-tag.h
+    model/satellite-topology.h
     model/satellite-traced-interference.h
     model/satellite-traced-mobility-model.h
     model/satellite-typedefs.h
@@ -435,7 +437,6 @@ set(header_files
     helper/satellite-beam-user-info.h
     helper/satellite-cno-helper.h
     helper/satellite-conf.h
-    helper/satellite-geo-helper.h
     helper/satellite-group-helper.h
     helper/satellite-gw-helper.h
     helper/satellite-gw-helper-dvb.h
@@ -444,6 +445,7 @@ set(header_files
     helper/satellite-isl-arbiter-unicast-helper.h
     helper/satellite-lora-conf.h
     helper/satellite-on-off-helper.h
+    helper/satellite-orbiter-helper.h
     helper/satellite-point-to-point-isl-helper.h
     helper/satellite-traffic-helper.h
     helper/satellite-user-helper.h

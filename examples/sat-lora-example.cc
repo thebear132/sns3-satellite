@@ -188,9 +188,9 @@ main(int argc, char* argv[])
                        BooleanValue(false));
 
     // Configure RA
-    Config::SetDefault("ns3::SatGeoHelper::FwdLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::FwdLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_AVI));
-    Config::SetDefault("ns3::SatGeoHelper::RtnLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::RtnLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_AVI));
     Config::SetDefault("ns3::SatBeamHelper::RandomAccessModel", EnumValue(SatEnums::RA_MODEL_ESSA));
     if (interferenceModePerPacket)
@@ -254,21 +254,21 @@ main(int argc, char* argv[])
 
     simulationHelper->CreateSatScenario();
 
-    Config::SetDefault("ns3::CbrApplication::Interval", StringValue(interval));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
+    simulationHelper->GetTrafficHelper()->AddLoraCbrTraffic(
+        loraInterval,
+        packetSize,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        appStartTime,
+        simLength,
+        Seconds(1));
 
-    simulationHelper->InstallLoraTrafficModel(SimulationHelper::LORA_CBR,
-                                              loraInterval,
-                                              packetSize,
-                                              appStartTime,
-                                              simLength,
-                                              Seconds(1));
-
-    /*simulationHelper->InstallLoraTrafficModel (
-      SimulationHelper::PERIODIC,
-      loraInterval,
-      packetSize,
-      appStartTime, simLength, Seconds (1));*/
+    /*simulationHelper->GetTrafficHelper()->AddLoraPeriodicTraffic(loraInterval,
+                                                                 packetSize,
+                                                                 Singleton<SatTopology>::Get()->GetUtNodes(),
+                                                                 appStartTime,
+                                                                 simLength,
+                                                                 Seconds(1));*/
 
     // Outputs
     simulationHelper->EnableProgressLogs();

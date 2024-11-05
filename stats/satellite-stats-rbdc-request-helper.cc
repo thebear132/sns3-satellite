@@ -33,6 +33,7 @@
 #include <ns3/probe.h>
 #include <ns3/satellite-helper.h>
 #include <ns3/satellite-request-manager.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/satellite-ut-llc.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/singleton.h>
@@ -461,7 +462,7 @@ SatStatsRbdcRequestHelper::InstallProbes()
     Callback<void, std::string, uint32_t> callback =
         MakeCallback(&SatStatsRbdcRequestHelper::RbdcRateCallback, this);
 
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
         std::ostringstream context;

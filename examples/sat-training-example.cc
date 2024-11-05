@@ -186,19 +186,18 @@ main(int argc, char* argv[])
     // in the beginning that all applications start at the same time.
     Time appStartTime(MilliSeconds(100));
 
-    Config::SetDefault("ns3::OnOffApplication::PacketSize", UintegerValue(packetSize));
-    Config::SetDefault("ns3::OnOffApplication::DataRate", DataRateValue(dataRate));
-    Config::SetDefault("ns3::OnOffApplication::OnTime",
-                       StringValue("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
-    Config::SetDefault("ns3::OnOffApplication::OffTime",
-                       StringValue("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::ONOFF,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          appStartTime,
-                                          Seconds(simDuration + 1),
-                                          MilliSeconds(25));
+    simulationHelper->GetTrafficHelper()->AddOnOffTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        dataRate,
+        packetSize,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        "ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]",
+        "ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]",
+        appStartTime,
+        Seconds(simDuration + 1),
+        MilliSeconds(25));
 
     /**
      * -----------------

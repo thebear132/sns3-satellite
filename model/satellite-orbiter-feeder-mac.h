@@ -18,13 +18,13 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#ifndef SATELLITE_GEO_FEEDER_MAC_H
-#define SATELLITE_GEO_FEEDER_MAC_H
+#ifndef SATELLITE_ORBITER_FEEDER_MAC_H
+#define SATELLITE_ORBITER_FEEDER_MAC_H
 
 #include "satellite-fwd-link-scheduler.h"
-#include "satellite-geo-feeder-llc.h"
-#include "satellite-geo-mac.h"
 #include "satellite-mac.h"
+#include "satellite-orbiter-feeder-llc.h"
+#include "satellite-orbiter-mac.h"
 #include "satellite-phy.h"
 #include "satellite-signal-parameters.h"
 
@@ -40,36 +40,36 @@ namespace ns3
 /**
  * \ingroup satellite
  *
- * The SatGeoFeederMac models the user link MAC layer of the
+ * The SatOrbiterFeederMac models the user link MAC layer of the
  * satellite node.
  */
-class SatGeoFeederMac : public SatGeoMac
+class SatOrbiterFeederMac : public SatOrbiterMac
 {
   public:
     /**
      * Default constructor
      */
-    SatGeoFeederMac(void);
+    SatOrbiterFeederMac(void);
 
     /**
-     * Construct a SatGeoFeederMac
+     * Construct a SatOrbiterFeederMac
      *
-     * This is the constructor for the SatGeoFeederMac
+     * This is the constructor for the SatOrbiterFeederMac
      *
      * \param satId ID of sat for UT
      * \param beamid ID of beam for UT
      * \param forwardLinkRegenerationMode Forward link regeneration mode
      * \param returnLinkRegenerationMode Return link regeneration mode
      */
-    SatGeoFeederMac(uint32_t satId,
-                    uint32_t beamId,
-                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                    SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+    SatOrbiterFeederMac(uint32_t satId,
+                        uint32_t beamId,
+                        SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                        SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
     /**
-     * Destructor for SatGeoFeederMac
+     * Destructor for SatOrbiterFeederMac
      */
-    virtual ~SatGeoFeederMac();
+    virtual ~SatOrbiterFeederMac();
 
     /**
      * inherited from Object
@@ -145,4 +145,4 @@ class SatGeoFeederMac : public SatGeoMac
 
 } // namespace ns3
 
-#endif /* SATELLITE_GEO_FEEDER_MAC_H */
+#endif /* SATELLITE_ORBITER_FEEDER_MAC_H */

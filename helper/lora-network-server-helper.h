@@ -61,16 +61,6 @@ class LoraNetworkServerHelper : public Object
     ApplicationContainer Install(Ptr<Node> node);
 
     /**
-     * Set which gateways will need to be connected to this NS.
-     */
-    void SetGateways(NodeContainer gateways);
-
-    /**
-     * Set which end devices will be managed by this NS.
-     */
-    void SetEndDevices(NodeContainer endDevices);
-
-    /**
      * Enable (true) or disable (false) the ADR component in the Network
      * Server created by this helper.
      */
@@ -87,10 +77,6 @@ class LoraNetworkServerHelper : public Object
     Ptr<Application> InstallPriv(Ptr<Node> node);
 
     ObjectFactory m_factory;
-
-    NodeContainer m_gateways; //!< Set of gateways to connect to this NS
-
-    NodeContainer m_endDevices; //!< Set of endDevices to connect to this NS
 
     PointToPointHelper p2pHelper; //!< Helper to create PointToPoint links
 

@@ -23,8 +23,8 @@
 #ifndef SATELLITE_BEAM_HELPER_H
 #define SATELLITE_BEAM_HELPER_H
 
-#include "satellite-geo-helper.h"
 #include "satellite-gw-helper.h"
+#include "satellite-orbiter-helper.h"
 #include "satellite-ut-helper.h"
 
 #include <ns3/ipv4-address-helper.h>
@@ -53,7 +53,7 @@ class PropagationDelayModel;
 
 /**
  * \brief SatBeamHelper builds a set Satellite beams with needed objects and configuration.
- *        It utilizes SatUtHelper, SatGwHelper and SatGeoHelper to create needed objects.
+ *        It utilizes SatUtHelper, SatGwHelper and SatOrbiterHelper to create needed objects.
  *
  *        SatBeamHelper creates needed routes between nodes inside satellite network.
  *
@@ -101,7 +101,6 @@ class SatBeamHelper : public Object
      * Constructor for SatBeamHelper.
      *
      * \param standard                    The standard to use (DVB or LORA)
-     * \param geoNodes                    Container of Geo Satellite node
      * \param isls                        List of all ISLs
      * \param bandwidthConverterCb        Callback to convert bandwidth
      * \param fwdLinkCarrierCount         Number of carriers used in forward link
@@ -112,7 +111,6 @@ class SatBeamHelper : public Object
      * mode used in satellites for return link
      */
     SatBeamHelper(SatEnums::Standard_t standard,
-                  NodeContainer geoNodes,
                   std::vector<std::pair<uint32_t, uint32_t>> isls,
                   SatTypedefs::CarrierBandwidthConverter_t bandwidthConverterCb,
                   uint32_t fwdLinkCarrierCount,
@@ -136,7 +134,7 @@ class SatBeamHelper : public Object
 
     /**
      * Set the antenna gain patterns to be used when configuring the beams
-     * to the GEO satellite. Note, that currently we have only one set of
+     * to the satellite. Note, that currently we have only one set of
      * antenna patterns, which are utilized in both user return (Rx gain)
      * and user forward (Tx gain) links. Antenna gain patterns are not utilized
      * in feeder link at all.
@@ -206,7 +204,7 @@ class SatBeamHelper : public Object
         SatMac::RoutingUpdateCallback routingCallback);
 
     /**
-     * \param geoNetDevice Net device of satellite
+     * \param orbiterNetDevice Net device of satellite
      * \param gwNode pointer of GW node
      * \param gwId id of the GW
      * \param satId ID of the satellite linked to the UT
@@ -223,7 +221,7 @@ class SatBeamHelper : public Object
      * and associate the resulting ns3::NetDevices with the ns3::Nodes.
      * \return the new SatNetDevice of the gateway
      */
-    Ptr<NetDevice> InstallFeeder(Ptr<SatGeoNetDevice> geoNetDevice,
+    Ptr<NetDevice> InstallFeeder(Ptr<SatOrbiterNetDevice> orbiterNetDevice,
                                  Ptr<Node> gwNode,
                                  uint32_t gwId,
                                  uint32_t satId,
@@ -236,7 +234,7 @@ class SatBeamHelper : public Object
                                  SatMac::RoutingUpdateCallback routingCallback);
 
     /**
-     * \param geoNetDevice Net device of satellite
+     * \param orbiterNetDevice Net device of satellite
      * \param ut a set of UT nodes
      * \param gwNd Net Device of GW
      * \param satId ID of the satellite
@@ -251,7 +249,7 @@ class SatBeamHelper : public Object
      * and associate the resulting ns3::NetDevices with the ns3::Nodes.
      * \return a NetDeviceContainer of all SatNetDevice for the UTs
      */
-    NetDeviceContainer InstallUser(Ptr<SatGeoNetDevice> geoNetDevice,
+    NetDeviceContainer InstallUser(Ptr<SatOrbiterNetDevice> orbiterNetDevice,
                                    NodeContainer ut,
                                    Ptr<NetDevice> gwNd,
                                    uint32_t satId,
@@ -280,16 +278,6 @@ class SatBeamHelper : public Object
     uint32_t GetGwId(uint32_t satId, uint32_t beamId) const;
 
     /**
-     * \return container having all GW nodes in satellite network.
-     */
-    NodeContainer GetGwNodes() const;
-
-    /**
-     * \return container having all UT nodes in satellite network.
-     */
-    NodeContainer GetUtNodes() const;
-
-    /**
      * \param satId satellite ID
      * \param beamId beam ID
      * \return container having all UT nodes of a specific beam.
@@ -308,13 +296,6 @@ class SatBeamHelper : public Object
      * \param cb  callback to connect traces
      */
     void EnableCreationTraces(Ptr<OutputStreamWrapper> stream, CallbackBase& cb);
-
-    /**
-     * Get closest satellite to a ground station
-     * \param position The position of the ground station
-     * \return The ID of the closest satellite
-     */
-    uint32_t GetClosestSat(GeoCoordinate position);
 
     /**
      * \return info of created beams as std::string with GW info..
@@ -336,13 +317,6 @@ class SatBeamHelper : public Object
     Ptr<Node> GetGwNode(uint32_t gwId) const;
 
     /**
-     * Gets Geo Satellite nodes.
-     *
-     * \return pointer to Geo Satellite nodes.
-     */
-    NodeContainer GetGeoSatNodes() const;
-
-    /**
      * \return pointer to UT helper.
      */
     Ptr<SatUtHelper> GetUtHelper() const;
@@ -353,9 +327,9 @@ class SatBeamHelper : public Object
     Ptr<SatGwHelper> GetGwHelper() const;
 
     /**
-     * \return pointer to Geo helper.
+     * \return pointer to Orbiter helper.
      */
-    Ptr<SatGeoHelper> GetGeoHelper() const;
+    Ptr<SatOrbiterHelper> GetOrbiterHelper() const;
 
     /**
      * \return pointer to the NCC.
@@ -420,10 +394,9 @@ class SatBeamHelper : public Object
     Ptr<SatSuperframeSeq> m_superframeSeq;
 
     ObjectFactory m_channelFactory;
-    Ptr<SatGeoHelper> m_geoHelper;
+    Ptr<SatOrbiterHelper> m_orbiterHelper;
     Ptr<SatGwHelper> m_gwHelper;
     Ptr<SatUtHelper> m_utHelper;
-    NodeContainer m_geoNodes;
     Ptr<SatNcc> m_ncc;
 
     Ptr<SatAntennaGainPatternContainer> m_antennaGainPatterns;

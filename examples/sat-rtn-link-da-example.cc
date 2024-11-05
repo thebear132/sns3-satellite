@@ -74,14 +74,16 @@ main(int argc, char* argv[])
     simulationHelper->CreateSatScenario();
 
     // >>> Start of actual test using Full scenario >>>
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(MilliSeconds(5)));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(128));
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(1),
-                                          simLength,
-                                          Seconds(0.05));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(5),
+        128,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        simLength,
+        Seconds(0.05));
 
     // Create RTN link statistics
     simulationHelper->CreateDefaultRtnLinkStats();

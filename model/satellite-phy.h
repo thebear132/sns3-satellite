@@ -54,8 +54,8 @@ class SatMac;
  * nodes. This is a pure virtual class and actual implementations are located in:
  * - SatUtPhy
  * - SatGwPhy
- * - SatGeoFeederPhy
- * - SatGeoUserPhy
+ * - SatOrbiterFeederPhy
+ * - SatOrbiterUserPhy
  */
 class SatPhy : public Object
 {
@@ -429,7 +429,7 @@ class SatPhy : public Object
                          SatSignalParameters::txInfo_s txInfo);
 
     /**
-     * \brief Send Pdu to the PHY tx module (for GEO satellite switch packet forwarding)
+     * \brief Send Pdu to the PHY tx module (for satellite switch packet forwarding)
      * \param rxParams Transmission parameters
      */
     virtual void SendPduWithParams(Ptr<SatSignalParameters> rxParams);

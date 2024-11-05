@@ -39,6 +39,7 @@
 #include <ns3/satellite-net-device.h>
 #include <ns3/satellite-phy-rx.h>
 #include <ns3/satellite-phy.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/scalar-collector.h>
 #include <ns3/simulator.h>
 #include <ns3/singleton.h>
@@ -435,7 +436,7 @@ SatStatsFwdQueueHelper::DoEnlistSource()
 
     const SatIdMapper* satIdMapper = Singleton<SatIdMapper>::Get();
 
-    NodeContainer gws = GetSatHelper()->GetBeamHelper()->GetGwNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
     for (NodeContainer::Iterator it1 = gws.Begin(); it1 != gws.End(); ++it1)
     {
         NetDeviceContainer devs = GetGwSatNetDevice(*it1);
@@ -586,7 +587,7 @@ SatStatsRtnQueueHelper::DoEnlistSource()
 {
     NS_LOG_FUNCTION(this);
 
-    NodeContainer uts = GetSatHelper()->GetBeamHelper()->GetUtNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
     for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); ++it)
     {
         const uint32_t identifier = GetIdentifierForUt(*it);

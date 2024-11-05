@@ -62,25 +62,36 @@ main(int argc, char* argv[])
 
     simulationHelper->LoadScenario("geo-33E");
 
-    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario();
+    simulationHelper->CreateSatScenario();
 
     // ----------------------------------
     // ----- CREATE CBR APPLICATION -----
     // ----------------------------------
-    NodeContainer utUsers = helper->GetUtUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
 
     NS_ASSERT(utUsers.GetN() == 1);
 
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(64));
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(Seconds(2)));
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(1));
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(1));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        Seconds(2),
+        64,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(simulationTime),
+        Seconds(0));
+
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        Seconds(2),
+        64,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(simulationTime),
+        Seconds(0));
     // ----------------------------------
     // ----- CREATE CBR APPLICATION -----
     // ----------------------------------

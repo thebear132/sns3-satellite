@@ -92,7 +92,7 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(returnLinkRegenerationMode));
 
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
 
     /// Set simulation output details
     Config::SetDefault("ns3::SatEnvVariables::EnableSimulationOutputOverwrite", BooleanValue(true));
@@ -188,9 +188,9 @@ main(int argc, char* argv[])
     Config::SetDefault("ns3::SatRandomAccessConf::SlottedAlohaSignalingOverheadInBytes",
                        UintegerValue(3));
 
-    Config::SetDefault("ns3::SatGeoHelper::FwdLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::FwdLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_AVI));
-    Config::SetDefault("ns3::SatGeoHelper::RtnLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::RtnLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_AVI));
 
     if (randomAccess == "Essa")
@@ -214,7 +214,7 @@ main(int argc, char* argv[])
                            EnumValue(SatPhyRxCarrierConf::SIC_RESIDUAL));
         Config::SetDefault("ns3::SatBeamHelper::ReturnLinkLinkResults",
                            EnumValue(SatEnums::LR_FSIM));
-        Config::SetDefault("ns3::SatGeoHelper::RtnLinkErrorModel",
+        Config::SetDefault("ns3::SatOrbiterHelper::RtnLinkErrorModel",
                            EnumValue(SatPhyRxCarrierConf::EM_AVI));
 
         Config::SetDefault("ns3::SatPhyRxCarrierPerWindow::WindowDuration", StringValue("600ms"));
@@ -269,16 +269,18 @@ main(int argc, char* argv[])
     simulationHelper->SetUtCountPerBeam(50);
     simulationHelper->SetBeamSet({1});
 
-    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario();
+    simulationHelper->CreateSatScenario();
 
-    Config::SetDefault("ns3::CbrApplication::Interval", StringValue(interval));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(1.0),
-                                          Seconds(10.0));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        Time(interval),
+        packetSize,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1.0),
+        Seconds(10.0),
+        Seconds(0));
 
     NS_LOG_INFO("--- sat-regeneration-collisions-example ---");
     NS_LOG_INFO("  Random Access (or DA): " << randomAccess);

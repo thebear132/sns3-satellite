@@ -18,58 +18,58 @@
  * Author: Bastien TAURAN <bastien.tauran@viveris.fr>
  */
 
-#include "satellite-geo-llc.h"
+#include "satellite-orbiter-llc.h"
 
 #include "satellite-scheduling-object.h"
 #include "satellite-time-tag.h"
 #include "satellite-utils.h"
 
-NS_LOG_COMPONENT_DEFINE("SatGeoLlc");
+NS_LOG_COMPONENT_DEFINE("SatOrbiterLlc");
 
 namespace ns3
 {
 
-NS_OBJECT_ENSURE_REGISTERED(SatGeoLlc);
+NS_OBJECT_ENSURE_REGISTERED(SatOrbiterLlc);
 
 TypeId
-SatGeoLlc::GetTypeId(void)
+SatOrbiterLlc::GetTypeId(void)
 {
-    static TypeId tid = TypeId("ns3::SatGeoLlc").SetParent<SatLlc>();
+    static TypeId tid = TypeId("ns3::SatOrbiterLlc").SetParent<SatLlc>();
     return tid;
 }
 
-SatGeoLlc::SatGeoLlc()
+SatOrbiterLlc::SatOrbiterLlc()
 {
     NS_LOG_FUNCTION(this);
     NS_ASSERT(false); // this version of the constructor should not been used
 }
 
-SatGeoLlc::SatGeoLlc(SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                     SatEnums::RegenerationMode_t returnLinkRegenerationMode)
+SatOrbiterLlc::SatOrbiterLlc(SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                             SatEnums::RegenerationMode_t returnLinkRegenerationMode)
     : SatLlc(forwardLinkRegenerationMode, returnLinkRegenerationMode)
 {
     NS_LOG_FUNCTION(this);
 }
 
-SatGeoLlc::~SatGeoLlc()
+SatOrbiterLlc::~SatOrbiterLlc()
 {
     NS_LOG_FUNCTION(this);
 }
 
 void
-SatGeoLlc::DoDispose()
+SatOrbiterLlc::DoDispose()
 {
     Object::DoDispose();
 }
 
 void
-SatGeoLlc::SetReceiveSatelliteCallback(SatGeoLlc::ReceiveSatelliteCallback cb)
+SatOrbiterLlc::SetReceiveSatelliteCallback(SatOrbiterLlc::ReceiveSatelliteCallback cb)
 {
     m_rxSatelliteCallback = cb;
 }
 
 bool
-SatGeoLlc::Enque(Ptr<Packet> packet, Address dest, uint8_t flowId)
+SatOrbiterLlc::Enque(Ptr<Packet> packet, Address dest, uint8_t flowId)
 {
     NS_LOG_FUNCTION(this << packet << dest << (uint32_t)flowId);
     NS_LOG_INFO("p=" << packet);
@@ -113,11 +113,11 @@ SatGeoLlc::Enque(Ptr<Packet> packet, Address dest, uint8_t flowId)
 }
 
 Ptr<Packet>
-SatGeoLlc::NotifyTxOpportunity(uint32_t bytes,
-                               Mac48Address utAddr,
-                               uint8_t flowId,
-                               uint32_t& bytesLeft,
-                               uint32_t& nextMinTxO)
+SatOrbiterLlc::NotifyTxOpportunity(uint32_t bytes,
+                                   Mac48Address utAddr,
+                                   uint8_t flowId,
+                                   uint32_t& bytesLeft,
+                                   uint32_t& nextMinTxO)
 {
     NS_LOG_FUNCTION(this << utAddr << bytes << (uint32_t)flowId);
 
@@ -155,7 +155,7 @@ SatGeoLlc::NotifyTxOpportunity(uint32_t bytes,
 }
 
 void
-SatGeoLlc::ReceiveHigherLayerPdu(Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
+SatOrbiterLlc::ReceiveHigherLayerPdu(Ptr<Packet> packet, Mac48Address source, Mac48Address dest)
 {
     NS_LOG_FUNCTION(this << packet << source << dest);
 
@@ -192,7 +192,7 @@ SatGeoLlc::ReceiveHigherLayerPdu(Ptr<Packet> packet, Mac48Address source, Mac48A
 }
 
 void
-SatGeoLlc::CreateEncap(Ptr<EncapKey> key)
+SatOrbiterLlc::CreateEncap(Ptr<EncapKey> key)
 {
     NS_LOG_FUNCTION(this << key->m_encapAddress << key->m_decapAddress
                          << (uint32_t)(key->m_flowId));
@@ -222,7 +222,7 @@ SatGeoLlc::CreateEncap(Ptr<EncapKey> key)
 }
 
 void
-SatGeoLlc::CreateDecap(Ptr<EncapKey> key)
+SatOrbiterLlc::CreateDecap(Ptr<EncapKey> key)
 {
     NS_LOG_FUNCTION(this << key->m_encapAddress << key->m_decapAddress
                          << (uint32_t)(key->m_flowId));
@@ -252,7 +252,7 @@ SatGeoLlc::CreateDecap(Ptr<EncapKey> key)
 }
 
 void
-SatGeoLlc::GetSchedulingContexts(std::vector<Ptr<SatSchedulingObject>>& output) const
+SatOrbiterLlc::GetSchedulingContexts(std::vector<Ptr<SatSchedulingObject>>& output) const
 {
     NS_LOG_FUNCTION(this);
 
@@ -279,7 +279,7 @@ SatGeoLlc::GetSchedulingContexts(std::vector<Ptr<SatSchedulingObject>>& output) 
 }
 
 uint32_t
-SatGeoLlc::GetNBytesInQueue(Mac48Address utAddress) const
+SatOrbiterLlc::GetNBytesInQueue(Mac48Address utAddress) const
 {
     NS_LOG_FUNCTION(this << utAddress);
 
@@ -300,7 +300,7 @@ SatGeoLlc::GetNBytesInQueue(Mac48Address utAddress) const
 }
 
 uint32_t
-SatGeoLlc::GetNPacketsInQueue(Mac48Address utAddress) const
+SatOrbiterLlc::GetNPacketsInQueue(Mac48Address utAddress) const
 {
     NS_LOG_FUNCTION(this << utAddress);
 
@@ -321,7 +321,7 @@ SatGeoLlc::GetNPacketsInQueue(Mac48Address utAddress) const
 }
 
 void
-SatGeoLlc::ClearQueues()
+SatOrbiterLlc::ClearQueues()
 {
     NS_LOG_FUNCTION(this);
 

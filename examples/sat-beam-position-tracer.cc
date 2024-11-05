@@ -42,7 +42,7 @@ void
 GetBeamPositions(Ptr<SatHelper> satHelper)
 {
     Ptr<SatAntennaGainPatternContainer> antennaGainPatterns = satHelper->GetAntennaGainPatterns();
-    NodeContainer satNodes = satHelper->GeoSatNodes();
+    NodeContainer satNodes = Singleton<SatTopology>::Get()->GetOrbiterNodes();
     uint32_t beamCount = satHelper->GetBeamCount();
     for (uint32_t satId = 0; satId < satNodes.GetN(); satId++)
     {
@@ -71,7 +71,8 @@ main(int argc, char* argv[])
                        EnumValue(SatEnums::REGENERATION_NETWORK));
 
     Config::SetDefault("ns3::SatGwMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
-    Config::SetDefault("ns3::SatGeoMac::DisableSchedulingIfNoDeviceConnected", BooleanValue(true));
+    Config::SetDefault("ns3::SatOrbiterMac::DisableSchedulingIfNoDeviceConnected",
+                       BooleanValue(true));
 
     Ptr<SimulationHelper> simulationHelper =
         CreateObject<SimulationHelper>("sat-beam-position-tracer");

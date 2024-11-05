@@ -23,6 +23,7 @@
 
 #include <ns3/log.h>
 #include <ns3/satellite-id-mapper.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/singleton.h>
 
 NS_LOG_COMPONENT_DEFINE("SatGroupHelper");
@@ -64,10 +65,9 @@ SatGroupHelper::DoDispose()
 }
 
 void
-SatGroupHelper::Init(NodeContainer uts)
+SatGroupHelper::Init()
 {
     NS_LOG_FUNCTION(this);
-    m_uts = uts;
 
     m_scenarioCreated = true;
 
@@ -110,6 +110,8 @@ SatGroupHelper::AddUtNodeToGroup(uint32_t groupId, Ptr<Node> node)
     Singleton<SatIdMapper>::Get()->AttachMacToGroupId(
         Singleton<SatIdMapper>::Get()->GetUtMacWithNode(node),
         groupId);
+
+    Singleton<SatTopology>::Get()->UpdateUtGroup(node, groupId);
 }
 
 void
@@ -262,7 +264,8 @@ SatGroupHelper::GetUtNodes(uint32_t groupId) const
     {
         bool found;
         NodeContainer groupIdZeroUts;
-        for (NodeContainer::Iterator it = m_uts.Begin(); it != m_uts.End(); it++)
+        NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
+        for (NodeContainer::Iterator it = uts.Begin(); it != uts.End(); it++)
         {
             found = false;
             for (std::map<uint32_t, std::set<Ptr<Node>>>::const_iterator it2 = m_groupsMap.begin();

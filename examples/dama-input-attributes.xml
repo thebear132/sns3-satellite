@@ -251,32 +251,32 @@
  <default name="ns3::SatGenericStreamEncapsulatorArq::WindowSize" value="10"/>
  <default name="ns3::SatGenericStreamEncapsulatorArq::ArqHeaderSize" value="1"/>
  <default name="ns3::SatGenericStreamEncapsulatorArq::RxWaitingTime" value="+1800000000.0ns"/>
- <default name="ns3::SatGeoFeederPhy::RxTemperatureDbk" value="28.4"/>
- <default name="ns3::SatGeoFeederPhy::RxMaxAntennaGainDb" value="54"/>
- <default name="ns3::SatGeoFeederPhy::TxMaxAntennaGainDb" value="54"/>
- <default name="ns3::SatGeoFeederPhy::TxMaxPowerDbw" value="-4.38"/>
- <default name="ns3::SatGeoFeederPhy::TxOutputLossDb" value="1.75"/>
- <default name="ns3::SatGeoFeederPhy::TxPointingLossDb" value="0"/>
- <default name="ns3::SatGeoFeederPhy::TxOboLossDb" value="4"/>
- <default name="ns3::SatGeoFeederPhy::TxAntennaLossDb" value="1"/>
- <default name="ns3::SatGeoFeederPhy::RxAntennaLossDb" value="1"/>
- <default name="ns3::SatGeoFeederPhy::DefaultFadingValue" value="1"/>
- <default name="ns3::SatGeoFeederPhy::ExtNoisePowerDensityDbwhz" value="-207"/>
- <default name="ns3::SatGeoFeederPhy::ImIfCOverIDb" value="27"/>
- <default name="ns3::SatGeoFeederPhy::FixedAmplificationGainDb" value="82"/>
+ <default name="ns3::SatOrbiterFeederPhy::RxTemperatureDbk" value="28.4"/>
+ <default name="ns3::SatOrbiterFeederPhy::RxMaxAntennaGainDb" value="54"/>
+ <default name="ns3::SatOrbiterFeederPhy::TxMaxAntennaGainDb" value="54"/>
+ <default name="ns3::SatOrbiterFeederPhy::TxMaxPowerDbw" value="-4.38"/>
+ <default name="ns3::SatOrbiterFeederPhy::TxOutputLossDb" value="1.75"/>
+ <default name="ns3::SatOrbiterFeederPhy::TxPointingLossDb" value="0"/>
+ <default name="ns3::SatOrbiterFeederPhy::TxOboLossDb" value="4"/>
+ <default name="ns3::SatOrbiterFeederPhy::TxAntennaLossDb" value="1"/>
+ <default name="ns3::SatOrbiterFeederPhy::RxAntennaLossDb" value="1"/>
+ <default name="ns3::SatOrbiterFeederPhy::DefaultFadingValue" value="1"/>
+ <default name="ns3::SatOrbiterFeederPhy::ExtNoisePowerDensityDbwhz" value="-207"/>
+ <default name="ns3::SatOrbiterFeederPhy::ImIfCOverIDb" value="27"/>
+ <default name="ns3::SatOrbiterFeederPhy::FixedAmplificationGainDb" value="82"/>
  <default name="ns3::SatPhy::EnableStatisticsTags" value="false"/>
- <default name="ns3::SatGeoUserPhy::RxTemperatureDbk" value="28.4"/>
- <default name="ns3::SatGeoUserPhy::RxMaxAntennaGainDb" value="54"/>
- <default name="ns3::SatGeoUserPhy::TxMaxAntennaGainDb" value="54"/>
- <default name="ns3::SatGeoUserPhy::TxMaxPowerDbw" value="15"/>
- <default name="ns3::SatGeoUserPhy::TxOutputLossDb" value="2.85"/>
- <default name="ns3::SatGeoUserPhy::TxPointingLossDb" value="0"/>
- <default name="ns3::SatGeoUserPhy::TxOboLossDb" value="0"/>
- <default name="ns3::SatGeoUserPhy::TxAntennaLossDb" value="1"/>
- <default name="ns3::SatGeoUserPhy::RxAntennaLossDb" value="1"/>
- <default name="ns3::SatGeoUserPhy::DefaultFadingValue" value="1"/>
- <default name="ns3::SatGeoUserPhy::OtherSysIfCOverIDb" value="27.5"/>
- <default name="ns3::SatGeoUserPhy::AciIfCOverIDb" value="17"/>
+ <default name="ns3::SatOrbiterUserPhy::RxTemperatureDbk" value="28.4"/>
+ <default name="ns3::SatOrbiterUserPhy::RxMaxAntennaGainDb" value="54"/>
+ <default name="ns3::SatOrbiterUserPhy::TxMaxAntennaGainDb" value="54"/>
+ <default name="ns3::SatOrbiterUserPhy::TxMaxPowerDbw" value="15"/>
+ <default name="ns3::SatOrbiterUserPhy::TxOutputLossDb" value="2.85"/>
+ <default name="ns3::SatOrbiterUserPhy::TxPointingLossDb" value="0"/>
+ <default name="ns3::SatOrbiterUserPhy::TxOboLossDb" value="0"/>
+ <default name="ns3::SatOrbiterUserPhy::TxAntennaLossDb" value="1"/>
+ <default name="ns3::SatOrbiterUserPhy::RxAntennaLossDb" value="1"/>
+ <default name="ns3::SatOrbiterUserPhy::DefaultFadingValue" value="1"/>
+ <default name="ns3::SatOrbiterUserPhy::OtherSysIfCOverIDb" value="27.5"/>
+ <default name="ns3::SatOrbiterUserPhy::AciIfCOverIDb" value="17"/>
  <default name="ns3::SatFwdLinkScheduler::DummyFrameSendingEnabled" value="false"/>
  <default name="ns3::SatGwMac::GuardTime" value="+1000.0ns"/>
  <default name="ns3::SatMac::EnableStatisticsTags" value="false"/>
@@ -424,8 +424,8 @@
  <default name="ns3::SatConf::FwdCarrierAllocatedBandwidth" value="1.25e+08"/>
  <default name="ns3::SatConf::FwdCarrierRollOff" value="0.2"/>
  <default name="ns3::SatConf::FwdCarrierSpacing" value="0"/>
- <default name="ns3::SatGeoHelper::DaFwdLinkInterferenceModel" value="Constant"/>
- <default name="ns3::SatGeoHelper::DaRtnLinkInterferenceModel" value="Constant"/>
+ <default name="ns3::SatOrbiterHelper::DaFwdLinkInterferenceModel" value="Constant"/>
+ <default name="ns3::SatOrbiterHelper::DaRtnLinkInterferenceModel" value="Constant"/>
  <default name="ns3::SatGwHelper::RtnLinkConstantErrorRate" value="0.01"/>
  <default name="ns3::SatGwHelper::RtnLinkErrorModel" value="AVI"/>
  <default name="ns3::SatGwHelper::DaRtnLinkInterferenceModel" value="Constant"/>

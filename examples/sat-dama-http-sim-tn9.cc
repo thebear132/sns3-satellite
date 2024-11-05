@@ -174,10 +174,13 @@ main(int argc, char* argv[])
     /**
      * Set-up HTTP traffic
      */
-    simulationHelper->InstallTrafficModel(SimulationHelper::HTTP,
-                                          SimulationHelper::TCP,
-                                          SimulationHelper::FWD_LINK,
-                                          MilliSeconds(3));
+    simulationHelper->GetTrafficHelper()->AddHttpTraffic(
+        SatTrafficHelper::FWD_LINK,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        MilliSeconds(3),
+        Seconds(simLength),
+        Seconds(0));
 
     /**
      * Set-up statistics

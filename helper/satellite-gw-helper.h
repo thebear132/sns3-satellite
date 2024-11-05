@@ -43,7 +43,7 @@ namespace ns3
 class OutputStreamWrapper;
 
 /**
- * \brief Creates needed objects for GW nodes like SatGeoNetDevice objects.
+ * \brief Creates needed objects for GW nodes like SatOrbiterNetDevice objects.
  *        Handles needed configuration for the GW nodes.
  *
  */

@@ -30,7 +30,7 @@ namespace ns3
 {
 
 /**
- * \brief A configuration class for the GEO satellite reference system
+ * \brief A configuration class for the satellite reference system
  *
  */
 class SatLoraConf : public Object

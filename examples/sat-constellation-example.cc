@@ -65,8 +65,8 @@ main(int argc, char* argv[])
                        EnumValue(SatEnums::REGENERATION_NETWORK));
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_NETWORK));
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
-    Config::SetDefault("ns3::SatGeoUserPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterUserPhy::QueueSize", UintegerValue(100000));
 
     /// Use constellation
     Config::SetDefault("ns3::PointToPointIslHelper::IslDataRate",
@@ -117,9 +117,9 @@ main(int argc, char* argv[])
 
     LogComponentEnable("sat-constellation-example", LOG_LEVEL_INFO);
 
-    Ptr<SatHelper> helper = simulationHelper->CreateSatScenario();
+    simulationHelper->CreateSatScenario();
 
-    helper->PrintTopology(std::cout);
+    Singleton<SatTopology>::Get()->PrintTopology(std::cout);
     Singleton<SatIdMapper>::Get()->ShowIslMap();
 
     Config::SetDefault("ns3::CbrApplication::Interval", StringValue(interval));
@@ -129,17 +129,18 @@ main(int argc, char* argv[])
     Time stopTime = Seconds(29.0);
     Time startDelay = Seconds(0.0);
 
-    NodeContainer gws = helper->GwNodes();
-    NodeContainer uts = helper->UtNodes();
-    NodeContainer gwUsers = helper->GetGwUsers();
-    NodeContainer utUsers = helper->GetUtUsers(uts);
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes(uts);
 
     // Total is 3*6 = 18 flows
     // Global App rate is pktSize*ptkPerSecond*nbFlows = 512*8*50*18 = 3686kb/s on both FWD and RTN
     Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper();
 
     trafficHelper->AddCbrTraffic(SatTrafficHelper::FWD_LINK,
-                                 interval,
+                                 SatTrafficHelper::UDP,
+                                 Time(interval),
                                  packetSize,
                                  gwUsers,
                                  utUsers,
@@ -148,7 +149,8 @@ main(int argc, char* argv[])
                                  startDelay);
 
     trafficHelper->AddCbrTraffic(SatTrafficHelper::RTN_LINK,
-                                 interval,
+                                 SatTrafficHelper::UDP,
+                                 Time(interval),
                                  packetSize,
                                  gwUsers,
                                  utUsers,

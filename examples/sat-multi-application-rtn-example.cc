@@ -95,8 +95,8 @@ main(int argc, char* argv[])
 
     // Get the end users so that it is possible to attach
     // applications on them
-    NodeContainer utUsers = helper->GetUtUsers();
-    NodeContainer gwUsers = helper->GetGwUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
 
     // Random variable for sharing the UTs to CBR and On-Off users
     Ptr<UniformRandomVariable> rand = CreateObject<UniformRandomVariable>();

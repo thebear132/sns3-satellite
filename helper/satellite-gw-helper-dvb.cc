@@ -30,7 +30,6 @@
 #include <ns3/satellite-fwd-link-scheduler-default.h>
 #include <ns3/satellite-fwd-link-scheduler-time-slicing.h>
 #include <ns3/satellite-fwd-link-scheduler.h>
-#include <ns3/satellite-geo-net-device.h>
 #include <ns3/satellite-gw-llc.h>
 #include <ns3/satellite-gw-mac.h>
 #include <ns3/satellite-gw-phy.h>
@@ -39,8 +38,10 @@
 #include <ns3/satellite-lower-layer-service.h>
 #include <ns3/satellite-net-device.h>
 #include <ns3/satellite-node-info.h>
+#include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-packet-classifier.h>
 #include <ns3/satellite-phy-rx-carrier-conf.h>
+#include <ns3/satellite-topology.h>
 #include <ns3/satellite-typedefs.h>
 #include <ns3/singleton.h>
 
@@ -193,7 +194,8 @@ SatGwHelperDvb::Install(Ptr<Node> n,
     phy->SetTxFadingContainer(n->GetObject<SatBaseFading>());
     phy->SetRxFadingContainer(n->GetObject<SatBaseFading>());
 
-    Ptr<SatGwMac> mac = CreateObject<SatGwMac>(satId,
+    Ptr<SatGwMac> mac = CreateObject<SatGwMac>(n,
+                                               satId,
                                                beamId,
                                                feederSatId,
                                                feederBeamId,
@@ -349,6 +351,9 @@ SatGwHelperDvb::Install(Ptr<Node> n,
         mac->SetBeamSchedulerCallback(MakeCallback(&SatNcc::GetBeamScheduler, ncc));
         mac->SetHandoverModule(handoverModule);
     }
+
+    Singleton<SatTopology>::Get()
+        ->AddGwLayers(n, feederSatId, feederBeamId, satId, beamId, dev, llc, mac, phy);
 
     return dev;
 }

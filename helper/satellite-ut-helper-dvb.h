@@ -34,7 +34,7 @@ namespace ns3
 {
 
 /**
- * \brief Creates needed objects for DVB UT nodes like SatGeoNetDevice objects.
+ * \brief Creates needed objects for DVB UT nodes like SatOrbiterNetDevice objects.
  *        Handles needed configuration for the UT nodes.
  *
  */

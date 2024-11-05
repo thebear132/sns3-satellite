@@ -98,14 +98,9 @@ main(int argc, char* argv[])
 
     // set default values for traffic model apps here
     // attributes can be overridden by command line arguments or input xml when needed
-    // Config::SetDefault ("ns3::CbrApplication::PacketSize", packetSize);
-    // Config::SetDefault ("ns3::CbrApplication::Interval", interval);
-    // Config::SetDefault ("ns3::OnOffApplication::PacketSize", packetSize);
-    // Config::SetDefault ("ns3::OnOffApplication::DataRate", dataRate);
-    Config::SetDefault("ns3::OnOffApplication::OnTime",
-                       StringValue("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
-    Config::SetDefault("ns3::OnOffApplication::OffTime",
-                       StringValue("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
+
+    std::string onPattern = "ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]";
+    std::string offPattern = "ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]";
 
     // To read input attributes from input xml-file
     std::string inputFileNameWithPath =
@@ -270,8 +265,7 @@ main(int argc, char* argv[])
         // Periodical control slots
         // Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
 
-        Config::SetDefault("ns3::OnOffApplication::OffTime",
-                           StringValue("ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]"));
+        offPattern = "ns3::ExponentialRandomVariable[Mean=1.0|Bound=0.0]";
 
         endUsersPerUt = 1;
         utsPerBeam = 1;
@@ -333,8 +327,7 @@ main(int argc, char* argv[])
         // Periodical control slots
         // Config::SetDefault ("ns3::SatBeamScheduler::ControlSlotsEnabled", BooleanValue (true));
 
-        Config::SetDefault("ns3::OnOffApplication::OffTime",
-                           StringValue("ns3::ExponentialRandomVariable[Mean=10.0|Bound=0.0]"));
+        offPattern = "ns3::ExponentialRandomVariable[Mean=10.0|Bound=0.0]";
 
         endUsersPerUt = 1;
         utsPerBeam = 1;
@@ -377,29 +370,42 @@ main(int argc, char* argv[])
     /**
      * Set-up CBR or OnOff traffic
      */
-    SimulationHelper::TrafficModel_t model;
-
     switch (trafficModel)
     {
     case 0: // CBR
-        model = SimulationHelper::CBR;
-        break;
-
+    {
+        simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            Seconds(1),
+            512,
+            NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            utAppStartTime,
+            Seconds(simLength + 1),
+            Seconds(0.1));
+    }
+    break;
     case 1: // On-Off
-        model = SimulationHelper::ONOFF;
-        break;
-
+    {
+        simulationHelper->GetTrafficHelper()->AddOnOffTraffic(
+            SatTrafficHelper::RTN_LINK,
+            SatTrafficHelper::UDP,
+            DataRate("500kb/s"),
+            512,
+            NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+            Singleton<SatTopology>::Get()->GetUtUserNodes(),
+            onPattern,
+            offPattern,
+            utAppStartTime,
+            Seconds(simLength + 1),
+            Seconds(0.1));
+    }
+    break;
     default:
         NS_FATAL_ERROR("Not Supported Traffic Model!");
         break;
     }
-
-    simulationHelper->InstallTrafficModel(model,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          utAppStartTime,
-                                          Seconds(simLength + 1),
-                                          Seconds(0.1));
 
     /**
      * Set-up statistics

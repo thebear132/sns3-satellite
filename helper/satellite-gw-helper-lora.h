@@ -34,7 +34,7 @@ namespace ns3
 {
 
 /**
- * \brief Creates needed objects for LORA GW nodes like SatGeoNetDevice objects.
+ * \brief Creates needed objects for LORA GW nodes like SatorbiterNetDevice objects.
  *        Handles needed configuration for the GW nodes.
  *
  */

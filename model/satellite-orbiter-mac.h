@@ -18,13 +18,13 @@
  * Author: Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#ifndef SATELLITE_GEO_MAC_H
-#define SATELLITE_GEO_MAC_H
+#ifndef SATELLITE_ORBITER_MAC_H
+#define SATELLITE_ORBITER_MAC_H
 
 #include "satellite-beam-scheduler.h"
 #include "satellite-fwd-link-scheduler.h"
-#include "satellite-geo-user-llc.h"
 #include "satellite-mac.h"
+#include "satellite-orbiter-user-llc.h"
 #include "satellite-phy.h"
 #include "satellite-signal-parameters.h"
 
@@ -40,35 +40,35 @@ namespace ns3
 /**
  * \ingroup satellite
  *
- * The SatGeoMac models the global link MAC layer of the satellite node.
+ * The SatOrbiterMac models the global link MAC layer of the satellite node.
  */
-class SatGeoMac : public SatMac
+class SatOrbiterMac : public SatMac
 {
   public:
     /**
      * Default constructor
      */
-    SatGeoMac(void);
+    SatOrbiterMac(void);
 
     /**
-     * Construct a SatGeoMac
+     * Construct a SatOrbiterMac
      *
-     * This is the constructor for the SatGeoMac
+     * This is the constructor for the SatOrbiterMac
      *
      * \param satId ID of sat for UT
      * \param beamId ID of beam for UT
      * \param forwardLinkRegenerationMode Forward link regeneration mode
      * \param returnLinkRegenerationMode Return link regeneration mode
      */
-    SatGeoMac(uint32_t satId,
-              uint32_t beamId,
-              SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-              SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+    SatOrbiterMac(uint32_t satId,
+                  uint32_t beamId,
+                  SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                  SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
     /**
-     * Destructor for SatGeoMac
+     * Destructor for SatOrbiterMac
      */
-    virtual ~SatGeoMac();
+    virtual ~SatOrbiterMac();
 
     /**
      * inherited from Object
@@ -100,21 +100,21 @@ class SatGeoMac : public SatMac
     void SetFwdScheduler(Ptr<SatFwdLinkScheduler> fwdScheduler);
 
     /**
-     * Set the Geo LLC associated to this Geo MAC layer
+     * Set the orbiter LLC associated to this orbiter MAC layer
      */
-    void SetLlc(Ptr<SatGeoLlc> llc);
+    void SetLlc(Ptr<SatOrbiterLlc> llc);
 
     virtual Time GetGuardTime() const;
     virtual void SetGuardTime(Time guardTime);
 
     typedef Callback<void, Ptr<SatSignalParameters>> TransmitCallback;
 
-    void SetTransmitCallback(SatGeoMac::TransmitCallback cb);
+    void SetTransmitCallback(SatOrbiterMac::TransmitCallback cb);
 
     typedef Callback<void, SatPhy::PacketContainer_t, Ptr<SatSignalParameters>>
         ReceiveNetDeviceCallback;
 
-    void SetReceiveNetDeviceCallback(SatGeoMac::ReceiveNetDeviceCallback cb);
+    void SetReceiveNetDeviceCallback(SatOrbiterMac::ReceiveNetDeviceCallback cb);
 
     /**
      * Callback to get the SatBeamScheduler from the beam ID for handover
@@ -125,7 +125,7 @@ class SatGeoMac : public SatMac
      * \brief Set the beam scheduler callback
      * \param cb Callback to get the SatBeamScheduler
      */
-    void SetBeamSchedulerCallback(SatGeoMac::BeamSchedulerCallback cb);
+    void SetBeamSchedulerCallback(SatOrbiterMac::BeamSchedulerCallback cb);
 
     /**
      * Stop periodic transmission, until a pacquet in enqued.
@@ -153,7 +153,7 @@ class SatGeoMac : public SatMac
      * Start sending a Packet Down the Wire.
      *
      * The StartTransmission method is used internally in the
-     * SatGeoMac to begin the process of sending a packet out on the PHY layer.
+     * SatOrbiterMac to begin the process of sending a packet out on the PHY layer.
      *
      * \param carrierId id of the carrier.
      * \returns true if success, false on failure
@@ -235,7 +235,7 @@ class SatGeoMac : public SatMac
     /**
      * LLC layer linked to this MAC
      */
-    Ptr<SatGeoLlc> m_llc;
+    Ptr<SatOrbiterLlc> m_llc;
 
     /**
      * Trace for transmitted BB frames.
@@ -253,4 +253,4 @@ class SatGeoMac : public SatMac
 
 } // namespace ns3
 
-#endif /* SATELLITE_GEO_MAC_H */
+#endif /* SATELLITE_ORBITER_MAC_H */

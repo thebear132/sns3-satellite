@@ -261,14 +261,14 @@ main(int argc, char* argv[])
     Ptr<SatTrafficHelper> trafficHelper = simulationHelper->GetTrafficHelper();
     trafficHelper->AddVoipTraffic(SatTrafficHelper::FWD_LINK,
                                   SatTrafficHelper::G_711_1,
-                                  satHelper->GetGwUsers(),
-                                  satHelper->GetUtUsers(),
+                                  Singleton<SatTopology>::Get()->GetGwUserNodes(),
+                                  Singleton<SatTopology>::Get()->GetUtUserNodes(),
                                   appStartTime,
                                   simLength,
                                   Seconds(0.001));
     trafficHelper->AddHttpTraffic(SatTrafficHelper::FWD_LINK,
-                                  satHelper->GetGwUsers(),
-                                  satHelper->GetUtUsers(),
+                                  Singleton<SatTopology>::Get()->GetGwUserNodes(),
+                                  Singleton<SatTopology>::Get()->GetUtUserNodes(),
                                   appStartTime,
                                   simLength,
                                   Seconds(0.001));
@@ -278,12 +278,12 @@ main(int argc, char* argv[])
     /*
     Ptr<SatCnoHelper> satCnoHelper = simulationHelper->GetCnoHelper ();
     satCnoHelper->UseTracesForDefault (false);
-    for (uint32_t i = 0; i < satHelper->GetBeamHelper ()->GetUtNodes ().GetN (); i++)
+    for (uint32_t i = 0; i < Singleton<SatTopology>::Get()->GetNUtNodes(); i++)
       {
-        satCnoHelper->SetUtNodeCnoFile (satHelper->GetBeamHelper ()->GetUtNodes ().Get (i),
+        satCnoHelper->SetUtNodeCnoFile (Singleton<SatTopology>::Get()->GetUtNode(i),
     SatEnums::FORWARD_USER_CH, "path_to_cno_file"); // For input trace file
         // or
-        satCnoHelper->SetGwNodeCno (satHelper->GetBeamHelper ()->GetUtNodes ().Get (i),
+        satCnoHelper->SetGwNodeCno (Singleton<SatTopology>::Get()->GetUtNode(i),
     SatEnums::FORWARD_USER_CH, 1e10); // For constant value
       }
     */
@@ -292,7 +292,7 @@ main(int argc, char* argv[])
     if (utMobility)
     {
         Ptr<SatMobilityModel> satMobility =
-            satHelper->GetBeamHelper()->GetGeoSatNodes().Get(0)->GetObject<SatMobilityModel>();
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetObject<SatMobilityModel>();
         Ptr<Node> node = satHelper->LoadMobileUtFromFile(0, mobilityPath);
         node->GetObject<SatMobilityModel>()->TraceConnect("SatCourseChange",
                                                           "BeamTracer",

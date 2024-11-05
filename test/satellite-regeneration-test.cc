@@ -26,26 +26,27 @@
  * In this module implements the Regeneration Test Cases.
  */
 
-#include "ns3/cbr-application.h"
-#include "ns3/cbr-helper.h"
-#include "ns3/config.h"
-#include "ns3/log.h"
-#include "ns3/packet-sink-helper.h"
-#include "ns3/packet-sink.h"
-#include "ns3/satellite-env-variables.h"
-#include "ns3/satellite-geo-feeder-phy.h"
-#include "ns3/satellite-geo-net-device.h"
-#include "ns3/satellite-geo-user-phy.h"
-#include "ns3/satellite-gw-mac.h"
-#include "ns3/satellite-helper.h"
-#include "ns3/satellite-phy-rx-carrier.h"
-#include "ns3/satellite-phy-tx.h"
-#include "ns3/satellite-ut-mac-state.h"
-#include "ns3/simulation-helper.h"
-#include "ns3/simulator.h"
-#include "ns3/singleton.h"
-#include "ns3/string.h"
-#include "ns3/test.h"
+#include <ns3/cbr-application.h>
+#include <ns3/cbr-helper.h>
+#include <ns3/config.h>
+#include <ns3/log.h>
+#include <ns3/packet-sink-helper.h>
+#include <ns3/packet-sink.h>
+#include <ns3/satellite-env-variables.h>
+#include <ns3/satellite-gw-mac.h>
+#include <ns3/satellite-helper.h>
+#include <ns3/satellite-orbiter-feeder-phy.h>
+#include <ns3/satellite-orbiter-net-device.h>
+#include <ns3/satellite-orbiter-user-phy.h>
+#include <ns3/satellite-phy-rx-carrier.h>
+#include <ns3/satellite-phy-tx.h>
+#include <ns3/satellite-topology.h>
+#include <ns3/satellite-ut-mac-state.h>
+#include <ns3/simulation-helper.h>
+#include <ns3/simulator.h>
+#include <ns3/singleton.h>
+#include <ns3/string.h>
+#include <ns3/test.h>
 
 using namespace ns3;
 
@@ -67,8 +68,8 @@ class SatRegenerationTest1 : public TestCase
   private:
     virtual void DoRun(void);
     void PhyDelayTraceCb(std::string context, const Time& time, const Address& address);
-    void GeoFeederPhyTraceDelayCb(const Time& time, const Address& address);
-    void GeoUserPhyTraceDelayCb(const Time& time, const Address& address);
+    void OrbiterFeederPhyTraceDelayCb(const Time& time, const Address& address);
+    void OrbiterUserPhyTraceDelayCb(const Time& time, const Address& address);
 
     Ptr<SatHelper> m_helper;
 
@@ -77,8 +78,8 @@ class SatRegenerationTest1 : public TestCase
 
     std::vector<Time> m_forwardDelay;
     std::vector<Time> m_returnDelay;
-    std::vector<Time> m_geoForwardDelay;
-    std::vector<Time> m_geoReturnDelay;
+    std::vector<Time> m_orbiterForwardDelay;
+    std::vector<Time> m_orbiterReturnDelay;
 };
 
 // Add some help text to this case to describe what it is intended to test
@@ -108,15 +109,15 @@ SatRegenerationTest1::PhyDelayTraceCb(std::string context, const Time& time, con
 }
 
 void
-SatRegenerationTest1::GeoFeederPhyTraceDelayCb(const Time& time, const Address& address)
+SatRegenerationTest1::OrbiterFeederPhyTraceDelayCb(const Time& time, const Address& address)
 {
-    m_geoForwardDelay.push_back(time);
+    m_orbiterForwardDelay.push_back(time);
 }
 
 void
-SatRegenerationTest1::GeoUserPhyTraceDelayCb(const Time& time, const Address& address)
+SatRegenerationTest1::OrbiterUserPhyTraceDelayCb(const Time& time, const Address& address)
 {
-    m_geoReturnDelay.push_back(time);
+    m_orbiterReturnDelay.push_back(time);
 }
 
 //
@@ -137,7 +138,7 @@ SatRegenerationTest1::DoRun(void)
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_PHY));
 
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
 
     // Enable traces
     Config::SetDefault("ns3::SatPhy::EnableStatisticsTags", BooleanValue(true));
@@ -154,8 +155,8 @@ SatRegenerationTest1::DoRun(void)
                                        "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-    NodeContainer utUsers = m_helper->GetUtUsers();
-    NodeContainer gwUsers = m_helper->GetGwUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
     uint16_t port = 9;
 
     // Install forward traffic
@@ -187,43 +188,46 @@ SatRegenerationTest1::DoRun(void)
     gwAppsReturn.Start(Seconds(1.0));
     gwAppsReturn.Stop(Seconds(10.0));
 
-    m_gwAddress = m_helper->GwNodes().Get(0)->GetDevice(1)->GetAddress();
-    m_stAddress = m_helper->UtNodes().Get(0)->GetDevice(2)->GetAddress();
+    m_gwAddress = Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1)->GetAddress();
+    m_stAddress = Singleton<SatTopology>::Get()->GetUtNode(0)->GetDevice(2)->GetAddress();
 
-    Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy>(
-        DynamicCast<SatGeoNetDevice>(m_helper->GeoSatNodes().Get(0)->GetDevice(0))
+    Ptr<SatOrbiterFeederPhy> satOrbiterFeederPhy = DynamicCast<SatOrbiterFeederPhy>(
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
             ->GetFeederPhy(8));
-    Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy>(
-        DynamicCast<SatGeoNetDevice>(m_helper->GeoSatNodes().Get(0)->GetDevice(0))->GetUserPhy(8));
+    Ptr<SatOrbiterUserPhy> satOrbiterUserPhy = DynamicCast<SatOrbiterUserPhy>(
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
+            ->GetUserPhy(8));
 
-    satGeoFeederPhy->TraceConnectWithoutContext(
+    satOrbiterFeederPhy->TraceConnectWithoutContext(
         "RxLinkDelay",
-        MakeCallback(&SatRegenerationTest1::GeoFeederPhyTraceDelayCb, this));
-    satGeoUserPhy->TraceConnectWithoutContext(
+        MakeCallback(&SatRegenerationTest1::OrbiterFeederPhyTraceDelayCb, this));
+    satOrbiterUserPhy->TraceConnectWithoutContext(
         "RxLinkDelay",
-        MakeCallback(&SatRegenerationTest1::GeoUserPhyTraceDelayCb, this));
+        MakeCallback(&SatRegenerationTest1::OrbiterUserPhyTraceDelayCb, this));
     Config::Connect("/NodeList/*/DeviceList/*/SatPhy/RxLinkDelay",
                     MakeCallback(&SatRegenerationTest1::PhyDelayTraceCb, this));
 
-    Ptr<SatChannel> feederChannel = satGeoFeederPhy->GetPhyTx()->GetChannel();
-    Ptr<SatChannel> userChannel = satGeoUserPhy->GetPhyTx()->GetChannel();
+    Ptr<SatChannel> feederChannel = satOrbiterFeederPhy->GetPhyTx()->GetChannel();
+    Ptr<SatChannel> userChannel = satOrbiterUserPhy->GetPhyTx()->GetChannel();
 
     Ptr<PropagationDelayModel> feederDelayModel = feederChannel->GetPropagationDelayModel();
     Ptr<PropagationDelayModel> userDelayModel = userChannel->GetPropagationDelayModel();
 
     Time feederDelay = feederDelayModel->GetDelay(
-        DynamicCast<SatNetDevice>(m_helper->GwNodes().Get(0)->GetDevice(1))
+        DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1))
             ->GetPhy()
             ->GetPhyTx()
             ->GetMobility(),
-        satGeoFeederPhy->GetPhyTx()->GetMobility());
+        satOrbiterFeederPhy->GetPhyTx()->GetMobility());
 
-    Time userDelay =
-        userDelayModel->GetDelay(DynamicCast<SatNetDevice>(m_helper->UtNodes().Get(0)->GetDevice(2))
-                                     ->GetPhy()
-                                     ->GetPhyTx()
-                                     ->GetMobility(),
-                                 satGeoUserPhy->GetPhyTx()->GetMobility());
+    Time userDelay = userDelayModel->GetDelay(
+        DynamicCast<SatNetDevice>(Singleton<SatTopology>::Get()->GetUtNode(0)->GetDevice(2))
+            ->GetPhy()
+            ->GetPhyTx()
+            ->GetMobility(),
+        satOrbiterUserPhy->GetPhyTx()->GetMobility());
 
     Simulator::Stop(Seconds(10));
     Simulator::Run();
@@ -239,16 +243,16 @@ SatRegenerationTest1::DoRun(void)
     Time fwdTime = NanoSeconds(319507) - MicroSeconds(1);
     Time rtnTime = NanoSeconds(668928) - MicroSeconds(1);
 
-    for (uint32_t i = 0; i < m_geoForwardDelay.size(); i++)
+    for (uint32_t i = 0; i < m_orbiterForwardDelay.size(); i++)
     {
-        NS_TEST_ASSERT_MSG_EQ(m_geoForwardDelay[i] - feederDelay,
+        NS_TEST_ASSERT_MSG_EQ(m_orbiterForwardDelay[i] - feederDelay,
                               fwdTime,
                               "Transmission time on FWD FEEDER incorrect.");
     }
 
-    for (uint32_t i = 0; i < m_geoReturnDelay.size(); i++)
+    for (uint32_t i = 0; i < m_orbiterReturnDelay.size(); i++)
     {
-        NS_TEST_ASSERT_MSG_EQ(m_geoReturnDelay[i] - userDelay,
+        NS_TEST_ASSERT_MSG_EQ(m_orbiterReturnDelay[i] - userDelay,
                               rtnTime,
                               "Transmission time on RTN USER incorrect.");
     }
@@ -288,14 +292,14 @@ class SatRegenerationTest2 : public TestCase
 
   private:
     virtual void DoRun(void);
-    void GeoPhyTraceCb(Time time,
-                       SatEnums::SatPacketEvent_t event,
-                       SatEnums::SatNodeType_t type,
-                       uint32_t nodeId,
-                       Mac48Address address,
-                       SatEnums::SatLogLevel_t level,
-                       SatEnums::SatLinkDir_t dir,
-                       std::string packetInfo);
+    void OrbiterPhyTraceCb(Time time,
+                           SatEnums::SatPacketEvent_t event,
+                           SatEnums::SatNodeType_t type,
+                           uint32_t nodeId,
+                           Mac48Address address,
+                           SatEnums::SatLogLevel_t level,
+                           SatEnums::SatLinkDir_t dir,
+                           std::string packetInfo);
     void PhyTraceCb(Time time,
                     SatEnums::SatPacketEvent_t event,
                     SatEnums::SatNodeType_t type,
@@ -340,14 +344,14 @@ SatRegenerationTest2::~SatRegenerationTest2()
 }
 
 void
-SatRegenerationTest2::GeoPhyTraceCb(Time time,
-                                    SatEnums::SatPacketEvent_t event,
-                                    SatEnums::SatNodeType_t type,
-                                    uint32_t nodeId,
-                                    Mac48Address address,
-                                    SatEnums::SatLogLevel_t level,
-                                    SatEnums::SatLinkDir_t dir,
-                                    std::string packetInfo)
+SatRegenerationTest2::OrbiterPhyTraceCb(Time time,
+                                        SatEnums::SatPacketEvent_t event,
+                                        SatEnums::SatNodeType_t type,
+                                        uint32_t nodeId,
+                                        Mac48Address address,
+                                        SatEnums::SatLogLevel_t level,
+                                        SatEnums::SatLinkDir_t dir,
+                                        std::string packetInfo)
 {
     switch (dir)
     {
@@ -431,15 +435,15 @@ SatRegenerationTest2::DoRun(void)
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_PHY));
 
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
 
     /// Set constant 10% losses on Uplink
-    Config::SetDefault("ns3::SatGeoHelper::FwdLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::FwdLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_CONSTANT));
-    Config::SetDefault("ns3::SatGeoHelper::FwdLinkConstantErrorRate", DoubleValue(0.1));
-    Config::SetDefault("ns3::SatGeoHelper::RtnLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::FwdLinkConstantErrorRate", DoubleValue(0.1));
+    Config::SetDefault("ns3::SatOrbiterHelper::RtnLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_CONSTANT));
-    Config::SetDefault("ns3::SatGeoHelper::RtnLinkConstantErrorRate", DoubleValue(0.1));
+    Config::SetDefault("ns3::SatOrbiterHelper::RtnLinkConstantErrorRate", DoubleValue(0.1));
 
     // Enable SatMac traces
     Config::SetDefault("ns3::SatPhy::EnableStatisticsTags", BooleanValue(true));
@@ -456,8 +460,8 @@ SatRegenerationTest2::DoRun(void)
                                        "/scenarios/geo-33E");
     m_helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
-    NodeContainer utUsers = m_helper->GetUtUsers();
-    NodeContainer gwUsers = m_helper->GetGwUsers();
+    NodeContainer utUsers = Singleton<SatTopology>::Get()->GetUtUserNodes();
+    NodeContainer gwUsers = Singleton<SatTopology>::Get()->GetGwUserNodes();
     uint16_t port = 9;
 
     // Install forward traffic
@@ -489,18 +493,21 @@ SatRegenerationTest2::DoRun(void)
     gwAppsReturn.Start(Seconds(1.0));
     gwAppsReturn.Stop(Seconds(60.0));
 
-    Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy>(
-        DynamicCast<SatGeoNetDevice>(m_helper->GeoSatNodes().Get(0)->GetDevice(0))
+    Ptr<SatOrbiterFeederPhy> satOrbiterFeederPhy = DynamicCast<SatOrbiterFeederPhy>(
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
             ->GetFeederPhy(8));
-    Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy>(
-        DynamicCast<SatGeoNetDevice>(m_helper->GeoSatNodes().Get(0)->GetDevice(0))->GetUserPhy(8));
+    Ptr<SatOrbiterUserPhy> satOrbiterUserPhy = DynamicCast<SatOrbiterUserPhy>(
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
+            ->GetUserPhy(8));
 
-    satGeoFeederPhy->TraceConnectWithoutContext(
+    satOrbiterFeederPhy->TraceConnectWithoutContext(
         "PacketTrace",
-        MakeCallback(&SatRegenerationTest2::GeoPhyTraceCb, this));
-    satGeoUserPhy->TraceConnectWithoutContext(
+        MakeCallback(&SatRegenerationTest2::OrbiterPhyTraceCb, this));
+    satOrbiterUserPhy->TraceConnectWithoutContext(
         "PacketTrace",
-        MakeCallback(&SatRegenerationTest2::GeoPhyTraceCb, this));
+        MakeCallback(&SatRegenerationTest2::OrbiterPhyTraceCb, this));
 
     Config::ConnectWithoutContext("/NodeList/*/DeviceList/*/SatPhy/PacketTrace",
                                   MakeCallback(&SatRegenerationTest2::PhyTraceCb, this));
@@ -560,19 +567,22 @@ class SatRegenerationTest3 : public TestCase
 
   private:
     virtual void DoRun(void);
-    void GeoPhyTraceErrorCb(std::string, uint32_t nPackets, const Address& address, bool hasError);
-    void GeoPhyTraceCollisionCb(std::string,
+    void OrbiterPhyTraceErrorCb(std::string,
                                 uint32_t nPackets,
                                 const Address& address,
-                                bool hasCollision);
-    void GeoPhyTraceCb(Time time,
-                       SatEnums::SatPacketEvent_t event,
-                       SatEnums::SatNodeType_t type,
-                       uint32_t nodeId,
-                       Mac48Address address,
-                       SatEnums::SatLogLevel_t level,
-                       SatEnums::SatLinkDir_t dir,
-                       std::string packetInfo);
+                                bool hasError);
+    void OrbiterPhyTraceCollisionCb(std::string,
+                                    uint32_t nPackets,
+                                    const Address& address,
+                                    bool hasCollision);
+    void OrbiterPhyTraceCb(Time time,
+                           SatEnums::SatPacketEvent_t event,
+                           SatEnums::SatNodeType_t type,
+                           uint32_t nodeId,
+                           Mac48Address address,
+                           SatEnums::SatLogLevel_t level,
+                           SatEnums::SatLinkDir_t dir,
+                           std::string packetInfo);
 
     Ptr<SatHelper> m_helper;
 
@@ -611,10 +621,10 @@ SatRegenerationTest3::~SatRegenerationTest3()
 }
 
 void
-SatRegenerationTest3::GeoPhyTraceErrorCb(std::string,
-                                         uint32_t nPackets,
-                                         const Address& address,
-                                         bool hasError)
+SatRegenerationTest3::OrbiterPhyTraceErrorCb(std::string,
+                                             uint32_t nPackets,
+                                             const Address& address,
+                                             bool hasError)
 {
     if (!hasError)
     {
@@ -631,10 +641,10 @@ SatRegenerationTest3::GeoPhyTraceErrorCb(std::string,
 }
 
 void
-SatRegenerationTest3::GeoPhyTraceCollisionCb(std::string,
-                                             uint32_t nPackets,
-                                             const Address& address,
-                                             bool hasCollision)
+SatRegenerationTest3::OrbiterPhyTraceCollisionCb(std::string,
+                                                 uint32_t nPackets,
+                                                 const Address& address,
+                                                 bool hasCollision)
 {
     if (!hasCollision)
     {
@@ -651,14 +661,14 @@ SatRegenerationTest3::GeoPhyTraceCollisionCb(std::string,
 }
 
 void
-SatRegenerationTest3::GeoPhyTraceCb(Time time,
-                                    SatEnums::SatPacketEvent_t event,
-                                    SatEnums::SatNodeType_t type,
-                                    uint32_t nodeId,
-                                    Mac48Address address,
-                                    SatEnums::SatLogLevel_t level,
-                                    SatEnums::SatLinkDir_t dir,
-                                    std::string packetInfo)
+SatRegenerationTest3::OrbiterPhyTraceCb(Time time,
+                                        SatEnums::SatPacketEvent_t event,
+                                        SatEnums::SatNodeType_t type,
+                                        uint32_t nodeId,
+                                        Mac48Address address,
+                                        SatEnums::SatLogLevel_t level,
+                                        SatEnums::SatLinkDir_t dir,
+                                        std::string packetInfo)
 {
     switch (dir)
     {
@@ -705,7 +715,7 @@ SatRegenerationTest3::DoRun(void)
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_PHY));
 
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
 
     /// Enable SatMac traces
     Config::SetDefault("ns3::SatPhy::EnableStatisticsTags", BooleanValue(true));
@@ -782,9 +792,9 @@ SatRegenerationTest3::DoRun(void)
     Config::SetDefault("ns3::SatLowerLayerServiceConf::DaService3_VolumeAllowed",
                        BooleanValue(false));
 
-    Config::SetDefault("ns3::SatGeoHelper::FwdLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::FwdLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_NONE));
-    Config::SetDefault("ns3::SatGeoHelper::RtnLinkErrorModel",
+    Config::SetDefault("ns3::SatOrbiterHelper::RtnLinkErrorModel",
                        EnumValue(SatPhyRxCarrierConf::EM_AVI));
     Config::SetDefault("ns3::SatBeamHelper::RaCollisionModel",
                        EnumValue(SatPhyRxCarrierConf::RA_COLLISION_CHECK_AGAINST_SINR));
@@ -800,43 +810,48 @@ SatRegenerationTest3::DoRun(void)
 
     simulationHelper->CreateSatScenario();
 
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(MilliSeconds(1)));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(0.01),
-                                          Seconds(5),
-                                          Seconds(0.01));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(1),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(0.01),
+        Seconds(5),
+        Seconds(0.01));
 
     m_helper = simulationHelper->GetSatelliteHelper();
 
-    Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy>(
-        DynamicCast<SatGeoNetDevice>(m_helper->GeoSatNodes().Get(0)->GetDevice(0))
+    Ptr<SatOrbiterFeederPhy> satOrbiterFeederPhy = DynamicCast<SatOrbiterFeederPhy>(
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
             ->GetFeederPhy(1));
-    Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy>(
-        DynamicCast<SatGeoNetDevice>(m_helper->GeoSatNodes().Get(0)->GetDevice(0))->GetUserPhy(1));
+    Ptr<SatOrbiterUserPhy> satOrbiterUserPhy = DynamicCast<SatOrbiterUserPhy>(
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
+            ->GetUserPhy(1));
 
-    m_gwAddress = m_helper->GwNodes().Get(0)->GetDevice(1)->GetAddress();
+    m_gwAddress = Singleton<SatTopology>::Get()->GetGwNode(0)->GetDevice(1)->GetAddress();
 
-    satGeoFeederPhy->TraceConnectWithoutContext(
+    satOrbiterFeederPhy->TraceConnectWithoutContext(
         "PacketTrace",
-        MakeCallback(&SatRegenerationTest3::GeoPhyTraceCb, this));
-    satGeoUserPhy->TraceConnectWithoutContext(
+        MakeCallback(&SatRegenerationTest3::OrbiterPhyTraceCb, this));
+    satOrbiterUserPhy->TraceConnectWithoutContext(
         "PacketTrace",
-        MakeCallback(&SatRegenerationTest3::GeoPhyTraceCb, this));
+        MakeCallback(&SatRegenerationTest3::OrbiterPhyTraceCb, this));
 
     Config::Connect(
         "/NodeList/*/DeviceList/*/FeederPhy/1/PhyRx/RxCarrierList/*/SlottedAlohaRxError",
-        MakeCallback(&SatRegenerationTest3::GeoPhyTraceErrorCb, this));
+        MakeCallback(&SatRegenerationTest3::OrbiterPhyTraceErrorCb, this));
     Config::Connect(
         "/NodeList/*/DeviceList/*/FeederPhy/1/PhyRx/RxCarrierList/*/SlottedAlohaRxCollision",
-        MakeCallback(&SatRegenerationTest3::GeoPhyTraceCollisionCb, this));
+        MakeCallback(&SatRegenerationTest3::OrbiterPhyTraceCollisionCb, this));
     Config::Connect("/NodeList/*/DeviceList/*/UserPhy/1/PhyRx/RxCarrierList/*/SlottedAlohaRxError",
-                    MakeCallback(&SatRegenerationTest3::GeoPhyTraceErrorCb, this));
+                    MakeCallback(&SatRegenerationTest3::OrbiterPhyTraceErrorCb, this));
     Config::Connect(
         "/NodeList/*/DeviceList/*/UserPhy/1/PhyRx/RxCarrierList/*/SlottedAlohaRxCollision",
-        MakeCallback(&SatRegenerationTest3::GeoPhyTraceCollisionCb, this));
+        MakeCallback(&SatRegenerationTest3::OrbiterPhyTraceCollisionCb, this));
 
     Simulator::Stop(Seconds(5));
     Simulator::Run();
@@ -876,10 +891,10 @@ class SatRegenerationTest4 : public TestCase
 
   private:
     virtual void DoRun(void);
-    void GeoDevGwTxTraceCb(Ptr<const Packet> packet);
-    void GeoDevUtTxTraceCb(Ptr<const Packet> packet);
-    void GeoDevGwRxTraceCb(Ptr<const Packet> packet, const Address&);
-    void GeoDevUtRxTraceCb(Ptr<const Packet> packet, const Address&);
+    void OrbiterDevGwTxTraceCb(Ptr<const Packet> packet);
+    void OrbiterDevUtTxTraceCb(Ptr<const Packet> packet);
+    void OrbiterDevGwRxTraceCb(Ptr<const Packet> packet, const Address&);
+    void OrbiterDevUtRxTraceCb(Ptr<const Packet> packet, const Address&);
     bool HasSinkInstalled(Ptr<Node> node, uint16_t port);
 
     Ptr<SatHelper> m_helper;
@@ -891,25 +906,25 @@ class SatRegenerationTest4 : public TestCase
 };
 
 void
-SatRegenerationTest4::GeoDevGwTxTraceCb(Ptr<const Packet> packet)
+SatRegenerationTest4::OrbiterDevGwTxTraceCb(Ptr<const Packet> packet)
 {
     m_totalSentGw += packet->GetSize();
 }
 
 void
-SatRegenerationTest4::GeoDevUtTxTraceCb(Ptr<const Packet> packet)
+SatRegenerationTest4::OrbiterDevUtTxTraceCb(Ptr<const Packet> packet)
 {
     m_totalSentUt += packet->GetSize();
 }
 
 void
-SatRegenerationTest4::GeoDevGwRxTraceCb(Ptr<const Packet> packet, const Address&)
+SatRegenerationTest4::OrbiterDevGwRxTraceCb(Ptr<const Packet> packet, const Address&)
 {
     m_totalReceivedGw += packet->GetSize();
 }
 
 void
-SatRegenerationTest4::GeoDevUtRxTraceCb(Ptr<const Packet> packet, const Address& address)
+SatRegenerationTest4::OrbiterDevUtRxTraceCb(Ptr<const Packet> packet, const Address& address)
 {
     m_totalReceivedUt += packet->GetSize();
 }
@@ -967,7 +982,7 @@ SatRegenerationTest4::DoRun(void)
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_LINK));
 
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
 
     // Enable SatMac traces
     Config::SetDefault("ns3::SatPhy::EnableStatisticsTags", BooleanValue(true));
@@ -986,27 +1001,27 @@ SatRegenerationTest4::DoRun(void)
 
     m_helper = simulationHelper->GetSatelliteHelper();
 
-    NodeContainer gws = m_helper->GwNodes();
-    NodeContainer uts = m_helper->UtNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
 
     uint32_t i;
     for (i = 0; i < gws.GetN(); i++)
     {
         gws.Get(i)->GetDevice(1)->TraceConnectWithoutContext(
             "Tx",
-            MakeCallback(&SatRegenerationTest4::GeoDevGwTxTraceCb, this));
+            MakeCallback(&SatRegenerationTest4::OrbiterDevGwTxTraceCb, this));
         gws.Get(i)->GetDevice(1)->TraceConnectWithoutContext(
             "Rx",
-            MakeCallback(&SatRegenerationTest4::GeoDevGwRxTraceCb, this));
+            MakeCallback(&SatRegenerationTest4::OrbiterDevGwRxTraceCb, this));
     }
     for (i = 0; i < uts.GetN(); i++)
     {
         uts.Get(i)->GetDevice(2)->TraceConnectWithoutContext(
             "Tx",
-            MakeCallback(&SatRegenerationTest4::GeoDevUtTxTraceCb, this));
+            MakeCallback(&SatRegenerationTest4::OrbiterDevUtTxTraceCb, this));
         uts.Get(i)->GetDevice(2)->TraceConnectWithoutContext(
             "Rx",
-            MakeCallback(&SatRegenerationTest4::GeoDevUtRxTraceCb, this));
+            MakeCallback(&SatRegenerationTest4::OrbiterDevUtRxTraceCb, this));
     }
 
     std::string socketFactory = "ns3::UdpSocketFactory";
@@ -1079,10 +1094,10 @@ class SatRegenerationTest5 : public TestCase
 
   private:
     virtual void DoRun(void);
-    void GeoPhyGwModcodTraceCb(uint32_t modcod, const Address& address);
-    void GeoPhyUtModcodTraceCb(uint32_t modcod, const Address& address);
-    void GeoPhyFeederModcodTraceCb(uint32_t modcod, const Address& address);
-    void GeoPhyUserModcodTraceCb(uint32_t modcod, const Address& address);
+    void OrbiterPhyGwModcodTraceCb(uint32_t modcod, const Address& address);
+    void OrbiterPhyUtModcodTraceCb(uint32_t modcod, const Address& address);
+    void OrbiterPhyFeederModcodTraceCb(uint32_t modcod, const Address& address);
+    void OrbiterPhyUserModcodTraceCb(uint32_t modcod, const Address& address);
 
     double GetAverage(std::vector<uint32_t> list, uint32_t beg, uint32_t end);
     double GetMostFrequent(std::vector<uint32_t> list, uint32_t beg, uint32_t end);
@@ -1096,25 +1111,25 @@ class SatRegenerationTest5 : public TestCase
 };
 
 void
-SatRegenerationTest5::GeoPhyGwModcodTraceCb(uint32_t modcod, const Address& address)
+SatRegenerationTest5::OrbiterPhyGwModcodTraceCb(uint32_t modcod, const Address& address)
 {
     m_gwModcods.push_back(modcod);
 }
 
 void
-SatRegenerationTest5::GeoPhyUtModcodTraceCb(uint32_t modcod, const Address& address)
+SatRegenerationTest5::OrbiterPhyUtModcodTraceCb(uint32_t modcod, const Address& address)
 {
     m_utModcods.push_back(modcod);
 }
 
 void
-SatRegenerationTest5::GeoPhyFeederModcodTraceCb(uint32_t modcod, const Address& address)
+SatRegenerationTest5::OrbiterPhyFeederModcodTraceCb(uint32_t modcod, const Address& address)
 {
     m_feederModcods.push_back(modcod);
 }
 
 void
-SatRegenerationTest5::GeoPhyUserModcodTraceCb(uint32_t modcod, const Address& address)
+SatRegenerationTest5::OrbiterPhyUserModcodTraceCb(uint32_t modcod, const Address& address)
 {
     m_userModcods.push_back(modcod);
 }
@@ -1183,7 +1198,7 @@ SatRegenerationTest5::DoRun(void)
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_LINK));
 
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
 
     /// Enable ACM
     Config::SetDefault("ns3::SatBbFrameConf::AcmEnabled", BooleanValue(true));
@@ -1205,13 +1220,13 @@ SatRegenerationTest5::DoRun(void)
 
     m_helper = simulationHelper->GetSatelliteHelper();
 
-    Ptr<Node> gwNode = m_helper->GwNodes().Get(0);
-    Ptr<Node> utNode = m_helper->UtNodes().Get(0);
-    Ptr<Node> geoNode = m_helper->GeoSatNodes().Get(0);
-    Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy>(
-        DynamicCast<SatGeoNetDevice>(geoNode->GetDevice(0))->GetFeederPhy(8));
-    Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy>(
-        DynamicCast<SatGeoNetDevice>(geoNode->GetDevice(0))->GetUserPhy(8));
+    Ptr<Node> gwNode = Singleton<SatTopology>::Get()->GetGwNode(0);
+    Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(0);
+    Ptr<Node> satNode = Singleton<SatTopology>::Get()->GetOrbiterNode(0);
+    Ptr<SatOrbiterFeederPhy> satOrbiterFeederPhy = DynamicCast<SatOrbiterFeederPhy>(
+        DynamicCast<SatOrbiterNetDevice>(satNode->GetDevice(0))->GetFeederPhy(8));
+    Ptr<SatOrbiterUserPhy> satOrbiterUserPhy = DynamicCast<SatOrbiterUserPhy>(
+        DynamicCast<SatOrbiterNetDevice>(satNode->GetDevice(0))->GetUserPhy(8));
     Ptr<SatPhy> satGwPhy =
         DynamicCast<SatPhy>(DynamicCast<SatNetDevice>(gwNode->GetDevice(1))->GetPhy());
     Ptr<SatPhy> satUtPhy =
@@ -1219,33 +1234,38 @@ SatRegenerationTest5::DoRun(void)
 
     satGwPhy->TraceConnectWithoutContext(
         "RxLinkModcod",
-        MakeCallback(&SatRegenerationTest5::GeoPhyGwModcodTraceCb, this));
+        MakeCallback(&SatRegenerationTest5::OrbiterPhyGwModcodTraceCb, this));
     satUtPhy->TraceConnectWithoutContext(
         "RxLinkModcod",
-        MakeCallback(&SatRegenerationTest5::GeoPhyUtModcodTraceCb, this));
-    satGeoFeederPhy->TraceConnectWithoutContext(
+        MakeCallback(&SatRegenerationTest5::OrbiterPhyUtModcodTraceCb, this));
+    satOrbiterFeederPhy->TraceConnectWithoutContext(
         "RxLinkModcod",
-        MakeCallback(&SatRegenerationTest5::GeoPhyFeederModcodTraceCb, this));
-    satGeoUserPhy->TraceConnectWithoutContext(
+        MakeCallback(&SatRegenerationTest5::OrbiterPhyFeederModcodTraceCb, this));
+    satOrbiterUserPhy->TraceConnectWithoutContext(
         "RxLinkModcod",
-        MakeCallback(&SatRegenerationTest5::GeoPhyUserModcodTraceCb, this));
+        MakeCallback(&SatRegenerationTest5::OrbiterPhyUserModcodTraceCb, this));
 
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(MilliSeconds(20)));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(20),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(10),
+        Seconds(0.01));
 
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(1),
-                                          Seconds(10),
-                                          Seconds(0.01));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(1),
-                                          Seconds(10),
-                                          Seconds(0.01));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(20),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(10),
+        Seconds(0.01));
 
     simulationHelper->RunSimulation();
 
@@ -1319,10 +1339,10 @@ class SatRegenerationTest6 : public TestCase
 
   private:
     virtual void DoRun(void);
-    void GeoDevGwTxTraceCb(Ptr<const Packet> packet);
-    void GeoDevUtTxTraceCb(Ptr<const Packet> packet);
-    void GeoDevGwRxTraceCb(Ptr<const Packet> packet, const Address&);
-    void GeoDevUtRxTraceCb(Ptr<const Packet> packet, const Address&);
+    void OrbiterDevGwTxTraceCb(Ptr<const Packet> packet);
+    void OrbiterDevUtTxTraceCb(Ptr<const Packet> packet);
+    void OrbiterDevGwRxTraceCb(Ptr<const Packet> packet, const Address&);
+    void OrbiterDevUtRxTraceCb(Ptr<const Packet> packet, const Address&);
     bool HasSinkInstalled(Ptr<Node> node, uint16_t port);
 
     Ptr<SatHelper> m_helper;
@@ -1334,25 +1354,25 @@ class SatRegenerationTest6 : public TestCase
 };
 
 void
-SatRegenerationTest6::GeoDevGwTxTraceCb(Ptr<const Packet> packet)
+SatRegenerationTest6::OrbiterDevGwTxTraceCb(Ptr<const Packet> packet)
 {
     m_totalSentGw += packet->GetSize();
 }
 
 void
-SatRegenerationTest6::GeoDevUtTxTraceCb(Ptr<const Packet> packet)
+SatRegenerationTest6::OrbiterDevUtTxTraceCb(Ptr<const Packet> packet)
 {
     m_totalSentUt += packet->GetSize();
 }
 
 void
-SatRegenerationTest6::GeoDevGwRxTraceCb(Ptr<const Packet> packet, const Address&)
+SatRegenerationTest6::OrbiterDevGwRxTraceCb(Ptr<const Packet> packet, const Address&)
 {
     m_totalReceivedGw += packet->GetSize();
 }
 
 void
-SatRegenerationTest6::GeoDevUtRxTraceCb(Ptr<const Packet> packet, const Address& address)
+SatRegenerationTest6::OrbiterDevUtRxTraceCb(Ptr<const Packet> packet, const Address& address)
 {
     m_totalReceivedUt += packet->GetSize();
 }
@@ -1411,7 +1431,7 @@ SatRegenerationTest6::DoRun(void)
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_NETWORK));
 
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
 
     // Enable SatMac traces
     Config::SetDefault("ns3::SatPhy::EnableStatisticsTags", BooleanValue(true));
@@ -1430,51 +1450,50 @@ SatRegenerationTest6::DoRun(void)
 
     m_helper = simulationHelper->GetSatelliteHelper();
 
-    NodeContainer gws = m_helper->GwNodes();
-    NodeContainer uts = m_helper->UtNodes();
+    NodeContainer gws = Singleton<SatTopology>::Get()->GetGwNodes();
+    NodeContainer uts = Singleton<SatTopology>::Get()->GetUtNodes();
 
     uint32_t i;
     for (i = 0; i < gws.GetN(); i++)
     {
         gws.Get(i)->GetDevice(1)->TraceConnectWithoutContext(
             "Tx",
-            MakeCallback(&SatRegenerationTest6::GeoDevGwTxTraceCb, this));
+            MakeCallback(&SatRegenerationTest6::OrbiterDevGwTxTraceCb, this));
         gws.Get(i)->GetDevice(1)->TraceConnectWithoutContext(
             "Rx",
-            MakeCallback(&SatRegenerationTest6::GeoDevGwRxTraceCb, this));
+            MakeCallback(&SatRegenerationTest6::OrbiterDevGwRxTraceCb, this));
     }
     for (i = 0; i < uts.GetN(); i++)
     {
         uts.Get(i)->GetDevice(2)->TraceConnectWithoutContext(
             "Tx",
-            MakeCallback(&SatRegenerationTest6::GeoDevUtTxTraceCb, this));
+            MakeCallback(&SatRegenerationTest6::OrbiterDevUtTxTraceCb, this));
         uts.Get(i)->GetDevice(2)->TraceConnectWithoutContext(
             "Rx",
-            MakeCallback(&SatRegenerationTest6::GeoDevUtRxTraceCb, this));
+            MakeCallback(&SatRegenerationTest6::OrbiterDevUtRxTraceCb, this));
     }
 
-    Time startTime = Seconds(1);
-    Time stopTime = Seconds(15);
-    Time startDelay = MilliSeconds(10);
-    Time interval = MilliSeconds(1000);
-    uint32_t packetSize = 512;
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        Seconds(1),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(15),
+        MilliSeconds(10));
 
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(interval));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(1),
-                                          Seconds(10),
-                                          Seconds(0.01));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(1),
-                                          Seconds(10),
-                                          Seconds(0.01));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        Seconds(1),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(15),
+        MilliSeconds(10));
 
     simulationHelper->RunSimulation();
 
@@ -1512,10 +1531,10 @@ class SatRegenerationTest7 : public TestCase
 
   private:
     virtual void DoRun(void);
-    void GeoPhyGwModcodTraceCb(uint32_t modcod, const Address& address);
-    void GeoPhyUtModcodTraceCb(uint32_t modcod, const Address& address);
-    void GeoPhyFeederModcodTraceCb(uint32_t modcod, const Address& address);
-    void GeoPhyUserModcodTraceCb(uint32_t modcod, const Address& address);
+    void OrbiterPhyGwModcodTraceCb(uint32_t modcod, const Address& address);
+    void OrbiterPhyUtModcodTraceCb(uint32_t modcod, const Address& address);
+    void OrbiterPhyFeederModcodTraceCb(uint32_t modcod, const Address& address);
+    void OrbiterPhyUserModcodTraceCb(uint32_t modcod, const Address& address);
 
     double GetAverage(std::vector<uint32_t> list, uint32_t beg, uint32_t end);
     double GetMostFrequent(std::vector<uint32_t> list, uint32_t beg, uint32_t end);
@@ -1529,25 +1548,25 @@ class SatRegenerationTest7 : public TestCase
 };
 
 void
-SatRegenerationTest7::GeoPhyGwModcodTraceCb(uint32_t modcod, const Address& address)
+SatRegenerationTest7::OrbiterPhyGwModcodTraceCb(uint32_t modcod, const Address& address)
 {
     m_gwModcods.push_back(modcod);
 }
 
 void
-SatRegenerationTest7::GeoPhyUtModcodTraceCb(uint32_t modcod, const Address& address)
+SatRegenerationTest7::OrbiterPhyUtModcodTraceCb(uint32_t modcod, const Address& address)
 {
     m_utModcods.push_back(modcod);
 }
 
 void
-SatRegenerationTest7::GeoPhyFeederModcodTraceCb(uint32_t modcod, const Address& address)
+SatRegenerationTest7::OrbiterPhyFeederModcodTraceCb(uint32_t modcod, const Address& address)
 {
     m_feederModcods.push_back(modcod);
 }
 
 void
-SatRegenerationTest7::GeoPhyUserModcodTraceCb(uint32_t modcod, const Address& address)
+SatRegenerationTest7::OrbiterPhyUserModcodTraceCb(uint32_t modcod, const Address& address)
 {
     m_userModcods.push_back(modcod);
 }
@@ -1616,7 +1635,7 @@ SatRegenerationTest7::DoRun(void)
     Config::SetDefault("ns3::SatConf::ReturnLinkRegenerationMode",
                        EnumValue(SatEnums::REGENERATION_NETWORK));
 
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
 
     /// Enable ACM
     Config::SetDefault("ns3::SatBbFrameConf::AcmEnabled", BooleanValue(true));
@@ -1638,13 +1657,13 @@ SatRegenerationTest7::DoRun(void)
 
     m_helper = simulationHelper->GetSatelliteHelper();
 
-    Ptr<Node> gwNode = m_helper->GwNodes().Get(0);
-    Ptr<Node> utNode = m_helper->UtNodes().Get(0);
-    Ptr<Node> geoNode = m_helper->GeoSatNodes().Get(0);
-    Ptr<SatGeoFeederPhy> satGeoFeederPhy = DynamicCast<SatGeoFeederPhy>(
-        DynamicCast<SatGeoNetDevice>(geoNode->GetDevice(0))->GetFeederPhy(8));
-    Ptr<SatGeoUserPhy> satGeoUserPhy = DynamicCast<SatGeoUserPhy>(
-        DynamicCast<SatGeoNetDevice>(geoNode->GetDevice(0))->GetUserPhy(8));
+    Ptr<Node> gwNode = Singleton<SatTopology>::Get()->GetGwNode(0);
+    Ptr<Node> utNode = Singleton<SatTopology>::Get()->GetUtNode(0);
+    Ptr<Node> satNode = Singleton<SatTopology>::Get()->GetOrbiterNode(0);
+    Ptr<SatOrbiterFeederPhy> satOrbiterFeederPhy = DynamicCast<SatOrbiterFeederPhy>(
+        DynamicCast<SatOrbiterNetDevice>(satNode->GetDevice(0))->GetFeederPhy(8));
+    Ptr<SatOrbiterUserPhy> satOrbiterUserPhy = DynamicCast<SatOrbiterUserPhy>(
+        DynamicCast<SatOrbiterNetDevice>(satNode->GetDevice(0))->GetUserPhy(8));
     Ptr<SatPhy> satGwPhy =
         DynamicCast<SatPhy>(DynamicCast<SatNetDevice>(gwNode->GetDevice(1))->GetPhy());
     Ptr<SatPhy> satUtPhy =
@@ -1652,33 +1671,38 @@ SatRegenerationTest7::DoRun(void)
 
     satGwPhy->TraceConnectWithoutContext(
         "RxLinkModcod",
-        MakeCallback(&SatRegenerationTest7::GeoPhyGwModcodTraceCb, this));
+        MakeCallback(&SatRegenerationTest7::OrbiterPhyGwModcodTraceCb, this));
     satUtPhy->TraceConnectWithoutContext(
         "RxLinkModcod",
-        MakeCallback(&SatRegenerationTest7::GeoPhyUtModcodTraceCb, this));
-    satGeoFeederPhy->TraceConnectWithoutContext(
+        MakeCallback(&SatRegenerationTest7::OrbiterPhyUtModcodTraceCb, this));
+    satOrbiterFeederPhy->TraceConnectWithoutContext(
         "RxLinkModcod",
-        MakeCallback(&SatRegenerationTest7::GeoPhyFeederModcodTraceCb, this));
-    satGeoUserPhy->TraceConnectWithoutContext(
+        MakeCallback(&SatRegenerationTest7::OrbiterPhyFeederModcodTraceCb, this));
+    satOrbiterUserPhy->TraceConnectWithoutContext(
         "RxLinkModcod",
-        MakeCallback(&SatRegenerationTest7::GeoPhyUserModcodTraceCb, this));
+        MakeCallback(&SatRegenerationTest7::OrbiterPhyUserModcodTraceCb, this));
 
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(MilliSeconds(20)));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(512));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(20),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(10),
+        Seconds(0.01));
 
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          Seconds(1),
-                                          Seconds(10),
-                                          Seconds(0.01));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          Seconds(1),
-                                          Seconds(10),
-                                          Seconds(0.01));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(20),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(10),
+        Seconds(0.01));
 
     simulationHelper->RunSimulation();
 
@@ -1878,7 +1902,7 @@ SatRegenerationTest8::DoRun(void)
     SatEnums::RegenerationMode_t maxRegeneration =
         std::max(m_forwardLinkRegenerationMode, m_returnLinkRegenerationMode);
 
-    Config::SetDefault("ns3::SatGeoFeederPhy::QueueSize", UintegerValue(100000));
+    Config::SetDefault("ns3::SatOrbiterFeederPhy::QueueSize", UintegerValue(100000));
 
     // Enable SatMac traces
     Config::SetDefault("ns3::SatPhy::EnableStatisticsTags", BooleanValue(true));
@@ -1897,14 +1921,22 @@ SatRegenerationTest8::DoRun(void)
 
     m_helper = simulationHelper->GetSatelliteHelper();
 
-    std::map<uint32_t, Ptr<SatPhy>> satGeoFeederPhy =
-        DynamicCast<SatGeoNetDevice>(m_helper->GeoSatNodes().Get(0)->GetDevice(0))->GetFeederPhy();
-    std::map<uint32_t, Ptr<SatPhy>> satGeoUserPhy =
-        DynamicCast<SatGeoNetDevice>(m_helper->GeoSatNodes().Get(0)->GetDevice(0))->GetUserPhy();
-    std::map<uint32_t, Ptr<SatMac>> satGeoFeederMac =
-        DynamicCast<SatGeoNetDevice>(m_helper->GeoSatNodes().Get(0)->GetDevice(0))->GetFeederMac();
-    std::map<uint32_t, Ptr<SatMac>> satGeoUserMac =
-        DynamicCast<SatGeoNetDevice>(m_helper->GeoSatNodes().Get(0)->GetDevice(0))->GetUserMac();
+    std::map<uint32_t, Ptr<SatPhy>> satOrbiterFeederPhy =
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
+            ->GetFeederPhy();
+    std::map<uint32_t, Ptr<SatPhy>> satOrbiterUserPhy =
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
+            ->GetUserPhy();
+    std::map<uint32_t, Ptr<SatMac>> satOrbiterFeederMac =
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
+            ->GetFeederMac();
+    std::map<uint32_t, Ptr<SatMac>> satOrbiterUserMac =
+        DynamicCast<SatOrbiterNetDevice>(
+            Singleton<SatTopology>::Get()->GetOrbiterNode(0)->GetDevice(0))
+            ->GetUserMac();
 
     Config::ConnectWithoutContext("/NodeList/0/DeviceList/0/UserPhy/*/PacketTrace",
                                   MakeCallback(&SatRegenerationTest8::AddTraceEntry, this));
@@ -1924,28 +1956,27 @@ SatRegenerationTest8::DoRun(void)
                                       MakeCallback(&SatRegenerationTest8::AddTraceEntry, this));
     }
 
-    Time startTime = Seconds(1);
-    Time stopTime = Seconds(15);
-    Time startDelay = MilliSeconds(10);
-    Time interval = MilliSeconds(100);
-    uint32_t packetSize = 512;
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::FWD_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(100),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(15),
+        MilliSeconds(10));
 
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(interval));
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          startTime,
-                                          stopTime,
-                                          startDelay);
-
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::FWD_LINK,
-                                          startTime,
-                                          stopTime,
-                                          startDelay);
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        MilliSeconds(100),
+        512,
+        Singleton<SatTopology>::Get()->GetGwUserNodes(),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        Seconds(1),
+        Seconds(15),
+        MilliSeconds(10));
 
     simulationHelper->RunSimulation();
 

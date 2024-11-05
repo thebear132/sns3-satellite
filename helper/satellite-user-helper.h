@@ -202,7 +202,6 @@ class SatUserHelper : public Object
     NodeContainer InstallUt(Ptr<Node> ut, uint32_t users);
 
     /**
-     * \param gw a set of GW nodes
      * \param users number of users to install for GWs. If gw has more than one GWs then
      * IP router is added between GWs and users.
      *
@@ -211,15 +210,8 @@ class SatUserHelper : public Object
      * GW and their users. In case of more than one GW channel is created between GW and router and
      * between router and users.
      *
-     * \return  node container of created users for the GWs (and router).
-     *
      */
-    NodeContainer InstallGw(NodeContainer gw, uint32_t users);
-
-    /**
-     * \return A container having all GW user nodes in satellite network.
-     */
-    NodeContainer GetGwUsers() const;
+    void InstallGw(uint32_t users);
 
     /**
      * Check if node is GW user or not.
@@ -228,45 +220,6 @@ class SatUserHelper : public Object
      * \return true when requested node is GW user node, false in other case.
      */
     bool IsGwUser(Ptr<Node> node) const;
-
-    /**
-     * \return A container having all UT user nodes in satellite network.
-     */
-    NodeContainer GetUtUsers() const;
-
-    /**
-     * \param ut  Pointer to UT node, which user nodes are requested.
-     * \return A container having UT specific user nodes in satellite network.
-     */
-    NodeContainer GetUtUsers(Ptr<Node> ut) const;
-
-    /**
-     * \return number of GW users in satellite network.
-     */
-    uint32_t GetGwUserCount() const;
-
-    /**
-     * \return number of all UT users in satellite network.
-     */
-    uint32_t GetUtUserCount() const;
-
-    /**
-     * \param ut Pointer to UT node, which user node count is requested.
-     * \return number of UT specific users in satellite network.
-     */
-    uint32_t GetUtUserCount(Ptr<Node> ut) const;
-
-    /**
-     * \param utUserNode Pointer to the UT user node
-     * \return a pointer to the UT node which serves the specified UT user node,
-     *         or zero if the UT user node is invalid
-     */
-    Ptr<Node> GetUtNode(Ptr<Node> utUserNode) const;
-
-    /**
-     * \return All UT nodes in satellite network
-     */
-    NodeContainer GetUtNodes() const;
 
     /**
      * Enables creation traces to be written in given file
@@ -350,19 +303,14 @@ class SatUserHelper : public Object
     /**
      * Install IP router to to Gateways. Creates csma link between gateways and router.
      *
-     * \param gw      container having GWs
      * \param router  pointer to IP router
      */
-    void InstallRouter(NodeContainer gw, Ptr<Node> router);
+    void InstallRouter(Ptr<Node> router);
 
     CsmaHelper m_csma;
     Ipv4AddressHelper m_ipv4Ut;
     Ipv4AddressHelper m_ipv4Gw;
     Ipv4AddressHelper m_ipv4Beam;
-
-    NodeContainer m_gwUsers;
-    UtUsersContainer_t m_utUsers;
-    NodeContainer m_allUtUsers;
 
     NetworkType m_backboneNetworkType;
     NetworkType m_subscriberNetworkType;

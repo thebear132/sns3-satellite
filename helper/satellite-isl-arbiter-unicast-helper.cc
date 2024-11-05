@@ -25,6 +25,8 @@
 
 #include <ns3/node-container.h>
 #include <ns3/node.h>
+#include <ns3/satellite-topology.h>
+#include <ns3/singleton.h>
 
 NS_LOG_COMPONENT_DEFINE("SatIslArbiterUnicastHelper");
 
@@ -48,10 +50,8 @@ SatIslArbiterUnicastHelper::SatIslArbiterUnicastHelper()
 }
 
 SatIslArbiterUnicastHelper::SatIslArbiterUnicastHelper(
-    NodeContainer geoNodes,
     std::vector<std::pair<uint32_t, uint32_t>> isls)
-    : m_geoNodes(geoNodes),
-      m_isls(isls)
+    : m_isls(isls)
 {
     NS_LOG_FUNCTION(this);
 }
@@ -65,22 +65,23 @@ SatIslArbiterUnicastHelper::InstallArbiters()
 
     for (uint32_t satIndex = 0; satIndex < globalState.size(); satIndex++)
     {
-        Ptr<Node> satelliteNode = m_geoNodes.Get(satIndex);
-        Ptr<SatGeoNetDevice> satelliteGeoNetDevice;
+        Ptr<Node> satelliteNode = Singleton<SatTopology>::Get()->GetOrbiterNode(satIndex);
+        Ptr<SatOrbiterNetDevice> satelliteOrbiterNetDevice;
         for (uint32_t ndIndex = 0; ndIndex < satelliteNode->GetNDevices(); ndIndex++)
         {
-            Ptr<SatGeoNetDevice> nd =
-                DynamicCast<SatGeoNetDevice>(satelliteNode->GetDevice(ndIndex));
+            Ptr<SatOrbiterNetDevice> nd =
+                DynamicCast<SatOrbiterNetDevice>(satelliteNode->GetDevice(ndIndex));
             if (nd != nullptr)
             {
-                satelliteGeoNetDevice = nd;
+                satelliteOrbiterNetDevice = nd;
             }
         }
 
-        NS_ASSERT_MSG(satelliteGeoNetDevice != nullptr, "SatGeoNetDevice not found on satellite");
+        NS_ASSERT_MSG(satelliteOrbiterNetDevice != nullptr,
+                      "SatOrbiterNetDevice not found on satellite");
 
         std::vector<Ptr<PointToPointIslNetDevice>> islNetDevices =
-            satelliteGeoNetDevice->GetIslsNetDevices();
+            satelliteOrbiterNetDevice->GetIslsNetDevices();
         Ptr<SatIslArbiterUnicast> arbiter = CreateObject<SatIslArbiterUnicast>(satelliteNode);
 
         for (uint32_t islInterfaceIndex = 0; islInterfaceIndex < islNetDevices.size();
@@ -101,7 +102,7 @@ SatIslArbiterUnicastHelper::InstallArbiters()
                 }
             }
         }
-        satelliteGeoNetDevice->SetArbiter(arbiter);
+        satelliteOrbiterNetDevice->SetArbiter(arbiter);
     }
 }
 
@@ -124,7 +125,7 @@ SatIslArbiterUnicastHelper::CalculateGlobalState()
     ///////////////////////////
     // Floyd-Warshall
 
-    int64_t n = m_geoNodes.GetN();
+    int64_t n = Singleton<SatTopology>::Get()->GetNOrbiterNodes();
 
     // Enforce that more than 40000 nodes is not permitted (sqrt(2^31) ~= 46340, so let's call it an
     // even 40000)

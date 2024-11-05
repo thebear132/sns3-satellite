@@ -19,8 +19,8 @@
  *         Bastien Tauran <bastien.tauran@viveris.fr>
  */
 
-#ifndef SATELLITE_GEO_FEEDER_PHY_H
-#define SATELLITE_GEO_FEEDER_PHY_H
+#ifndef SATELLITE_ORBITER_FEEDER_PHY_H
+#define SATELLITE_ORBITER_FEEDER_PHY_H
 
 #include "satellite-frame-conf.h"
 #include "satellite-phy.h"
@@ -47,28 +47,28 @@ class SatPhyRxCarrierPerWindow;
 /**
  * \ingroup satellite
  *
- * The SatGeoFeederPhy models the feeder link physical layer of the
+ * The SatOrbiterFeederPhy models the feeder link physical layer of the
  * satellite node.
  */
-class SatGeoFeederPhy : public SatPhy
+class SatOrbiterFeederPhy : public SatPhy
 {
   public:
     /**
      * Default constructor
      */
-    SatGeoFeederPhy(void);
+    SatOrbiterFeederPhy(void);
 
-    SatGeoFeederPhy(SatPhy::CreateParam_t& params,
-                    Ptr<SatLinkResults> linkResults,
-                    SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
-                    Ptr<SatSuperframeConf> superFrameConf,
-                    SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
-                    SatEnums::RegenerationMode_t returnLinkRegenerationMode);
+    SatOrbiterFeederPhy(SatPhy::CreateParam_t& params,
+                        Ptr<SatLinkResults> linkResults,
+                        SatPhyRxCarrierConf::RxCarrierCreateParams_s parameters,
+                        Ptr<SatSuperframeConf> superFrameConf,
+                        SatEnums::RegenerationMode_t forwardLinkRegenerationMode,
+                        SatEnums::RegenerationMode_t returnLinkRegenerationMode);
 
     /**
-     * Destructor for SatGeoFeederPhy
+     * Destructor for SatOrbiterFeederPhy
      */
-    virtual ~SatGeoFeederPhy();
+    virtual ~SatOrbiterFeederPhy();
 
     /**
      * inherited from Object
@@ -83,7 +83,7 @@ class SatGeoFeederPhy : public SatPhy
     virtual void DoDispose(void);
 
     /**
-     * \brief Send Pdu to the PHY tx module (for GEO satellite switch packet forwarding)
+     * \brief Send Pdu to the PHY tx module (for satellite switch packet forwarding)
      * \param rxParams Transmission parameters
      */
     virtual void SendPduWithParams(Ptr<SatSignalParameters> rxParams);
@@ -93,7 +93,7 @@ class SatGeoFeederPhy : public SatPhy
      *
      * \param rxParams Packet reception parameters
      * \param phyError Boolean indicating whether the packet successfully
-     * received or not? Note, that this parameter is not used in the GEO satellite,
+     * received or not? Note, that this parameter is not used in the satellite,
      * but exists since we are using a general interface defined in the parent
      * class.
      */
@@ -219,4 +219,4 @@ class SatGeoFeederPhy : public SatPhy
 
 } // namespace ns3
 
-#endif /* SATELLITE_GEO_FEEDER_PHY_H */
+#endif /* SATELLITE_ORBITER_FEEDER_PHY_H */

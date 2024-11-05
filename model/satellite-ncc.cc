@@ -317,7 +317,7 @@ void
 SatNcc::AddBeam(uint32_t satId,
                 uint32_t beamId,
                 Ptr<SatNetDevice> gwNetDevice,
-                Ptr<SatGeoNetDevice> geoNetDevice,
+                Ptr<SatOrbiterNetDevice> orbiterNetDevice,
                 SatNcc::SendCallback cb,
                 SatNcc::SendTbtpCallback tbtpCb,
                 Ptr<SatSuperframeSeq> seq,
@@ -325,8 +325,8 @@ SatNcc::AddBeam(uint32_t satId,
                 Address satAddress,
                 Address gwAddress)
 {
-    NS_LOG_FUNCTION(this << satId << beamId << gwNetDevice << geoNetDevice << &cb << &tbtpCb << seq
-                         << maxFrameSize << satAddress << gwAddress);
+    NS_LOG_FUNCTION(this << satId << beamId << gwNetDevice << orbiterNetDevice << &cb << &tbtpCb
+                         << seq << maxFrameSize << satAddress << gwAddress);
 
     Ptr<SatBeamScheduler> scheduler;
     std::map<std::pair<uint32_t, uint32_t>, Ptr<SatBeamScheduler>>::iterator iterator =
@@ -341,7 +341,7 @@ SatNcc::AddBeam(uint32_t satId,
     scheduler->Initialize(satId,
                           beamId,
                           gwNetDevice,
-                          geoNetDevice,
+                          orbiterNetDevice,
                           cb,
                           seq,
                           maxFrameSize,

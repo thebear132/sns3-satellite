@@ -95,7 +95,6 @@ main(int argc, char* argv[])
     simulationHelper->LoadScenario("geo-33E");
 
     // Creating the reference system.
-    Ptr<SatHelper> helper;
     switch (profilingConf)
     {
     // Single beam
@@ -109,7 +108,7 @@ main(int argc, char* argv[])
         simulationHelper->SetUserCountPerUt(endUsersPerUt);
         simulationHelper->SetBeamSet({beamId});
         simulationHelper->SetSimulationTime(simLength);
-        helper = simulationHelper->CreateSatScenario();
+        simulationHelper->CreateSatScenario();
         break;
     }
     // Full
@@ -117,7 +116,7 @@ main(int argc, char* argv[])
         simLength = 30.0; // in seconds
 
         simulationHelper->SetSimulationTime(simLength);
-        helper = simulationHelper->CreateSatScenario(SatHelper::FULL);
+        simulationHelper->CreateSatScenario(SatHelper::FULL);
         break;
     }
     default: {
@@ -128,20 +127,21 @@ main(int argc, char* argv[])
     /**
      * Set-up CBR traffic
      */
-
-    Config::SetDefault("ns3::CbrApplication::PacketSize", UintegerValue(packetSize));
-    Config::SetDefault("ns3::CbrApplication::Interval", TimeValue(Seconds(intervalSeconds)));
-    simulationHelper->InstallTrafficModel(SimulationHelper::CBR,
-                                          SimulationHelper::UDP,
-                                          SimulationHelper::RTN_LINK,
-                                          appStartTime,
-                                          Seconds(simLength + 1),
-                                          MilliSeconds(10));
+    simulationHelper->GetTrafficHelper()->AddCbrTraffic(
+        SatTrafficHelper::RTN_LINK,
+        SatTrafficHelper::UDP,
+        Seconds(intervalSeconds),
+        packetSize,
+        NodeContainer(Singleton<SatTopology>::Get()->GetGwUserNode(0)),
+        Singleton<SatTopology>::Get()->GetUtUserNodes(),
+        appStartTime,
+        Seconds(simLength + 1),
+        MilliSeconds(10));
 
     /**
      * Set-up statistics
      */
-    Ptr<SatStatsHelperContainer> s = CreateObject<SatStatsHelperContainer>(helper);
+    Ptr<SatStatsHelperContainer> s = simulationHelper->GetStatisticsContainer();
 
     s->AddPerBeamRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_FILE);
     s->AddPerBeamRtnAppThroughput(SatStatsHelper::OUTPUT_SCATTER_PLOT);

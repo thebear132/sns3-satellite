@@ -28,11 +28,11 @@
  *
  */
 
-#include "../helper/satellite-helper.h"
-#include "../utils/satellite-env-variables.h"
-
 #include "ns3/core-module.h"
+#include "ns3/satellite-env-variables.h"
+#include "ns3/satellite-helper.h"
 #include "ns3/satellite-id-mapper.h"
+#include "ns3/satellite-topology.h"
 #include "ns3/simulator.h"
 #include "ns3/singleton.h"
 #include "ns3/string.h"
@@ -102,8 +102,12 @@ ScenarioCreationSimple::DoRun(void)
     helper->CreatePredefinedScenario(SatHelper::SIMPLE);
 
     // check results what can be done at this level. More checking done in module level with traces
-    NS_TEST_ASSERT_MSG_EQ(helper->GetGwUsers().GetN(), 1, "GW User count is not what expected!");
-    NS_TEST_ASSERT_MSG_EQ(helper->GetUtUsers().GetN(), 1, "UT User count is not what expected!");
+    NS_TEST_ASSERT_MSG_EQ(Singleton<SatTopology>::Get()->GetGwUserNodes().GetN(),
+                          1,
+                          "GW User count is not what expected!");
+    NS_TEST_ASSERT_MSG_EQ(Singleton<SatTopology>::Get()->GetNUtUserNodes(),
+                          1,
+                          "UT User count is not what expected!");
 
     Singleton<SatEnvVariables>::Get()->DoDispose();
 
@@ -172,8 +176,12 @@ ScenarioCreationLarger::DoRun(void)
     helper->CreatePredefinedScenario(SatHelper::LARGER);
 
     // check results what can be done at this level. More checking done in module level with traces
-    NS_TEST_ASSERT_MSG_EQ(helper->GetGwUsers().GetN(), 1, "GW User count is not what expected!");
-    NS_TEST_ASSERT_MSG_EQ(helper->GetUtUsers().GetN(), 5, "UT User count is not what expected!");
+    NS_TEST_ASSERT_MSG_EQ(Singleton<SatTopology>::Get()->GetGwUserNodes().GetN(),
+                          1,
+                          "GW User count is not what expected!");
+    NS_TEST_ASSERT_MSG_EQ(Singleton<SatTopology>::Get()->GetNUtUserNodes(),
+                          5,
+                          "UT User count is not what expected!");
 
     Singleton<SatEnvVariables>::Get()->DoDispose();
 
@@ -245,10 +253,12 @@ ScenarioCreationFull::DoRun(void)
     // reference system includes 98 beams and we create three UTs with three users per UT in full
     // scenario and five GW users
 
-    NS_TEST_ASSERT_MSG_EQ(helper->GetGwUsers().GetN(), 5, "GW User count is not what expected!");
-    // NS_TEST_ASSERT_MSG_EQ (helper->GetUtUsers().GetN(), 98*3*3, "UT User count is not what
-    // expected!");
-    NS_TEST_ASSERT_MSG_EQ(helper->GetUtUsers().GetN(),
+    NS_TEST_ASSERT_MSG_EQ(Singleton<SatTopology>::Get()->GetGwUserNodes().GetN(),
+                          5,
+                          "GW User count is not what expected!");
+    // NS_TEST_ASSERT_MSG_EQ (Singleton<SatTopology>::Get()->GetNUtUserNodes(), 98*3*3, "UT User
+    // count is not what expected!");
+    NS_TEST_ASSERT_MSG_EQ(Singleton<SatTopology>::Get()->GetNUtUserNodes(),
                           72 * 3 * 3,
                           "UT User count is not what expected!");
 
@@ -328,8 +338,12 @@ ScenarioCreationUser::DoRun(void)
     helper->CreateUserDefinedScenario(beamMap);
 
     // check results what can be done at this level. More checking done in module level with traces
-    NS_TEST_ASSERT_MSG_EQ(helper->GetGwUsers().GetN(), 5, "GW User count is not what expected!");
-    NS_TEST_ASSERT_MSG_EQ(helper->GetUtUsers().GetN(), 5, "UT User count is not what expected!");
+    NS_TEST_ASSERT_MSG_EQ(Singleton<SatTopology>::Get()->GetGwUserNodes().GetN(),
+                          5,
+                          "GW User count is not what expected!");
+    NS_TEST_ASSERT_MSG_EQ(Singleton<SatTopology>::Get()->GetNUtUserNodes(),
+                          5,
+                          "UT User count is not what expected!");
 
     Singleton<SatEnvVariables>::Get()->DoDispose();
 

@@ -96,7 +96,7 @@ SatPhy::SatPhy(CreateParam_t& params)
 
     switch (params.m_standard)
     {
-    case SatEnums::GEO:
+    case SatEnums::ORBITER:
     case SatEnums::DVB_UT:
     case SatEnums::DVB_GW: {
         m_phyTx = CreateObject<SatPhyTx>();

@@ -36,7 +36,7 @@ namespace ns3
 {
 
 /**
- * \brief Creates needed objects for DVB GW nodes like SatGeoNetDevice objects.
+ * \brief Creates needed objects for DVB GW nodes like SatOrbiterNetDevice objects.
  *        Handles needed configuration for the GW nodes.
  *
  */

@@ -244,7 +244,7 @@ SatConf::Initialize(std::string rtnConf,
     // Load satellite position
     if (!isConstellation)
     {
-        LoadPositions(satPos, m_geoSatPosition);
+        LoadPositions(satPos, m_satPosition);
     }
 
     // Load UT positions
@@ -664,7 +664,7 @@ SatConf::GetSatCount() const
     }
     else
     {
-        return m_geoSatPosition.size();
+        return m_satPosition.size();
     }
 }
 
@@ -798,12 +798,12 @@ SatConf::GetUtPosition(uint32_t utId) const
 }
 
 GeoCoordinate
-SatConf::GetGeoSatPosition() const
+SatConf::GetSatPosition() const
 {
     NS_LOG_FUNCTION(this);
-    NS_ASSERT(m_geoSatPosition.size() == 1);
+    NS_ASSERT(m_satPosition.size() == 1);
 
-    return m_geoSatPosition[0];
+    return m_satPosition[0];
 }
 
 std::string
