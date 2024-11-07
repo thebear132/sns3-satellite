@@ -24,6 +24,10 @@
 
 #include <ns3/log.h>
 
+#include <map>
+#include <set>
+#include <utility>
+
 NS_LOG_COMPONENT_DEFINE("SatRandomAccess");
 
 namespace ns3

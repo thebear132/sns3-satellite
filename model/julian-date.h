@@ -31,6 +31,7 @@
 #include <ostream>
 #include <stdint.h>
 #include <string>
+#include <utility>
 
 namespace ns3
 {

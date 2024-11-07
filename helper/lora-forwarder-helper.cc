@@ -30,6 +30,8 @@
 #include <ns3/string.h>
 #include <ns3/trace-source-accessor.h>
 
+#include <string>
+
 NS_LOG_COMPONENT_DEFINE("LoraForwarderHelper");
 
 namespace ns3

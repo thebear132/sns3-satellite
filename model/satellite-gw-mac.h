@@ -29,6 +29,10 @@
 #include <ns3/ptr.h>
 #include <ns3/traced-callback.h>
 
+#include <map>
+#include <set>
+#include <vector>
+
 namespace ns3
 {
 

@@ -33,12 +33,15 @@
 #include <ns3/uinteger.h>
 
 #include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <limits>
 #include <map>
 #include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
 
 NS_LOG_COMPONENT_DEFINE("SatWaveformConf");
 

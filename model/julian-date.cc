@@ -31,12 +31,16 @@
 #include <ns3/assert.h>
 #include <ns3/nstime.h>
 
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <iomanip>
+#include <ostream>
 #include <sstream>
 #include <stdint.h>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace ns3
 {

@@ -48,6 +48,12 @@
 #include <ns3/trace-source-accessor.h>
 #include <ns3/uinteger.h>
 
+#include <limits>
+#include <map>
+#include <set>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatOrbiterNetDevice");
 
 namespace ns3

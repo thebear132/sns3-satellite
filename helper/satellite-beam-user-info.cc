@@ -23,6 +23,9 @@
 #include "ns3/assert.h"
 #include "ns3/log.h"
 
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatBeamUserInfo");
 
 namespace ns3

@@ -24,6 +24,9 @@
 
 #include <ns3/log.h>
 
+#include <algorithm>
+#include <ostream>
+
 NS_LOG_COMPONENT_DEFINE("SatPPduHeader");
 
 namespace ns3

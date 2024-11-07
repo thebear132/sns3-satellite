@@ -39,7 +39,9 @@
 #include <ns3/string.h>
 
 #include <list>
+#include <map>
 #include <sstream>
+#include <string>
 #include <utility>
 
 NS_LOG_COMPONENT_DEFINE("SatStatsWaveformUsageHelper");

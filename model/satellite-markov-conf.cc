@@ -22,7 +22,10 @@
 
 #include <ns3/log.h>
 
+#include <cstdlib>
 #include <map>
+#include <utility>
+#include <vector>
 
 namespace ns3
 {

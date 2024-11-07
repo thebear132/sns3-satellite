@@ -24,6 +24,8 @@
 #include <ns3/simulator.h>
 #include <ns3/uinteger.h>
 
+#include <vector>
+
 namespace ns3
 {
 

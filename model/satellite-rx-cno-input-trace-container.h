@@ -28,6 +28,10 @@
 #include <ns3/mac48-address.h>
 #include <ns3/satellite-input-fstream-time-double-container.h>
 
+#include <map>
+#include <string>
+#include <utility>
+
 namespace ns3
 {
 

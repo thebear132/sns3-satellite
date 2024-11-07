@@ -37,6 +37,8 @@
 #include "ns3/simulator.h"
 #include "ns3/uinteger.h"
 
+#include <cstddef>
+
 NS_LOG_COMPONENT_DEFINE("PointToPointIslNetDevice");
 
 namespace ns3

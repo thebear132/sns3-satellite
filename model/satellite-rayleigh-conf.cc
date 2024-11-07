@@ -23,6 +23,7 @@
 #include "satellite-markov-conf.h"
 
 #include <map>
+#include <vector>
 
 namespace ns3
 {

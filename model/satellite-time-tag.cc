@@ -20,6 +20,8 @@
 
 #include "satellite-time-tag.h"
 
+#include <ostream>
+
 namespace ns3
 {
 

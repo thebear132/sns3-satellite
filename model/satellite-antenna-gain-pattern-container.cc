@@ -27,11 +27,17 @@
 #include "ns3/singleton.h"
 #include "ns3/string.h"
 
+#include <cmath>
+#include <cstddef>
 #include <dirent.h>
 #include <errno.h>
 #include <fstream>
+#include <limits>
+#include <map>
 #include <sstream>
 #include <string.h>
+#include <string>
+#include <utility>
 
 NS_LOG_COMPONENT_DEFINE("SatAntennaGainPatternContainer");
 

@@ -42,6 +42,8 @@
 #include <ns3/unit-conversion-collector.h>
 
 #include <sstream>
+#include <string>
+#include <vector>
 
 NS_LOG_COMPONENT_DEFINE("SatStatsPacketDropRateHelper");
 

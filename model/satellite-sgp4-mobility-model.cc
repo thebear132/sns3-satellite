@@ -31,6 +31,9 @@
 #include <ns3/simulator.h>
 #include <ns3/string.h>
 
+#include <string>
+#include <utility>
+
 NS_LOG_COMPONENT_DEFINE("SatSGP4MobilityModel");
 
 namespace ns3

@@ -22,6 +22,8 @@
 
 #include <ns3/log.h>
 
+#include <utility>
+
 NS_LOG_COMPONENT_DEFINE("SatFadingInputTrace");
 
 namespace ns3

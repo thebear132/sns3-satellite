@@ -22,6 +22,11 @@
 
 #include "satellite-utils.h"
 
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatFwdLinkSchedulerTimeSlicing");
 
 namespace ns3

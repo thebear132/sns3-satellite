@@ -28,6 +28,10 @@
 #include <ns3/simulator.h>
 #include <ns3/uinteger.h>
 
+#include <map>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatHandoverModule");
 
 namespace ns3

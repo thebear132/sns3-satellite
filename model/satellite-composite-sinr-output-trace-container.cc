@@ -28,6 +28,12 @@
 #include <ns3/singleton.h>
 #include <ns3/string.h>
 
+#include <ios>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatCompositeSinrOutputTraceContainer");
 
 namespace ns3

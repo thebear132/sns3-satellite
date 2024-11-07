@@ -30,6 +30,8 @@
 #include <ns3/mac48-address.h>
 #include <ns3/simulator.h>
 
+#include <algorithm>
+
 NS_LOG_COMPONENT_DEFINE("SatGenericStreamEncapsulator");
 
 namespace ns3

@@ -23,6 +23,13 @@
 
 #include "satellite-isl-arbiter-unicast.h"
 
+#include <iostream>
+#include <map>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatIslArbiterUnicast");
 
 namespace ns3

@@ -31,6 +31,8 @@
 #include <ns3/string.h>
 
 #include <algorithm>
+#include <utility>
+#include <vector>
 
 NS_LOG_COMPONENT_DEFINE("SatBstpController");
 

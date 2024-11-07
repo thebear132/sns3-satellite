@@ -29,6 +29,7 @@
 #include <ns3/satellite-bbframe.h>
 
 #include <map>
+#include <string>
 
 namespace ns3
 {

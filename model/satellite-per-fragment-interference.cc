@@ -23,6 +23,10 @@
 #include <ns3/log.h>
 #include <ns3/simulator.h>
 
+#include <cstddef>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatPerFragmentInterference");
 
 namespace ns3

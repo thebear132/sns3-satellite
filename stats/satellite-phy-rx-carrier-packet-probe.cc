@@ -35,6 +35,8 @@
 #include <ns3/simulator.h>
 #include <ns3/traced-value.h>
 
+#include <string>
+
 NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierPacketProbe");
 
 namespace ns3

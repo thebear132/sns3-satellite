@@ -28,7 +28,13 @@
 #include <ns3/singleton.h>
 #include <ns3/string.h>
 
+#include <cstdlib>
 #include <fstream>
+#include <ios>
+#include <limits>
+#include <map>
+#include <string>
+#include <utility>
 
 NS_LOG_COMPONENT_DEFINE("SatFadingExternalInputTraceContainer");
 

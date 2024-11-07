@@ -31,6 +31,9 @@
 #include <ns3/satellite-stats-helper-container.h>
 #include <ns3/string.h>
 
+#include <map>
+#include <string>
+
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 

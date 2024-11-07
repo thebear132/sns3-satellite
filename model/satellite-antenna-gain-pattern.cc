@@ -26,7 +26,14 @@
 #include "ns3/log.h"
 
 #include <algorithm>
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <limits>
 #include <stdlib.h>
+#include <string>
+#include <utility>
+#include <vector>
 
 NS_LOG_COMPONENT_DEFINE("SatAntennaGainPattern");
 

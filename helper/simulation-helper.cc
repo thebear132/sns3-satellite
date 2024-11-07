@@ -44,6 +44,14 @@
 #include <ns3/three-gpp-http-satellite-helper.h>
 #include <ns3/uinteger.h>
 
+#include <iostream>
+#include <map>
+#include <set>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SimulationHelper");
 
 namespace ns3

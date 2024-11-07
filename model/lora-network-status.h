@@ -31,6 +31,7 @@
 #include "lorawan-mac-end-device-class-a.h"
 
 #include <iterator>
+#include <map>
 
 namespace ns3
 {

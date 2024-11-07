@@ -25,6 +25,9 @@
 
 #include <ns3/log.h>
 
+#include <algorithm>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatDamaEntry");
 
 namespace ns3

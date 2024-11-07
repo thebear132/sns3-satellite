@@ -31,6 +31,9 @@
 #include <ns3/packet.h>
 #include <ns3/ptr.h>
 
+#include <utility>
+#include <vector>
+
 namespace ns3
 {
 

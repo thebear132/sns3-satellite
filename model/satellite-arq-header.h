@@ -23,6 +23,7 @@
 
 #include <ns3/header.h>
 
+#include <ostream>
 #include <vector>
 
 namespace ns3

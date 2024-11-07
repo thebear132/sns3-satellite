@@ -41,6 +41,8 @@
 #include <ns3/uinteger.h>
 
 #include <limits>
+#include <queue>
+#include <tuple>
 
 NS_LOG_COMPONENT_DEFINE("SatOrbiterUserPhy");
 

@@ -30,6 +30,7 @@
 #include <ns3/simulator.h>
 
 #include <algorithm>
+#include <deque>
 #include <limits>
 #include <ostream>
 #include <utility>

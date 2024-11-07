@@ -28,6 +28,8 @@
 #include <ns3/ptr.h>
 #include <ns3/simple-ref-count.h>
 
+#include <map>
+#include <string>
 #include <vector>
 
 namespace ns3

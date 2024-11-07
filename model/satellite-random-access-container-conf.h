@@ -32,6 +32,7 @@
 #include <ns3/uinteger.h>
 
 #include <map>
+#include <vector>
 
 namespace ns3
 {

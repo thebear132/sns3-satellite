@@ -24,6 +24,8 @@
 
 #include <ns3/log.h>
 
+#include <vector>
+
 namespace ns3
 {
 

@@ -27,6 +27,9 @@
 #include <ns3/nstime.h>
 #include <ns3/object.h>
 
+#include <list>
+#include <ostream>
+
 namespace ns3
 {
 

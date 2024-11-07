@@ -34,6 +34,9 @@
 #include <ns3/propagation-delay-model.h>
 #include <ns3/traced-callback.h>
 
+#include <cstddef>
+#include <vector>
+
 namespace ns3
 {
 

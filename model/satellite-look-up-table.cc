@@ -27,6 +27,8 @@
 #include <ns3/log.h>
 
 #include <cmath>
+#include <fstream>
+#include <string>
 
 NS_LOG_COMPONENT_DEFINE("SatLookUpTable");
 

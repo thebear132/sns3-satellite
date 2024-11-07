@@ -28,6 +28,10 @@
 #include <ns3/satellite-topology.h>
 #include <ns3/singleton.h>
 
+#include <map>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatIslArbiterUnicastHelper");
 
 namespace ns3

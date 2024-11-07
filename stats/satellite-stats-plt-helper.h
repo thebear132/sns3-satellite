@@ -30,6 +30,7 @@
 
 #include <list>
 #include <map>
+#include <utility>
 
 namespace ns3
 {

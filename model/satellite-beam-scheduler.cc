@@ -44,8 +44,10 @@
 #include <ns3/singleton.h>
 
 #include <algorithm>
+#include <map>
 #include <sstream>
 #include <utility>
+#include <vector>
 
 NS_LOG_COMPONENT_DEFINE("SatBeamScheduler");
 

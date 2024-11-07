@@ -34,6 +34,9 @@
 #include <ns3/singleton.h>
 #include <ns3/string.h>
 
+#include <sstream>
+#include <string>
+
 NS_LOG_COMPONENT_DEFINE("SatStatsCapacityRequestHelper");
 
 namespace ns3

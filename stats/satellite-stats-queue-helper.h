@@ -29,6 +29,7 @@
 #include <ns3/ptr.h>
 
 #include <list>
+#include <string>
 #include <utility>
 
 namespace ns3

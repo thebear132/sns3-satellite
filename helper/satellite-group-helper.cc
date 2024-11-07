@@ -26,6 +26,13 @@
 #include <ns3/satellite-topology.h>
 #include <ns3/singleton.h>
 
+#include <algorithm>
+#include <list>
+#include <map>
+#include <set>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatGroupHelper");
 
 namespace ns3

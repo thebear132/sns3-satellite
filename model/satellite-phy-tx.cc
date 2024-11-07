@@ -36,6 +36,7 @@
 #include <ns3/simulator.h>
 
 #include <cmath>
+#include <ostream>
 
 NS_LOG_COMPONENT_DEFINE("SatPhyTx");
 

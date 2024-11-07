@@ -26,6 +26,10 @@
 #include <ns3/log.h>
 #include <ns3/simulator.h>
 
+#include <list>
+#include <map>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierMarsala");
 
 namespace ns3

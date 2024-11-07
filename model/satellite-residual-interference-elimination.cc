@@ -27,6 +27,11 @@
 #include <ns3/log.h>
 #include <ns3/simulator.h>
 
+#include <cmath>
+#include <limits>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatResidualInterferenceElimination");
 
 namespace ns3

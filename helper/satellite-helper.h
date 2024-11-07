@@ -42,7 +42,11 @@
 #include <ns3/satellite-stats-helper-container.h>
 #include <ns3/trace-helper.h>
 
+#include <map>
+#include <set>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace ns3
 {

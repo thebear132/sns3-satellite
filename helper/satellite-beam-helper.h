@@ -40,10 +40,12 @@
 #include <ns3/satellite-superframe-sequence.h>
 #include <ns3/satellite-typedefs.h>
 
+#include <list>
 #include <map>
 #include <set>
 #include <stdint.h>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace ns3

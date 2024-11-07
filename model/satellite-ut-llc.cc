@@ -39,6 +39,9 @@
 #include <ns3/pointer.h>
 #include <ns3/simulator.h>
 
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatUtLlc");
 
 namespace ns3

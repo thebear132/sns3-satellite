@@ -26,6 +26,10 @@
 
 #include "ns3/satellite-beam-user-info.h"
 
+#include <map>
+#include <string>
+#include <utility>
+
 namespace ns3
 {
 

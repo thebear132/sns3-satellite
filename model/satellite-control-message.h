@@ -34,7 +34,9 @@
 #include <ns3/simulator.h>
 
 #include <map>
+#include <ostream>
 #include <set>
+#include <utility>
 #include <vector>
 
 namespace ns3

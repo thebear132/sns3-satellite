@@ -27,6 +27,8 @@
 #include <ns3/simulator.h>
 #include <ns3/singleton.h>
 
+#include <string>
+
 NS_LOG_COMPONENT_DEFINE("SatTracedMobilityModel");
 
 namespace ns3

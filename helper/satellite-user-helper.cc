@@ -39,6 +39,13 @@
 #include <ns3/satellite-typedefs.h>
 #include <ns3/singleton.h>
 
+#include <iostream>
+#include <map>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatUserHelper");
 
 namespace ns3

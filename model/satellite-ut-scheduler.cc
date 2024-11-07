@@ -30,6 +30,7 @@
 #include <ns3/uinteger.h>
 
 #include <algorithm>
+#include <vector>
 
 NS_LOG_COMPONENT_DEFINE("SatUtScheduler");
 

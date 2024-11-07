@@ -25,6 +25,9 @@
 
 #include <ns3/pointer.h>
 
+#include <utility>
+#include <vector>
+
 namespace ns3
 {
 

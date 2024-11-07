@@ -30,6 +30,8 @@
 
 #include <fstream>
 #include <set>
+#include <string>
+#include <utility>
 #include <vector>
 
 namespace ns3

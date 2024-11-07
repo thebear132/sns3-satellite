@@ -33,6 +33,10 @@
 #include <ns3/object.h>
 
 #include <deque>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace ns3
 {

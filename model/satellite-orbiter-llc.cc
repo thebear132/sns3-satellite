@@ -24,6 +24,9 @@
 #include "satellite-time-tag.h"
 #include "satellite-utils.h"
 
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatOrbiterLlc");
 
 namespace ns3

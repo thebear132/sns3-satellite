@@ -26,6 +26,9 @@
 
 #include <bitset>
 #include <cmath>
+#include <iostream>
+#include <list>
+#include <ostream>
 
 namespace ns3
 {

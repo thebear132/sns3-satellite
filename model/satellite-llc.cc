@@ -33,6 +33,8 @@
 #include <ns3/nstime.h>
 #include <ns3/simulator.h>
 
+#include <utility>
+
 NS_LOG_COMPONENT_DEFINE("SatLlc");
 
 namespace ns3

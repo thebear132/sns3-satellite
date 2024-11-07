@@ -27,6 +27,9 @@
 #include <ns3/packet.h>
 #include <ns3/simulator.h>
 
+#include <cstddef>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatSimpleChannel");
 
 namespace ns3

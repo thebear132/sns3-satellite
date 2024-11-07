@@ -50,6 +50,11 @@
 #include "ns3/singleton.h"
 #include "ns3/uinteger.h"
 
+#include <algorithm>
+#include <string>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatOrbiterHelper");
 
 namespace ns3

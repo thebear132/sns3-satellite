@@ -22,6 +22,9 @@
 
 #include <ns3/log.h>
 
+#include <limits>
+#include <map>
+
 NS_LOG_COMPONENT_DEFINE("SatArqSequenceNumber");
 
 namespace ns3

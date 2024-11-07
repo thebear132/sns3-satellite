@@ -26,6 +26,8 @@
 
 #include <ns3/ptr.h>
 
+#include <vector>
+
 namespace ns3
 {
 

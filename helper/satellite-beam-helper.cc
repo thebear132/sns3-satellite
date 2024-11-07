@@ -65,6 +65,17 @@
 #include <ns3/string.h>
 #include <ns3/traffic-control-helper.h>
 
+#include <algorithm>
+#include <ios>
+#include <iostream>
+#include <list>
+#include <map>
+#include <set>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatBeamHelper");
 
 namespace ns3

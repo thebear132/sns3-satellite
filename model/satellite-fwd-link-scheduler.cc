@@ -36,6 +36,10 @@
 #include <ns3/uinteger.h>
 
 #include <algorithm>
+#include <iostream>
+#include <string>
+#include <utility>
+#include <vector>
 
 NS_LOG_COMPONENT_DEFINE("SatFwdLinkScheduler");
 

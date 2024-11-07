@@ -38,6 +38,9 @@
 #include <ns3/traced-callback.h>
 #include <ns3/traced-value.h>
 
+#include <map>
+#include <queue>
+#include <set>
 #include <utility>
 
 namespace ns3

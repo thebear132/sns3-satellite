@@ -28,6 +28,9 @@
 #include "ns3/satellite-topology.h"
 #include "ns3/singleton.h"
 
+#include <string>
+#include <utility>
+
 NS_LOG_COMPONENT_DEFINE("SatelliteCnoHelper");
 
 namespace ns3

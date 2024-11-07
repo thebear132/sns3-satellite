@@ -31,6 +31,8 @@
 #include <ns3/satellite-phy-rx-carrier.h>
 
 #include <map>
+#include <string>
+#include <utility>
 
 namespace ns3
 {

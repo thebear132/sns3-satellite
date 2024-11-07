@@ -24,6 +24,7 @@
 #include <ns3/simulator.h>
 
 #include <cstdlib>
+#include <limits>
 
 namespace ns3
 {

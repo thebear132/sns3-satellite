@@ -24,6 +24,9 @@
 #include <ns3/attribute.h>
 #include <ns3/vector.h>
 
+#include <istream>
+#include <ostream>
+
 namespace ns3
 {
 

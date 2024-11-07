@@ -33,7 +33,9 @@
 #include <ns3/satellite-enums.h>
 #include <ns3/satellite-stats-helper-container.h>
 
+#include <map>
 #include <set>
+#include <string>
 
 namespace ns3
 {

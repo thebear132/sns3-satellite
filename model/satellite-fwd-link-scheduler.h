@@ -43,7 +43,10 @@
 #include <ns3/traced-callback.h>
 
 #include <cstring>
+#include <map>
 #include <math.h>
+#include <utility>
+#include <vector>
 
 namespace ns3
 {

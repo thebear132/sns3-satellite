@@ -31,6 +31,8 @@
 #include <ns3/singleton.h>
 #include <ns3/uinteger.h>
 
+#include <sstream>
+
 NS_LOG_COMPONENT_DEFINE("SatQueue");
 
 namespace ns3

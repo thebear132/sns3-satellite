@@ -30,8 +30,12 @@
 
 #include <algorithm>
 #include <limits>
+#include <list>
+#include <map>
 #include <ostream>
+#include <set>
 #include <utility>
+#include <vector>
 
 NS_LOG_COMPONENT_DEFINE("SatPhyRxCarrierPerFrame");
 

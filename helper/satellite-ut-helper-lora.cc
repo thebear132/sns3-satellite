@@ -43,6 +43,8 @@
 #include <ns3/satellite-ut-phy.h>
 #include <ns3/singleton.h>
 
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatUtHelperLora");
 
 namespace ns3

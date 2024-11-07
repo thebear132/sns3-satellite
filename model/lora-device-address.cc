@@ -25,6 +25,8 @@
 #include <ns3/log.h>
 
 #include <bitset>
+#include <ostream>
+#include <string>
 
 namespace ns3
 {

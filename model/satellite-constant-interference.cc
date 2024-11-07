@@ -26,6 +26,9 @@
 #include <ns3/log.h>
 #include <ns3/simulator.h>
 
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatConstantInterference");
 
 namespace ns3

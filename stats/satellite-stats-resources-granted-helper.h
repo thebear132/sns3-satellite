@@ -28,6 +28,8 @@
 #include <ns3/ptr.h>
 
 #include <list>
+#include <map>
+#include <utility>
 
 namespace ns3
 {

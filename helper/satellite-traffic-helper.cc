@@ -35,6 +35,10 @@
 #include <ns3/three-gpp-http-satellite-helper.h>
 #include <ns3/type-id.h>
 
+#include <string>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatelliteTrafficHelper");
 
 namespace ns3

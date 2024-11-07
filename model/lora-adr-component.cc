@@ -24,6 +24,9 @@
 
 #include <ns3/log.h>
 
+#include <cmath>
+#include <list>
+
 namespace ns3
 {
 

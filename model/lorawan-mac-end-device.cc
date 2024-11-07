@@ -34,6 +34,9 @@
 #include <ns3/simulator.h>
 
 #include <algorithm>
+#include <cmath>
+#include <list>
+#include <vector>
 
 namespace ns3
 {

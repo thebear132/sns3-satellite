@@ -24,6 +24,10 @@
 
 #include <ns3/log.h>
 
+#include <algorithm>
+#include <cmath>
+#include <vector>
+
 namespace ns3
 {
 

@@ -25,6 +25,9 @@
 #include <ns3/fatal-error.h>
 #include <ns3/log.h>
 
+#include <map>
+#include <utility>
+
 NS_LOG_COMPONENT_DEFINE("SatChannelPair");
 
 namespace ns3

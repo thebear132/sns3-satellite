@@ -43,6 +43,10 @@
 #include <ns3/singleton.h>
 #include <ns3/uinteger.h>
 
+#include <sstream>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatGwMac");
 
 namespace ns3

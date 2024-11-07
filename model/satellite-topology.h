@@ -39,6 +39,10 @@
 #include <ns3/node.h>
 #include <ns3/object.h>
 
+#include <map>
+#include <ostream>
+#include <utility>
+
 namespace ns3
 {
 

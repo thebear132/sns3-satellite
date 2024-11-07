@@ -60,6 +60,9 @@
 #include <ns3/singleton.h>
 #include <ns3/string.h>
 
+#include <list>
+#include <string>
+
 NS_LOG_COMPONENT_DEFINE("SatStatsHelperContainer");
 
 namespace ns3

@@ -32,6 +32,8 @@
 #include <algorithm>
 #include <iostream>
 #include <limits>
+#include <sstream>
+#include <string>
 #include <utility>
 #include <vector>
 

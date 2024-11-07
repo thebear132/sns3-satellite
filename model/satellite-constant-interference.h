@@ -25,6 +25,9 @@
 
 #include "satellite-interference.h"
 
+#include <utility>
+#include <vector>
+
 namespace ns3
 {
 

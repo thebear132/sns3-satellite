@@ -30,6 +30,10 @@
 #include <ns3/string.h>
 #include <ns3/trace-helper.h>
 
+#include <iostream>
+#include <sstream>
+#include <string>
+
 NS_LOG_COMPONENT_DEFINE("SatPacketTrace");
 
 namespace ns3

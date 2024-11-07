@@ -52,7 +52,10 @@
 #include <ns3/traffic-time-tag.h>
 #include <ns3/unit-conversion-collector.h>
 
+#include <map>
 #include <sstream>
+#include <string>
+#include <utility>
 
 NS_LOG_COMPONENT_DEFINE("SatStatsJitterHelper");
 

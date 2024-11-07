@@ -27,6 +27,7 @@
 
 #include <sstream>
 #include <string>
+#include <utility>
 
 NS_LOG_COMPONENT_DEFINE("SatFwdLinkChannelEstimationErrorContainer");
 

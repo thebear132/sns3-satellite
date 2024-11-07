@@ -32,6 +32,7 @@
 #include <ns3/packet.h>
 
 #include <array>
+#include <vector>
 
 namespace ns3
 {

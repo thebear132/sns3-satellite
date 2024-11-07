@@ -26,6 +26,11 @@
 
 #include <ns3/singleton.h>
 
+#include <ios>
+#include <sstream>
+#include <string>
+#include <utility>
+
 NS_LOG_COMPONENT_DEFINE("SatRxCnoInputTraceContainer");
 
 namespace ns3

@@ -30,6 +30,8 @@
 
 #include <map>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace ns3
 {

@@ -36,6 +36,9 @@
 #include <ns3/random-variable-stream.h>
 #include <ns3/traced-value.h>
 
+#include <list>
+#include <vector>
+
 namespace ns3
 {
 

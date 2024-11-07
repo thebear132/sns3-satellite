@@ -25,6 +25,10 @@
 
 #include <ns3/pointer.h>
 
+#include <map>
+#include <utility>
+#include <vector>
+
 namespace ns3
 {
 

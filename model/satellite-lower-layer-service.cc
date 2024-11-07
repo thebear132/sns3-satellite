@@ -33,6 +33,9 @@
 #include <ns3/string.h>
 #include <ns3/uinteger.h>
 
+#include <limits>
+#include <string>
+
 NS_LOG_COMPONENT_DEFINE("SatLowerLayerServiceConf");
 
 namespace ns3

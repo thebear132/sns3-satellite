@@ -23,6 +23,8 @@
 #include <ns3/satellite-output-fstream-string-container.h>
 
 #include <map>
+#include <string>
+#include <utility>
 
 namespace ns3
 {

@@ -28,6 +28,9 @@
 
 #include <cmath>
 #include <limits>
+#include <sstream>
+#include <string>
+#include <utility>
 #include <vector>
 
 namespace ns3

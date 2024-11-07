@@ -22,6 +22,9 @@
 
 #include <ns3/log.h>
 
+#include <ostream>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatCrdsaReplicaTag");
 
 namespace ns3

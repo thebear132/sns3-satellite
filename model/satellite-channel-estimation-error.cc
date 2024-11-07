@@ -26,6 +26,7 @@
 
 #include <cmath>
 #include <fstream>
+#include <string>
 
 NS_LOG_COMPONENT_DEFINE("SatChannelEstimationError");
 

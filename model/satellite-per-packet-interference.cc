@@ -27,6 +27,13 @@
 #include <ns3/singleton.h>
 
 #include <algorithm>
+#include <cmath>
+#include <istream>
+#include <limits>
+#include <set>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 NS_LOG_COMPONENT_DEFINE("SatPerPacketInterference");
 

@@ -22,6 +22,13 @@
 
 #include <ns3/log.h>
 
+#include <iostream>
+#include <limits>
+#include <map>
+#include <ostream>
+#include <set>
+#include <utility>
+
 NS_LOG_COMPONENT_DEFINE("SatTopology");
 
 namespace ns3

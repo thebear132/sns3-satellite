@@ -35,6 +35,10 @@
 #include <ns3/simulator.h>
 
 #include <algorithm>
+#include <iostream>
+#include <map>
+#include <ostream>
+#include <utility>
 
 namespace ns3
 {

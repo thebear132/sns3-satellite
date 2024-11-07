@@ -35,6 +35,8 @@
 #include <ns3/traced-callback.h>
 
 #include <cstring>
+#include <queue>
+#include <string>
 
 namespace ns3
 {

@@ -47,6 +47,13 @@
 #include <ns3/simulator.h>
 #include <ns3/singleton.h>
 
+#include <iostream>
+#include <map>
+#include <set>
+#include <sstream>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatUtMac");
 
 namespace ns3

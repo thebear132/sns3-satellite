@@ -23,6 +23,7 @@
 
 #include <ns3/tag.h>
 
+#include <ostream>
 #include <vector>
 
 namespace ns3

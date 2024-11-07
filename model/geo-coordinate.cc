@@ -26,6 +26,9 @@
 #include <ns3/log.h>
 
 #include <cmath>
+#include <ios>
+#include <istream>
+#include <ostream>
 #include <sstream>
 
 NS_LOG_COMPONENT_DEFINE("geo-coordinate");

@@ -30,7 +30,12 @@
 #include <ns3/uinteger.h>
 
 #include <algorithm>
+#include <cmath>
+#include <istream>
+#include <limits>
 #include <string>
+#include <tuple>
+#include <utility>
 
 NS_LOG_COMPONENT_DEFINE("SatFrameConf");
 

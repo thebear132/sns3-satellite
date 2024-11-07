@@ -29,6 +29,8 @@
 #include <ns3/traced-callback.h>
 
 #include <fstream>
+#include <string>
+#include <utility>
 #include <vector>
 
 namespace ns3

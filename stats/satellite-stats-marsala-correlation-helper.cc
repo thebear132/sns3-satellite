@@ -43,7 +43,9 @@
 #include <ns3/singleton.h>
 #include <ns3/string.h>
 
+#include <map>
 #include <sstream>
+#include <string>
 
 NS_LOG_COMPONENT_DEFINE("SatStatsMarsalaCorrelationHelper");
 

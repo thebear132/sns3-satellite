@@ -26,7 +26,9 @@
 #include <ns3/nstime.h>
 #include <ns3/simple-ref-count.h>
 
+#include <cmath>
 #include <map>
+#include <utility>
 
 namespace ns3
 {

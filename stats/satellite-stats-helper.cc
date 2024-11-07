@@ -41,7 +41,11 @@
 #include <ns3/string.h>
 #include <ns3/type-id.h>
 
+#include <list>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 NS_LOG_COMPONENT_DEFINE("SatStatsHelper");
 

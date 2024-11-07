@@ -33,6 +33,9 @@
 #include <ns3/simulator.h>
 
 #include <algorithm>
+#include <limits>
+#include <map>
+#include <utility>
 
 NS_LOG_COMPONENT_DEFINE("SatReturnLinkEncapsulatorArq");
 

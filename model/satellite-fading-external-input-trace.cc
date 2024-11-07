@@ -26,7 +26,12 @@
 #include <ns3/simulator.h>
 
 #include <algorithm>
+#include <cmath>
 #include <fstream>
+#include <ios>
+#include <iostream>
+#include <string>
+#include <vector>
 
 NS_LOG_COMPONENT_DEFINE("SatFadingExternalInputTrace");
 

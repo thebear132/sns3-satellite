@@ -29,6 +29,7 @@
 #include <ns3/satellite-enums.h>
 
 #include <map>
+#include <string>
 
 namespace ns3
 {

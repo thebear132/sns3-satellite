@@ -45,6 +45,7 @@
 #include <ns3/unit-conversion-collector.h>
 
 #include <sstream>
+#include <string>
 
 NS_LOG_COMPONENT_DEFINE("SatStatsFwdLinkSchedulerSymbolRateHelper");
 

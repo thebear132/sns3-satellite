@@ -26,8 +26,13 @@
 #include <ns3/singleton.h>
 
 #include <algorithm>
+#include <fstream>
 #include <istream>
+#include <map>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 NS_LOG_COMPONENT_DEFINE("SatStaticBstp");
 

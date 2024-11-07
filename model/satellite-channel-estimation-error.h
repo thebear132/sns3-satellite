@@ -24,6 +24,9 @@
 #include <ns3/object.h>
 #include <ns3/random-variable-stream.h>
 
+#include <string>
+#include <vector>
+
 namespace ns3
 {
 

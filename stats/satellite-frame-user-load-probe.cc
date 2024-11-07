@@ -34,6 +34,8 @@
 #include "ns3/names.h"
 #include "ns3/simulator.h"
 
+#include <string>
+
 NS_LOG_COMPONENT_DEFINE("SatFrameUserLoadProbe");
 
 namespace ns3

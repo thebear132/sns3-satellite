@@ -27,6 +27,9 @@
 
 #include <ns3/satellite-input-fstream-time-double-container.h>
 
+#include <map>
+#include <string>
+
 namespace ns3
 {
 

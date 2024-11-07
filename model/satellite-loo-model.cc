@@ -24,6 +24,10 @@
 
 #include <ns3/log.h>
 
+#include <cmath>
+#include <complex>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatLooModel");
 
 namespace ns3

@@ -32,6 +32,9 @@
 #include <ns3/string.h>
 
 #include <list>
+#include <sstream>
+#include <string>
+#include <utility>
 
 NS_LOG_COMPONENT_DEFINE("SatStatsBackloggedRequestHelper");
 

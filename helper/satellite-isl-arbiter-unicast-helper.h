@@ -27,6 +27,10 @@
 #include <ns3/node-container.h>
 #include <ns3/satellite-isl-arbiter-unicast.h>
 
+#include <map>
+#include <utility>
+#include <vector>
+
 namespace ns3
 {
 

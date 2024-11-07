@@ -27,6 +27,8 @@
 
 #include <ns3/object.h>
 
+#include <string>
+
 namespace ns3
 {
 

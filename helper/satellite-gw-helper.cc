@@ -37,6 +37,8 @@
 #include <ns3/satellite-orbiter-net-device.h>
 #include <ns3/satellite-typedefs.h>
 
+#include <string>
+
 NS_LOG_COMPONENT_DEFINE("SatGwHelper");
 
 namespace ns3

@@ -31,6 +31,8 @@
 #include "ns3/mobility-model.h"
 #include "ns3/node.h"
 
+#include <cstddef>
+
 namespace ns3
 {
 

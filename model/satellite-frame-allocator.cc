@@ -28,6 +28,8 @@
 
 #include <algorithm>
 #include <limits>
+#include <utility>
+#include <vector>
 
 NS_LOG_COMPONENT_DEFINE("SatFrameAllocator");
 

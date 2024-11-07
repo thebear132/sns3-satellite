@@ -29,6 +29,8 @@
 #include "ns3/singleton.h"
 #include "ns3/string.h"
 
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatLoraConf");
 
 namespace ns3

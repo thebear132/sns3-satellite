@@ -34,6 +34,8 @@
 #include <ns3/packet.h>
 #include <ns3/ptr.h>
 
+#include <set>
+
 namespace ns3
 {
 

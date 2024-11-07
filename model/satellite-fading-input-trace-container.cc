@@ -26,6 +26,11 @@
 #include <ns3/log.h>
 #include <ns3/singleton.h>
 
+#include <ios>
+#include <sstream>
+#include <string>
+#include <utility>
+
 NS_LOG_COMPONENT_DEFINE("SatFadingInputTraceContainer");
 
 namespace ns3

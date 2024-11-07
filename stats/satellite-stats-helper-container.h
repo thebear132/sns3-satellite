@@ -30,6 +30,7 @@
 
 #include <list>
 #include <set>
+#include <string>
 
 namespace ns3
 {

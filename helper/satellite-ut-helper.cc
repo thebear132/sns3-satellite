@@ -36,6 +36,8 @@
 #include <ns3/satellite-phy-rx-carrier-conf.h>
 #include <ns3/satellite-typedefs.h>
 
+#include <string>
+
 NS_LOG_COMPONENT_DEFINE("SatUtHelper");
 
 namespace ns3

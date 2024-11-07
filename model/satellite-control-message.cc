@@ -29,7 +29,10 @@
 #include <ns3/log.h>
 #include <ns3/uinteger.h>
 
+#include <iostream>
 #include <map>
+#include <ostream>
+#include <utility>
 
 NS_LOG_COMPONENT_DEFINE("SatCtrlMessage");
 

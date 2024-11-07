@@ -34,6 +34,9 @@
 #include <ns3/packet.h>
 #include <ns3/pointer.h>
 
+#include <map>
+#include <utility>
+
 namespace ns3
 {
 

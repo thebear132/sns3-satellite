@@ -25,6 +25,10 @@
 #include <ns3/log.h>
 #include <ns3/uinteger.h>
 
+#include <algorithm>
+#include <iostream>
+#include <ostream>
+
 NS_LOG_COMPONENT_DEFINE("SatGseHeader");
 
 namespace ns3

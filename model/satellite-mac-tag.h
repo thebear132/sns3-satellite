@@ -25,6 +25,8 @@
 #include <ns3/mac48-address.h>
 #include <ns3/tag.h>
 
+#include <ostream>
+
 namespace ns3
 {
 

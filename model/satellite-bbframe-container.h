@@ -27,6 +27,7 @@
 #include <ns3/simple-ref-count.h>
 
 #include <deque>
+#include <map>
 #include <vector>
 
 namespace ns3

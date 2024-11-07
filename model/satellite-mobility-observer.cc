@@ -28,6 +28,9 @@
 #include <ns3/pointer.h>
 #include <ns3/trace-source-accessor.h>
 
+#include <cmath>
+#include <string>
+
 NS_LOG_COMPONENT_DEFINE("SatMobilityObserver");
 
 namespace ns3

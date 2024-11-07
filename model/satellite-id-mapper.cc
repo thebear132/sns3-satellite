@@ -27,7 +27,11 @@
 #include <ns3/log.h>
 #include <ns3/node.h>
 
+#include <iostream>
+#include <map>
 #include <sstream>
+#include <string>
+#include <utility>
 
 NS_LOG_COMPONENT_DEFINE("SatIdMapper");
 

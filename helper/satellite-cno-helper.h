@@ -28,6 +28,9 @@
 #include <ns3/object.h>
 #include <ns3/type-id.h>
 
+#include <string>
+#include <vector>
+
 namespace ns3
 {
 

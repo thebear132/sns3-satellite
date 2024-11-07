@@ -30,6 +30,10 @@
 #include <ns3/log.h>
 #include <ns3/packet.h>
 
+#include <map>
+#include <tuple>
+#include <utility>
+
 NS_LOG_COMPONENT_DEFINE("SatNcc");
 
 namespace ns3

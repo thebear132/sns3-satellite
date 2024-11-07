@@ -31,7 +31,9 @@
 #include <ns3/simulator.h>
 #include <ns3/uinteger.h>
 
+#include <map>
 #include <set>
+#include <utility>
 
 namespace ns3
 {

@@ -30,6 +30,12 @@
 #include "ns3/singleton.h"
 #include "ns3/string.h"
 
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatConf");
 
 namespace ns3

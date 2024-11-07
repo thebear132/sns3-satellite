@@ -34,6 +34,8 @@
 #include <ns3/simulator.h>
 #include <ns3/uinteger.h>
 
+#include <utility>
+
 NS_LOG_COMPONENT_DEFINE("SatOrbiterMac");
 
 namespace ns3

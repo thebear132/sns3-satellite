@@ -27,6 +27,8 @@
 
 #include "ns3/core-module.h"
 
+#include <cstddef>
+
 NS_LOG_COMPONENT_DEFINE("PointToPointIslChannel");
 
 namespace ns3

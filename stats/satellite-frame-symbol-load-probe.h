@@ -33,6 +33,8 @@
 #include "ns3/probe.h"
 #include "ns3/traced-callback.h"
 
+#include <string>
+
 namespace ns3
 {
 

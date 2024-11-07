@@ -34,6 +34,10 @@
 #include <ns3/pointer.h>
 
 #include <iostream>
+#include <list>
+#include <map>
+#include <ostream>
+#include <utility>
 
 namespace ns3
 {

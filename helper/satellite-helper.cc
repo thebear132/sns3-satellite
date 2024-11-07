@@ -53,7 +53,16 @@
 #include <ns3/system-path.h>
 #include <ns3/type-id.h>
 
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <set>
+#include <sstream>
+#include <string>
 #include <sys/stat.h>
+#include <utility>
+#include <vector>
 
 NS_LOG_COMPONENT_DEFINE("SatHelper");
 

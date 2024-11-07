@@ -34,6 +34,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <utility>
 #include <vector>
 
 namespace ns3

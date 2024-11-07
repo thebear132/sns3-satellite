@@ -20,6 +20,8 @@
 
 #include "satellite-uplink-info-tag.h"
 
+#include <ostream>
+
 namespace ns3
 {
 

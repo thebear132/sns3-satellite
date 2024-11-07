@@ -26,6 +26,9 @@
 
 #include <ns3/header.h>
 
+#include <list>
+#include <ostream>
+
 namespace ns3
 {
 

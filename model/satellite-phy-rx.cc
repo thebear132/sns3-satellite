@@ -40,6 +40,8 @@
 #include <ns3/object-factory.h>
 #include <ns3/object-vector.h>
 
+#include <vector>
+
 NS_LOG_COMPONENT_DEFINE("SatPhyRx");
 
 namespace ns3

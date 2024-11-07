@@ -40,7 +40,10 @@
 #include "ns3/satellite-typedefs.h"
 #include "ns3/traced-callback.h"
 
+#include <map>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace ns3
 {

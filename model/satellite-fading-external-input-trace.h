@@ -23,6 +23,7 @@
 
 #include <ns3/simple-ref-count.h>
 
+#include <string>
 #include <vector>
 
 namespace ns3
